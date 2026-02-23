@@ -1,0 +1,55 @@
+# Pycache
+__pycache__/
+thirdparty/mdn/mdn/__pycache__/
+thirdparty/mdn/mdn/__pycache__/__init__.cpython-38.pyc
+thirdparty/mdn/mdn/__pycache__/models.cpython-38.pyc
+
+# Virtual Environments
+venv/
+venvTemp/
+venv-test/
+
+# IDE Config
+.vscode/
+
+# Third party folders
+wandb/
+artifacts/
+
+# Unit testing generated files
+_tests/models/
+
+# Pytl training data
+checkpoints/
+training_logs/
+old/
+notes_to_self
+notes
+
+# Datasets
+datasets/*/
+
+# Slurm log files
+*.out
+SBATCH_train.sh
+SBATCH_resume_train.sh
+SBATCH_script.sh
+SBATCH_wandb_sweep.sh
+
+sourcewandbenvvars
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+lr_scheduler_scrathpad.py
+
+*.pkl
+
+dist/
+ikflow.egg-info
+build/
+*.pdf
+*.png
+
+.pytest_cache/
+.ruff_cache/
+.venv/
