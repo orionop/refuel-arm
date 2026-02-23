@@ -168,7 +168,7 @@ BATCH_SIZE = 512
 N_EPOCHS = 50
 
 # Shuffle
-perm = torch.randperm(configs.shape[0])
+perm = torch.randperm(configs.shape[0], device="cpu")
 configs_shuffled = configs[perm]
 poses_shuffled = poses[perm]
 
