@@ -144,5 +144,5 @@ for i, (lo, hi) in enumerate(robot.actuated_joints_limits):
 import torch
 q_zero = torch.zeros(1, 6)
 pose_home = robot.forward_kinematics(q_zero)
-print(f"\n   FK at HOME (all zeros): {pose_home[0,:3].numpy().round(4)}")
+print(f"\n   FK at HOME (all zeros): {pose_home[0,:3].cpu().numpy().round(4)}")
 print(f"   ✅ Robot is ready for dataset generation!")
