@@ -16,19 +16,28 @@ Steps:
 
 # ╔════════════════════════════════════════════════════════════════╗
 # ║  CELL 1: Install Dependencies                                 ║
+# ║  Run this cell FIRST, then restart the kernel if prompted.     ║
 # ╚════════════════════════════════════════════════════════════════╝
 
-# !pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-# !pip install pytorch-lightning freia wandb tqdm tabulate pandas matplotlib numpy==1.24.4
-# !git clone https://github.com/orionop/refuel-arm.git
-# !cd refuel-arm && git submodule update --init --recursive
+import subprocess
+import sys
 
-# Install jrl (Jeremy's Robotics Library) - editable so we can patch it
-# !pip install -e refuel-arm/ikflow/  # This also installs jrl as a dependency
+def run(cmd):
+    print(f"➤ {cmd}")
+    subprocess.check_call(cmd, shell=True)
 
-# --- OR install jrl separately for patching ---
-# !pip install git+https://github.com/jstmn/Jrl.git@2ba7c3995b36b32886a8aa021a00c73b2cd55b2c
-# !pip install -e refuel-arm/ikflow/
+# Install core deps
+run(f"{sys.executable} -m pip install -q numpy==1.24.4")
+run(f"{sys.executable} -m pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cu118")
+run(f"{sys.executable} -m pip install -q pytorch-lightning freia wandb tqdm tabulate pandas matplotlib")
+
+# Clone the repo
+run("git clone https://github.com/orionop/refuel-arm.git || true")
+
+# Install jrl + ikflow (editable, so we can patch jrl at runtime)
+run(f"{sys.executable} -m pip install -q -e refuel-arm/ikflow/")
+
+print("\n✅ All dependencies installed!")
 
 
 # ╔════════════════════════════════════════════════════════════════╗
