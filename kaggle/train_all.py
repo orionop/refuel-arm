@@ -135,124 +135,89 @@ print(f"   Workspace Z: [{pos[:,2].min():.3f}, {pos[:,2].max():.3f}]")
 
 
 # ═══════════════════════════════════════════════════════════════════
-# PART 3: Train IKFlow
+# PART 3: Train IKFlow (using official IkfLitModel + PyTorch Lightning)
 # ═══════════════════════════════════════════════════════════════════
 
 from ikflow.model import IkflowModelParameters
 from ikflow.ikflow_solver import IKFlowSolver
+from ikflow.training.lt_model import IkfLitModel
+from torch.utils.data import DataLoader, TensorDataset
+import pytorch_lightning as pl
 
+# Use default model params (same as official IKFlow)
 model_params = IkflowModelParameters()
 model_params.nb_nodes = 12
-model_params.dim_latent_space = 6
+model_params.dim_latent_space = 6   # 6 DOF robot
 model_params.coeff_fn_config = 3
 model_params.coeff_fn_internal_size = 1024
 model_params.rnvp_clamp = 2.5
 
+# Create solver + model
 solver = IKFlowSolver(model_params, robot)
-nn_model = solver.nn_model
+n_params = sum(p.numel() for p in solver.nn_model.parameters())
 
-n_params = sum(p.numel() for p in nn_model.parameters())
 print(f"\n{'='*60}")
 print(f"🧠 IKFlow: {n_params:,} params, {model_params.nb_nodes} layers")
+print(f"   dim_latent_space: {model_params.dim_latent_space}")
+print(f"   softflow_enabled: {model_params.softflow_enabled}")
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"🚀 Training on: {device}")
-
-nn_model = nn_model.to(device)
-nn_model.train()
-
-optimizer = torch.optim.Adam(nn_model.parameters(), lr=5e-4)
-scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.975)
-
-BATCH_SIZE = 512
+# Create the Lightning training module (handles loss, optimizer, scheduler internally)
+BATCH_SIZE_TRAIN = 512
 N_EPOCHS = 20
 
-# Shuffle
-perm = torch.randperm(configs.shape[0], device="cpu")
-configs_shuffled = configs[perm]
-poses_shuffled = poses[perm]
+lit_model = IkfLitModel(
+    ik_solver=solver,
+    base_hparams=model_params,
+    learning_rate=1e-4,
+    checkpoint_every=100000,
+    gamma=0.9794578299341784,
+    log_every=int(1e10),  # disable wandb logging
+    gradient_clip=1.0,
+    optimizer_name="adamw",
+    weight_decay=1.8e-05,
+)
 
-best_loss = float("inf")
-import time as _time
-t_start = _time.time()
+# Create DataLoader from our generated dataset
+# IkfLitModel expects batch = (joint_configs, ee_poses)
+from jrl.config import DEVICE as JRL_DEVICE
+train_dataset = TensorDataset(configs.to(JRL_DEVICE), poses.to(JRL_DEVICE))
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=BATCH_SIZE_TRAIN,
+    shuffle=True,
+    drop_last=True,
+    generator=torch.Generator(device=JRL_DEVICE),
+)
 
-# IKFlow-specific parameters
-dim_tot = model_params.dim_latent_space  # network width (may be > ndof for padding)
-ndof = robot.ndof  # actual degrees of freedom
-softflow_noise_scale = model_params.softflow_noise_scale
-softflow_enabled = model_params.softflow_enabled
+# Validation set (small subset)
+val_configs = configs[:500].to(JRL_DEVICE)
+val_poses = poses[:500].to(JRL_DEVICE)
+val_dataset = TensorDataset(val_configs, val_poses)
+val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, drop_last=True)
 
-print(f"   dim_latent_space: {dim_tot}, ndof: {ndof}, softflow: {softflow_enabled}")
-print(f"   softflow_noise_scale: {softflow_noise_scale}")
+print(f"   Training batches/epoch: {len(train_loader):,}")
+print(f"   Estimated time: {len(train_loader) * N_EPOCHS * 0.007 / 60:.0f}-{len(train_loader) * N_EPOCHS * 0.015 / 60:.0f} minutes")
+print(f"\n🚀 Training on: {JRL_DEVICE}")
 
-for epoch in range(N_EPOCHS):
-    epoch_loss = 0.0
-    n_batches = 0
+# Train using PyTorch Lightning (same as official IKFlow train.py)
+SAVE_DIR = "/kaggle/working/ikflow_dataset"
+trainer = pl.Trainer(
+    max_epochs=N_EPOCHS,
+    devices=[0],
+    accelerator="gpu",
+    log_every_n_steps=5000,
+    val_check_interval=min(20000, len(train_loader)),
+    enable_progress_bar=True,
+)
 
-    pbar = tqdm(range(0, configs_shuffled.shape[0] - BATCH_SIZE, BATCH_SIZE),
-                desc=f"Epoch {epoch+1:2d}/{N_EPOCHS}", leave=True)
+trainer.fit(lit_model, train_loader, val_loader)
 
-    for i in pbar:
-        x = configs_shuffled[i:i+BATCH_SIZE].to(device)   # (B, ndof) joint configs
-        y = poses_shuffled[i:i+BATCH_SIZE].to(device)      # (B, 7) poses
-
-        # Pad x if dim_latent_space > ndof (matching IKFlow's ml_loss_fn)
-        if dim_tot > ndof:
-            pad_x = 0.001 * torch.randn(BATCH_SIZE, dim_tot - ndof, device=device)
-            x = torch.cat([x, pad_x], dim=1)
-
-        # Add softflow noise (from IKFlow's get_softflow_noise)
-        if softflow_enabled:
-            dim_x = x.shape[1]
-            c = torch.rand(BATCH_SIZE, 1, device=device)  # noise magnitude
-            eps = torch.randn_like(x) * c.expand(-1, dim_x) * softflow_noise_scale
-            x = x + eps
-            conditional = torch.cat([y, c], dim=1)  # (B, 8)
-        else:
-            conditional = y  # (B, 7)
-
-        # Forward pass (must use jac=True, NOT the rev=True / log_det_J API)
-        output, jac = nn_model.forward(x, c=conditional, jac=True)
-
-        # Maximum likelihood loss (matching IKFlow exactly)
-        zz = torch.sum(output**2, dim=1)
-        neg_log_likeli = 0.5 * zz - jac
-        loss = torch.mean(neg_log_likeli)
-
-        if torch.isnan(loss):
-            print(f"  ⚠️ NaN loss at batch {n_batches}, skipping")
-            continue
-
-        optimizer.zero_grad()
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(nn_model.parameters(), 1.0)
-        optimizer.step()
-
-        epoch_loss += loss.item()
-        n_batches += 1
-
-        if n_batches % 500 == 0:
-            elapsed = _time.time() - t_start
-            pbar.set_postfix(loss=f"{epoch_loss/n_batches:.4f}", elapsed=f"{elapsed/60:.1f}m")
-
-    scheduler.step()
-    avg_loss = epoch_loss / max(n_batches, 1)
-    lr = scheduler.get_last_lr()[0]
-    elapsed = _time.time() - t_start
-    eta = elapsed / (epoch + 1) * (N_EPOCHS - epoch - 1)
-
-    if avg_loss < best_loss:
-        best_loss = avg_loss
-        torch.save(nn_model.state_dict(), os.path.join(SAVE_DIR, "kuka_kr6_ikflow_best.pt"))
-        saved = " ★ saved"
-    else:
-        saved = ""
-
-    print(f"  Epoch {epoch+1:3d}/{N_EPOCHS} | Loss: {avg_loss:.4f} | Best: {best_loss:.4f} | "
-          f"LR: {lr:.6f} | Elapsed: {elapsed/60:.1f}m | ETA: {eta/60:.1f}m{saved}")
-
-final_path = os.path.join(SAVE_DIR, "kuka_kr6_ikflow_final.pt")
-torch.save(nn_model.state_dict(), final_path)
+# Save the trained model weights
+import pickle
+best_path = os.path.join(SAVE_DIR, "kuka_kr6_ikflow_best.pt")
+with open(best_path, "wb") as f:
+    pickle.dump(solver.nn_model.state_dict(), f)
+print(f"\n✅ Model saved to: {best_path}")
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -261,15 +226,16 @@ torch.save(nn_model.state_dict(), final_path)
 
 print(f"\n{'='*60}")
 print("🔍 Validating trained model...")
-nn_model.eval()
+solver.nn_model.eval()
+solver._model_weights_loaded = True  # We trained it ourselves, not loaded from file
 
-test_q = torch.rand(1000, 6) * (hi - lo) + lo
+test_q = torch.rand(1000, 6, device="cpu") * (hi - lo) + lo
 test_poses = robot.forward_kinematics(test_q)
 
 with torch.no_grad():
     ik_solutions = solver.generate_ik_solutions(
-        test_poses.to(device),
-        latent=torch.randn(1000, 6, device=device) * 0.5,
+        test_poses,
+        latent=torch.randn(1000, model_params.dim_latent_space, device=JRL_DEVICE) * 0.5,
         clamp_to_joint_limits=True,
     )
 
