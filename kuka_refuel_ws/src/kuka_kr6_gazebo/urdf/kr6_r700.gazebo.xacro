@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kr6_r700_gazebo">
+
+  <!-- Include the raw clean URDF (primitive cylinders/boxes) -->
+  <xacro:include filename="$(find kuka_kr6_gazebo)/urdf/kr6_r700_clean.urdf" />
+
+  <!-- ROS 2 Control tag for Gazebo -->
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+
+    <xacro:macro name="kuka_joint_control" params="joint_name">
+      <joint name="${joint_name}">
+        <command_interface name="position">
+          <param name="min">-3.14</param>
+          <param name="max">3.14</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+    </xacro:macro>
+
+    <xacro:kuka_joint_control joint_name="joint_1"/>
+    <xacro:kuka_joint_control joint_name="joint_2"/>
+    <xacro:kuka_joint_control joint_name="joint_3"/>
+    <xacro:kuka_joint_control joint_name="joint_4"/>
+    <xacro:kuka_joint_control joint_name="joint_5"/>
+    <xacro:kuka_joint_control joint_name="joint_6"/>
+
+  </ros2_control>
+
+  <!-- Gazebo ROS 2 Control Plugin -->
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find kuka_kr6_gazebo)/config/ros2_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+  <!-- Physics materials -->
+  <gazebo reference="base_link">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  <gazebo reference="link_1">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_2">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_3">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_4">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_5">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_6">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+</robot>
