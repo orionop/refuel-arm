@@ -96,7 +96,7 @@ print(f"\n  FK at HOME: {pose_home[0,:3].cpu().numpy().round(4)}")
 # PART 2: Generate FK Dataset
 # ═══════════════════════════════════════════════════════════════════
 
-DATASET_SIZE = 10_000_000
+DATASET_SIZE = 5_000_000
 BATCH_SIZE = 50_000
 SAVE_DIR = "/kaggle/working/ikflow_dataset"
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -165,7 +165,7 @@ optimizer = torch.optim.Adam(nn_model.parameters(), lr=5e-4)
 scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.975)
 
 BATCH_SIZE = 512
-N_EPOCHS = 50
+N_EPOCHS = 20
 
 # Shuffle
 perm = torch.randperm(configs.shape[0], device="cpu")
