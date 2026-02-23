@@ -176,24 +176,52 @@ best_loss = float("inf")
 import time as _time
 t_start = _time.time()
 
+# IKFlow-specific parameters
+dim_tot = model_params.dim_latent_space  # network width (may be > ndof for padding)
+ndof = robot.ndof  # actual degrees of freedom
+softflow_noise_scale = model_params.softflow_noise_scale
+softflow_enabled = model_params.softflow_enabled
+
+print(f"   dim_latent_space: {dim_tot}, ndof: {ndof}, softflow: {softflow_enabled}")
+print(f"   softflow_noise_scale: {softflow_noise_scale}")
+
 for epoch in range(N_EPOCHS):
     epoch_loss = 0.0
     n_batches = 0
-    n_total_batches = (configs_shuffled.shape[0] - BATCH_SIZE) // BATCH_SIZE
 
     pbar = tqdm(range(0, configs_shuffled.shape[0] - BATCH_SIZE, BATCH_SIZE),
                 desc=f"Epoch {epoch+1:2d}/{N_EPOCHS}", leave=True)
 
     for i in pbar:
-        q_batch = configs_shuffled[i:i+BATCH_SIZE].to(device)
-        pose_batch = poses_shuffled[i:i+BATCH_SIZE].to(device)
+        x = configs_shuffled[i:i+BATCH_SIZE].to(device)   # (B, ndof) joint configs
+        y = poses_shuffled[i:i+BATCH_SIZE].to(device)      # (B, 7) poses
 
-        softflow_noise = torch.zeros(BATCH_SIZE, 1, device=device)
-        conditional = torch.cat([pose_batch, softflow_noise], dim=1)
+        # Pad x if dim_latent_space > ndof (matching IKFlow's ml_loss_fn)
+        if dim_tot > ndof:
+            pad_x = 0.001 * torch.randn(BATCH_SIZE, dim_tot - ndof, device=device)
+            x = torch.cat([x, pad_x], dim=1)
 
-        z, log_det_J = nn_model(q_batch, c=conditional)
-        nll = 0.5 * torch.sum(z**2, dim=1) - log_det_J
-        loss = torch.mean(nll)
+        # Add softflow noise (from IKFlow's get_softflow_noise)
+        if softflow_enabled:
+            dim_x = x.shape[1]
+            c = torch.rand(BATCH_SIZE, 1, device=device)  # noise magnitude
+            eps = torch.randn_like(x) * c.expand(-1, dim_x) * softflow_noise_scale
+            x = x + eps
+            conditional = torch.cat([y, c], dim=1)  # (B, 8)
+        else:
+            conditional = y  # (B, 7)
+
+        # Forward pass (must use jac=True, NOT the rev=True / log_det_J API)
+        output, jac = nn_model.forward(x, c=conditional, jac=True)
+
+        # Maximum likelihood loss (matching IKFlow exactly)
+        zz = torch.sum(output**2, dim=1)
+        neg_log_likeli = 0.5 * zz - jac
+        loss = torch.mean(neg_log_likeli)
+
+        if torch.isnan(loss):
+            print(f"  ⚠️ NaN loss at batch {n_batches}, skipping")
+            continue
 
         optimizer.zero_grad()
         loss.backward()
