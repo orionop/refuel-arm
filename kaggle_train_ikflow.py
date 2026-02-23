@@ -26,16 +26,18 @@ def run(cmd):
     print(f"➤ {cmd}")
     subprocess.check_call(cmd, shell=True)
 
-# Install core deps
-run(f"{sys.executable} -m pip install -q numpy==1.24.4")
-run(f"{sys.executable} -m pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cu118")
-run(f"{sys.executable} -m pip install -q pytorch-lightning freia wandb tqdm tabulate pandas matplotlib")
+# Kaggle already has torch, numpy, pandas, matplotlib pre-installed.
+# Only install the missing deps that ikflow/jrl need.
+run(f"{sys.executable} -m pip install -q pytorch-lightning freia wandb tqdm tabulate")
 
 # Clone the repo
 run("git clone https://github.com/orionop/refuel-arm.git || true")
 
-# Install jrl + ikflow (editable, so we can patch jrl at runtime)
-run(f"{sys.executable} -m pip install -q -e refuel-arm/ikflow/")
+# Install jrl first (ikflow's pyproject.toml pins Python <3.12, so we install jrl directly)
+run(f"{sys.executable} -m pip install -q git+https://github.com/jstmn/Jrl.git@2ba7c3995b36b32886a8aa021a00c73b2cd55b2c")
+
+# Install ikflow without deps (to avoid the python version conflict), then patch manually
+run(f"{sys.executable} -m pip install -q --no-deps -e refuel-arm/ikflow/")
 
 print("\n✅ All dependencies installed!")
 
