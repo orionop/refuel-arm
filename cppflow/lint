@@ -1,0 +1,15 @@
+# Follow these two webpages to setup black to automatically run on saving
+# https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00#
+# https://dev.to/adamlombard/vscode-setting-line-lengths-in-the-black-python-code-formatter-1g62
+
+echo "_____________"
+echo "Running ruff"
+echo ""
+uv run ruff check *.py --fix
+uv run ruff check **/*.py --fix
+uv run ruff check cppflow/ros2/*.py --fix
+
+echo "______________"
+echo "Running pylint"
+echo ""
+uv run python -m pylint --ignore cppflow/latent_optimization.py cppflow/*.py

@@ -1,0 +1,12 @@
+robot:     "kuka_kr6_r700"
+path_name: "refuel_line"
+
+# Straight-line path from HOME to the refueling inlet
+# CppFlow will interpolate waypoints along this Cartesian path
+path_offset_frame: "base_link"
+path_xyz_offset: [0.3, 0.4, 0.25]
+path_R_offset: [
+  [1,  0, 0],
+  [0,  1, 0],
+  [0,  0, 1]
+]
