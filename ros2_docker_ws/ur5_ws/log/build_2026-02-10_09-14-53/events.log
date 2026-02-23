@@ -1,0 +1,767 @@
+[0.000000] (-) TimerEvent: {}
+[0.001834] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.001936] (ur_dashboard_msgs) JobQueued: {'identifier': 'ur_dashboard_msgs', 'dependencies': OrderedDict()}
+[0.002057] (ur_description) JobQueued: {'identifier': 'ur_description', 'dependencies': OrderedDict()}
+[0.002139] (ur_controllers) JobQueued: {'identifier': 'ur_controllers', 'dependencies': OrderedDict([('ur_dashboard_msgs', '/workspace/ur5_ws/install/ur_dashboard_msgs')])}
+[0.002285] (ur_moveit_config) JobQueued: {'identifier': 'ur_moveit_config', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description')])}
+[0.002349] (ur5_minimal_moveit) JobQueued: {'identifier': 'ur5_minimal_moveit', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.002404] (ur_robot_driver) JobQueued: {'identifier': 'ur_robot_driver', 'dependencies': OrderedDict([('ur_dashboard_msgs', '/workspace/ur5_ws/install/ur_dashboard_msgs'), ('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_controllers', '/workspace/ur5_ws/install/ur_controllers')])}
+[0.003067] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_dashboard_msgs', '/workspace/ur5_ws/install/ur_dashboard_msgs'), ('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_controllers', '/workspace/ur5_ws/install/ur_controllers'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config'), ('ur5_minimal_moveit', '/workspace/ur5_ws/install/ur5_minimal_moveit'), ('ur_robot_driver', '/workspace/ur5_ws/install/ur_robot_driver')])}
+[0.003298] (ur_calibration) JobQueued: {'identifier': 'ur_calibration', 'dependencies': OrderedDict([('ur_dashboard_msgs', '/workspace/ur5_ws/install/ur_dashboard_msgs'), ('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_controllers', '/workspace/ur5_ws/install/ur_controllers'), ('ur_robot_driver', '/workspace/ur5_ws/install/ur_robot_driver')])}
+[0.003348] (ur) JobQueued: {'identifier': 'ur', 'dependencies': OrderedDict([('ur_dashboard_msgs', '/workspace/ur5_ws/install/ur_dashboard_msgs'), ('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_controllers', '/workspace/ur5_ws/install/ur_controllers'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config'), ('ur_robot_driver', '/workspace/ur5_ws/install/ur_robot_driver'), ('ur_calibration', '/workspace/ur5_ws/install/ur_calibration')])}
+[0.003597] (ur_description) JobStarted: {'identifier': 'ur_description'}
+[0.003810] (ur_dashboard_msgs) JobStarted: {'identifier': 'ur_dashboard_msgs'}
+[0.006999] (ur_description) JobProgress: {'identifier': 'ur_description', 'progress': 'cmake'}
+[0.008358] (ur_description) JobProgress: {'identifier': 'ur_description', 'progress': 'build'}
+[0.009297] (ur_description) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur_description', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur_description', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_description'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.012572] (ur_dashboard_msgs) JobProgress: {'identifier': 'ur_dashboard_msgs', 'progress': 'cmake'}
+[0.012650] (ur_dashboard_msgs) JobProgress: {'identifier': 'ur_dashboard_msgs', 'progress': 'build'}
+[0.013411] (ur_dashboard_msgs) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur_dashboard_msgs', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur_dashboard_msgs', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_dashboard_msgs'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.034190] (ur_description) CommandEnded: {'returncode': 0}
+[0.035462] (ur_description) JobProgress: {'identifier': 'ur_description', 'progress': 'install'}
+[0.043595] (ur_description) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur_description'], 'cwd': '/workspace/ur5_ws/build/ur_description', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_description'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.046763] (ur_description) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[0.048233] (ur_description) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[0.053707] (ur_dashboard_msgs) StdoutLine: {'line': b'[  0%] Built target ur_dashboard_msgs__cpp\n'}
+[0.057336] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/initial_positions.yaml\n'}
+[0.058361] (ur_dashboard_msgs) StdoutLine: {'line': b'[  0%] Built target ament_cmake_python_symlink_ur_dashboard_msgs\n'}
+[0.059628] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/default_kinematics.yaml\n'}
+[0.060670] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/joint_limits.yaml\n'}
+[0.061391] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/physical_parameters.yaml\n'}
+[0.063157] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/visual_parameters.yaml\n'}
+[0.064040] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/default_kinematics.yaml\n'}
+[0.065029] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/joint_limits.yaml\n'}
+[0.066143] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/physical_parameters.yaml\n'}
+[0.066939] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/visual_parameters.yaml\n'}
+[0.068310] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/default_kinematics.yaml\n'}
+[0.069462] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/joint_limits.yaml\n'}
+[0.070164] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/physical_parameters.yaml\n'}
+[0.072356] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/visual_parameters.yaml\n'}
+[0.073453] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/default_kinematics.yaml\n'}
+[0.074065] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 12%] Built target ur_dashboard_msgs__rosidl_generator_c\n'}
+[0.075194] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/joint_limits.yaml\n'}
+[0.075887] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/physical_parameters.yaml\n'}
+[0.076832] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/visual_parameters.yaml\n'}
+[0.079486] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/default_kinematics.yaml\n'}
+[0.081632] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/joint_limits.yaml\n'}
+[0.083230] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/physical_parameters.yaml\n'}
+[0.085751] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/visual_parameters.yaml\n'}
+[0.088207] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/default_kinematics.yaml\n'}
+[0.089482] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/joint_limits.yaml\n'}
+[0.091935] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/physical_parameters.yaml\n'}
+[0.093567] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/visual_parameters.yaml\n'}
+[0.094588] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/default_kinematics.yaml\n'}
+[0.096278] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/joint_limits.yaml\n'}
+[0.097852] (-) TimerEvent: {}
+[0.098107] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/physical_parameters.yaml\n'}
+[0.099158] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 38%] Built target ur_dashboard_msgs__rosidl_typesupport_cpp\n'}
+[0.100094] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 38%] Built target ur_dashboard_msgs__rosidl_typesupport_introspection_cpp\n'}
+[0.100860] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/visual_parameters.yaml\n'}
+[0.101844] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/default_kinematics.yaml\n'}
+[0.103117] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/joint_limits.yaml\n'}
+[0.104191] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/physical_parameters.yaml\n'}
+[0.105257] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/visual_parameters.yaml\n'}
+[0.105919] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/default_kinematics.yaml\n'}
+[0.106917] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/joint_limits.yaml\n'}
+[0.108259] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/physical_parameters.yaml\n'}
+[0.109234] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/visual_parameters.yaml\n'}
+[0.109727] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 56%] Built target ur_dashboard_msgs__rosidl_typesupport_fastrtps_cpp\n'}
+[0.110454] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/default_kinematics.yaml\n'}
+[0.111087] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/joint_limits.yaml\n'}
+[0.111938] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/physical_parameters.yaml\n'}
+[0.112993] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/visual_parameters.yaml\n'}
+[0.113930] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/default_kinematics.yaml\n'}
+[0.115157] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/joint_limits.yaml\n'}
+[0.116051] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/physical_parameters.yaml\n'}
+[0.117198] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/visual_parameters.yaml\n'}
+[0.117723] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 81%] Built target ur_dashboard_msgs__rosidl_typesupport_c\n'}
+[0.118473] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 81%] Built target ur_dashboard_msgs__rosidl_typesupport_introspection_c\n'}
+[0.118970] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/default_kinematics.yaml\n'}
+[0.119304] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/joint_limits.yaml\n'}
+[0.119915] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/physical_parameters.yaml\n'}
+[0.120352] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 84%] Built target ur_dashboard_msgs__rosidl_typesupport_fastrtps_c\n'}
+[0.120780] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/visual_parameters.yaml\n'}
+[0.121333] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/default_kinematics.yaml\n'}
+[0.121732] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/joint_limits.yaml\n'}
+[0.122196] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/physical_parameters.yaml\n'}
+[0.122631] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/visual_parameters.yaml\n'}
+[0.123016] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/default_kinematics.yaml\n'}
+[0.123387] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/joint_limits.yaml\n'}
+[0.123643] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/physical_parameters.yaml\n'}
+[0.124002] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/visual_parameters.yaml\n'}
+[0.124620] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/launch/view_ur.launch.py\n'}
+[0.133169] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 84%] Built target ur_dashboard_msgs\n'}
+[0.139449] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/base.stl\n'}
+[0.140558] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/forearm.stl\n'}
+[0.140962] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/shoulder.stl\n'}
+[0.141857] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/upperarm.stl\n'}
+[0.142459] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/wrist1.stl\n'}
+[0.142869] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/wrist2.stl\n'}
+[0.143300] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/wrist3.stl\n'}
+[0.143636] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/base.dae\n'}
+[0.144277] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/forearm.dae\n'}
+[0.144579] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/shoulder.dae\n'}
+[0.147398] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/upperarm.dae\n'}
+[0.148448] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/wrist1.dae\n'}
+[0.148728] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/wrist2.dae\n'}
+[0.149243] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/wrist3.dae\n'}
+[0.149480] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/base.stl\n'}
+[0.149688] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/forearm.stl\n'}
+[0.149837] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 85%] Built target ur_dashboard_msgs__py\n'}
+[0.150076] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/shoulder.stl\n'}
+[0.150664] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/upperarm.stl\n'}
+[0.151401] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/wrist1.stl\n'}
+[0.151907] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/wrist2.stl\n'}
+[0.153223] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/wrist3.stl\n'}
+[0.153616] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/base.dae\n'}
+[0.153949] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/forearm.dae\n'}
+[0.154333] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/shoulder.dae\n'}
+[0.154825] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/upperarm.dae\n'}
+[0.155245] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/wrist1.dae\n'}
+[0.155623] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/wrist2.dae\n'}
+[0.156034] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/wrist3.dae\n'}
+[0.156410] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/LICENSE.txt\n'}
+[0.156742] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/base.stl\n'}
+[0.157078] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/forearm.stl\n'}
+[0.157549] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/shoulder.stl\n'}
+[0.157990] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/upperarm.stl\n'}
+[0.158453] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/wrist1.stl\n'}
+[0.159114] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/wrist2.stl\n'}
+[0.159545] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/wrist3.stl\n'}
+[0.159940] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/UR15_DIFF_8bit_2K.jpg\n'}
+[0.160405] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/base.dae\n'}
+[0.160845] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/forearm.dae\n'}
+[0.161275] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/shoulder.dae\n'}
+[0.161802] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/upperarm.dae\n'}
+[0.162530] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/wrist1.dae\n'}
+[0.162962] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/wrist2.dae\n'}
+[0.163438] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/wrist3.dae\n'}
+[0.163898] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/collision/forearm.stl\n'}
+[0.164530] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/collision/upperarm.stl\n'}
+[0.164866] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/visual/forearm.dae\n'}
+[0.165355] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/visual/upperarm.dae\n'}
+[0.166244] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/LICENSE.txt\n'}
+[0.166667] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/collision/forearm.stl\n'}
+[0.167095] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/collision/upperarm.stl\n'}
+[0.167510] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/visual/UR18_DIFF_8bit_2K.jpg\n'}
+[0.167904] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/visual/forearm.dae\n'}
+[0.169199] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/visual/upperarm.dae\n'}
+[0.169475] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/LICENSE.txt\n'}
+[0.169876] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/base.stl\n'}
+[0.170142] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/forearm.stl\n'}
+[0.170485] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/shoulder.stl\n'}
+[0.170809] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/upperarm.stl\n'}
+[0.171305] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/wrist1.stl\n'}
+[0.171630] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/wrist2.stl\n'}
+[0.171933] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/wrist3.stl\n'}
+[0.172348] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/UR20_DIFF_8bit_2K.png\n'}
+[0.172728] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/base.dae\n'}
+[0.173836] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/forearm.dae\n'}
+[0.174163] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/shoulder.dae\n'}
+[0.174614] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/upperarm.dae\n'}
+[0.174960] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/wrist1.dae\n'}
+[0.175486] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/wrist2.dae\n'}
+[0.176153] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/wrist3.dae\n'}
+[0.176991] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/base.stl\n'}
+[0.177558] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/forearm.stl\n'}
+[0.178114] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/shoulder.stl\n'}
+[0.178819] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/upperarm.stl\n'}
+[0.179260] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/wrist1.stl\n'}
+[0.179680] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/wrist2.stl\n'}
+[0.180111] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/wrist3.stl\n'}
+[0.180527] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/base.dae\n'}
+[0.180942] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/forearm.dae\n'}
+[0.181397] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/shoulder.dae\n'}
+[0.181959] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/upperarm.dae\n'}
+[0.182674] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/wrist1.dae\n'}
+[0.183390] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/wrist2.dae\n'}
+[0.183993] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/wrist3.dae\n'}
+[0.184638] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/LICENSE.txt\n'}
+[0.185493] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/collision/forearm.stl\n'}
+[0.186110] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/collision/upperarm.stl\n'}
+[0.186785] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/visual/UR30_DIFF_8bit_2K.png\n'}
+[0.187717] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/visual/forearm.dae\n'}
+[0.188320] (ur_dashboard_msgs) StdoutLine: {'line': b'[ 96%] Built target ur_dashboard_msgs__rosidl_generator_py\n'}
+[0.188932] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/visual/upperarm.dae\n'}
+[0.189699] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/base.stl\n'}
+[0.190500] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/forearm.stl\n'}
+[0.190949] (ur_dashboard_msgs) StdoutLine: {'line': b'running egg_info\n'}
+[0.191813] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/shoulder.stl\n'}
+[0.192616] (ur_dashboard_msgs) StdoutLine: {'line': b'writing ur_dashboard_msgs.egg-info/PKG-INFO\n'}
+[0.193102] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/upperarm.stl\n'}
+[0.193421] (ur_dashboard_msgs) StdoutLine: {'line': b'writing dependency_links to ur_dashboard_msgs.egg-info/dependency_links.txt\n'}
+[0.194587] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/wrist1.stl\n'}
+[0.195813] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/wrist2.stl\n'}
+[0.196663] (ur_dashboard_msgs) StdoutLine: {'line': b'writing top-level names to ur_dashboard_msgs.egg-info/top_level.txt\n'}
+[0.197688] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/wrist3.stl\n'}
+[0.199179] (-) TimerEvent: {}
+[0.199351] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/base.dae\n'}
+[0.200221] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/forearm.dae\n'}
+[0.201327] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/shoulder.dae\n'}
+[0.201898] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/upperarm.dae\n'}
+[0.202567] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/wrist1.dae\n'}
+[0.203220] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/wrist2.dae\n'}
+[0.204049] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/wrist3.dae\n'}
+[0.204612] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/base.stl\n'}
+[0.205716] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/forearm.stl\n'}
+[0.206866] (ur_dashboard_msgs) StdoutLine: {'line': b"reading manifest file 'ur_dashboard_msgs.egg-info/SOURCES.txt'\n"}
+[0.207466] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/shoulder.stl\n'}
+[0.209427] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/upperarm.stl\n'}
+[0.210476] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/wrist1.stl\n'}
+[0.211179] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/wrist2.stl\n'}
+[0.211910] (ur_dashboard_msgs) StdoutLine: {'line': b'[100%] Built target ur_dashboard_msgs__rosidl_typesupport_fastrtps_c__pyext\n'}
+[0.212769] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/wrist3.stl\n'}
+[0.213382] (ur_dashboard_msgs) StdoutLine: {'line': b'[100%] Built target ur_dashboard_msgs__rosidl_typesupport_c__pyext\n'}
+[0.213822] (ur_dashboard_msgs) StdoutLine: {'line': b'[100%] Built target ur_dashboard_msgs__rosidl_typesupport_introspection_c__pyext\n'}
+[0.214233] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/base.dae\n'}
+[0.214636] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/forearm.dae\n'}
+[0.214984] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/shoulder.dae\n'}
+[0.215375] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/upperarm.dae\n'}
+[0.215926] (ur_dashboard_msgs) StdoutLine: {'line': b"writing manifest file 'ur_dashboard_msgs.egg-info/SOURCES.txt'\n"}
+[0.216558] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/wrist1.dae\n'}
+[0.217052] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/wrist2.dae\n'}
+[0.217469] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/wrist3.dae\n'}
+[0.217845] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/base.stl\n'}
+[0.218267] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/forearm.stl\n'}
+[0.218536] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/shoulder.stl\n'}
+[0.218925] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/upperarm.stl\n'}
+[0.219763] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/wrist1.stl\n'}
+[0.220332] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/wrist2.stl\n'}
+[0.221460] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/wrist3.stl\n'}
+[0.221951] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/base.dae\n'}
+[0.222548] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/forearm.dae\n'}
+[0.223002] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/shoulder.dae\n'}
+[0.223469] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/upperarm.dae\n'}
+[0.224033] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/wrist1.dae\n'}
+[0.224449] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/wrist2.dae\n'}
+[0.224862] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/wrist3.dae\n'}
+[0.225268] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/LICENSE.txt\n'}
+[0.225723] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/collision/forearm.stl\n'}
+[0.226201] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/collision/upperarm.stl\n'}
+[0.226648] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/visual/UR8Long_DIFF_8bit_2K.jpg\n'}
+[0.227088] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/visual/forearm.dae\n'}
+[0.227583] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/visual/upperarm.dae\n'}
+[0.228249] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/rviz/view_robot.rviz\n'}
+[0.229140] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_common.xacro\n'}
+[0.229698] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_joint_control.xacro\n'}
+[0.230481] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_sensors.xacro\n'}
+[0.231325] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_transmissions.xacro\n'}
+[0.232249] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ros2_control_mock_hardware.xacro\n'}
+[0.232821] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ur.urdf.xacro\n'}
+[0.233221] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ur_macro.xacro\n'}
+[0.233671] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ur_mocked.urdf.xacro\n'}
+[0.234643] (ur_dashboard_msgs) StdoutLine: {'line': b'[100%] Built target ament_cmake_python_build_ur_dashboard_msgs_egg\n'}
+[0.235118] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/test/test_ur_urdf_xacro.py\n'}
+[0.235449] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/test/test_view_ur_launch.py\n'}
+[0.235828] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ament_index/resource_index/package_run_dependencies/ur_description\n'}
+[0.236219] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ament_index/resource_index/parent_prefix_path/ur_description\n'}
+[0.236775] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/ament_prefix_path.sh\n'}
+[0.237286] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/ament_prefix_path.dsv\n'}
+[0.237709] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/path.sh\n'}
+[0.238120] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/path.dsv\n'}
+[0.238616] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.bash\n'}
+[0.239104] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.sh\n'}
+[0.239855] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.zsh\n'}
+[0.240569] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.dsv\n'}
+[0.241589] (ur_description) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur_description/share/ur_description/package.dsv\n'}
+[0.248464] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ament_index/resource_index/packages/ur_description\n'}
+[0.249174] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/cmake/ur_descriptionConfig.cmake\n'}
+[0.249953] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/cmake/ur_descriptionConfig-version.cmake\n'}
+[0.250625] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/package.xml\n'}
+[0.252589] (ur_description) CommandEnded: {'returncode': 0}
+[0.290178] (ur_description) JobEnded: {'identifier': 'ur_description', 'rc': 0}
+[0.295209] (ur_moveit_config) JobStarted: {'identifier': 'ur_moveit_config'}
+[0.295370] (ur_dashboard_msgs) CommandEnded: {'returncode': 0}
+[0.296372] (ur_dashboard_msgs) JobProgress: {'identifier': 'ur_dashboard_msgs', 'progress': 'install'}
+[0.296956] (ur_dashboard_msgs) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur_dashboard_msgs'], 'cwd': '/workspace/ur5_ws/build/ur_dashboard_msgs', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_dashboard_msgs'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.299154] (-) TimerEvent: {}
+[0.299549] (ur_moveit_config) JobProgress: {'identifier': 'ur_moveit_config', 'progress': 'cmake'}
+[0.300774] (ur_moveit_config) JobProgress: {'identifier': 'ur_moveit_config', 'progress': 'build'}
+[0.302035] (ur_moveit_config) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur_moveit_config', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur_moveit_config', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_moveit_config'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.306525] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[0.306889] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[0.307490] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ament_index/resource_index/rosidl_interfaces/ur_dashboard_msgs\n'}
+[0.309140] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__functions.h\n'}
+[0.309542] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__struct.h\n'}
+[0.309934] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__type_support.h\n'}
+[0.310420] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/set_mode.h\n'}
+[0.310915] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__functions.h\n'}
+[0.311599] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__struct.h\n'}
+[0.312230] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__type_support.h\n'}
+[0.312617] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__functions.h\n'}
+[0.313990] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__struct.h\n'}
+[0.314421] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__type_support.h\n'}
+[0.314826] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__functions.h\n'}
+[0.315297] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__struct.h\n'}
+[0.315842] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__type_support.h\n'}
+[0.316218] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/program_state.h\n'}
+[0.316608] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/robot_mode.h\n'}
+[0.316952] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/rosidl_generator_c__visibility_control.h\n'}
+[0.317820] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/safety_mode.h\n'}
+[0.318303] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/add_to_log.h\n'}
+[0.318881] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__functions.h\n'}
+[0.319279] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__struct.h\n'}
+[0.319697] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__type_support.h\n'}
+[0.320078] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__functions.h\n'}
+[0.320569] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__struct.h\n'}
+[0.320954] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__type_support.h\n'}
+[0.321339] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__functions.h\n'}
+[0.321943] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__struct.h\n'}
+[0.322576] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__type_support.h\n'}
+[0.323618] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__functions.h\n'}
+[0.324208] (ur_moveit_config) CommandEnded: {'returncode': 0}
+[0.325146] (ur_moveit_config) JobProgress: {'identifier': 'ur_moveit_config', 'progress': 'install'}
+[0.326501] (ur_moveit_config) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur_moveit_config'], 'cwd': '/workspace/ur5_ws/build/ur_moveit_config', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_moveit_config'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.326836] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__struct.h\n'}
+[0.327162] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__type_support.h\n'}
+[0.327398] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__functions.h\n'}
+[0.327704] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__struct.h\n'}
+[0.327921] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__type_support.h\n'}
+[0.328230] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__functions.h\n'}
+[0.328498] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__struct.h\n'}
+[0.328889] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__type_support.h\n'}
+[0.329191] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__functions.h\n'}
+[0.329413] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__struct.h\n'}
+[0.329857] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__type_support.h\n'}
+[0.330287] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__functions.h\n'}
+[0.330633] (ur_moveit_config) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[0.331000] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__struct.h\n'}
+[0.331505] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__type_support.h\n'}
+[0.331854] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__functions.h\n'}
+[0.332381] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__struct.h\n'}
+[0.333015] (ur_moveit_config) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[0.333560] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__type_support.h\n'}
+[0.333963] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ament_index/resource_index/package_run_dependencies/ur_moveit_config\n'}
+[0.334385] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__functions.h\n'}
+[0.334949] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ament_index/resource_index/parent_prefix_path/ur_moveit_config\n'}
+[0.335423] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__struct.h\n'}
+[0.335952] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/ament_prefix_path.sh\n'}
+[0.336657] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__type_support.h\n'}
+[0.337151] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/ament_prefix_path.dsv\n'}
+[0.337787] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__functions.h\n'}
+[0.338351] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/path.sh\n'}
+[0.338686] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__struct.h\n'}
+[0.338951] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/path.dsv\n'}
+[0.339287] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__type_support.h\n'}
+[0.339659] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.bash\n'}
+[0.339966] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_loaded_program.h\n'}
+[0.340177] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.sh\n'}
+[0.340538] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_program_state.h\n'}
+[0.340801] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.zsh\n'}
+[0.341111] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_robot_mode.h\n'}
+[0.341643] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.dsv\n'}
+[0.342300] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_safety_mode.h\n'}
+[0.342780] (ur_moveit_config) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/package.dsv\n'}
+[0.343083] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/is_in_remote_control.h\n'}
+[0.343408] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/is_program_running.h\n'}
+[0.343845] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/is_program_saved.h\n'}
+[0.344590] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/load.h\n'}
+[0.344956] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/popup.h\n'}
+[0.345547] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/raw_request.h\n'}
+[0.345929] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/library_path.sh\n'}
+[0.346477] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/library_path.dsv\n'}
+[0.346876] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ament_index/resource_index/packages/ur_moveit_config\n'}
+[0.347295] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/cmake/ur_moveit_configConfig.cmake\n'}
+[0.347791] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/cmake/ur_moveit_configConfig-version.cmake\n'}
+[0.348297] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/package.xml\n'}
+[0.348716] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/chomp_planning.yaml\n'}
+[0.349162] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__rosidl_typesupport_fastrtps_c.h\n'}
+[0.349587] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/joint_limits.yaml\n'}
+[0.350285] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__rosidl_typesupport_fastrtps_c.h\n'}
+[0.350840] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/kinematics.yaml\n'}
+[0.351248] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__rosidl_typesupport_fastrtps_c.h\n'}
+[0.351669] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/moveit.rviz\n'}
+[0.352201] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/moveit_controllers.yaml\n'}
+[0.352621] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__rosidl_typesupport_fastrtps_c.h\n'}
+[0.352942] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/ompl_planning.yaml\n'}
+[0.353345] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[0.353683] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/pilz_cartesian_limits.yaml\n'}
+[0.353991] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__rosidl_typesupport_fastrtps_c.h\n'}
+[0.354323] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/pilz_industrial_motion_planner_planning.yaml\n'}
+[0.355282] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__rosidl_typesupport_fastrtps_c.h\n'}
+[0.356012] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/ur_servo.yaml\n'}
+[0.356531] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__rosidl_typesupport_fastrtps_c.h\n'}
+[0.357162] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__rosidl_typesupport_fastrtps_c.h\n'}
+[0.357582] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/launch/ur_moveit.launch.py\n'}
+[0.358135] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__rosidl_typesupport_fastrtps_c.h\n'}
+[0.358473] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__rosidl_typesupport_fastrtps_c.h\n'}
+[0.358934] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/srdf/ur.srdf.xacro\n'}
+[0.359336] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__rosidl_typesupport_fastrtps_c.h\n'}
+[0.359721] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/srdf/ur_macro.srdf.xacro\n'}
+[0.360159] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__rosidl_typesupport_fastrtps_c.h\n'}
+[0.360509] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__rosidl_typesupport_fastrtps_c.h\n'}
+[0.360903] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__rosidl_typesupport_fastrtps_c.h\n'}
+[0.361384] (ur_moveit_config) CommandEnded: {'returncode': 0}
+[0.398057] (ur_moveit_config) JobEnded: {'identifier': 'ur_moveit_config', 'rc': 0}
+[0.400502] (-) TimerEvent: {}
+[0.400630] (ur5_minimal_moveit) JobStarted: {'identifier': 'ur5_minimal_moveit'}
+[0.405663] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__rosidl_typesupport_fastrtps_c.h\n'}
+[0.406931] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__rosidl_typesupport_introspection_c.h\n'}
+[0.407269] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__rosidl_typesupport_introspection_c.h\n'}
+[0.407640] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__rosidl_typesupport_introspection_c.h\n'}
+[0.407928] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__rosidl_typesupport_introspection_c.h\n'}
+[0.408276] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[0.408883] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__rosidl_typesupport_introspection_c.h\n'}
+[0.409223] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__rosidl_typesupport_introspection_c.h\n'}
+[0.409579] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__rosidl_typesupport_introspection_c.h\n'}
+[0.410281] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__rosidl_typesupport_introspection_c.h\n'}
+[0.410861] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__rosidl_typesupport_introspection_c.h\n'}
+[0.411786] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__rosidl_typesupport_introspection_c.h\n'}
+[0.412037] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__rosidl_typesupport_introspection_c.h\n'}
+[0.412343] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__rosidl_typesupport_introspection_c.h\n'}
+[0.412650] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__rosidl_typesupport_introspection_c.h\n'}
+[0.412865] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__rosidl_typesupport_introspection_c.h\n'}
+[0.413183] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__rosidl_typesupport_introspection_c.h\n'}
+[0.413499] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__builder.hpp\n'}
+[0.413759] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__struct.hpp\n'}
+[0.414196] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__traits.hpp\n'}
+[0.414562] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__type_support.hpp\n'}
+[0.414822] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/set_mode.hpp\n'}
+[0.415071] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__builder.hpp\n'}
+[0.415477] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__struct.hpp\n'}
+[0.415779] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__traits.hpp\n'}
+[0.416111] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__type_support.hpp\n'}
+[0.416469] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__builder.hpp\n'}
+[0.416782] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__struct.hpp\n'}
+[0.417150] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__traits.hpp\n'}
+[0.417350] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__type_support.hpp\n'}
+[0.417652] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__builder.hpp\n'}
+[0.417947] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__struct.hpp\n'}
+[0.418202] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__traits.hpp\n'}
+[0.418519] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__type_support.hpp\n'}
+[0.418765] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/program_state.hpp\n'}
+[0.419071] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/robot_mode.hpp\n'}
+[0.419412] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[0.419789] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/safety_mode.hpp\n'}
+[0.420017] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/add_to_log.hpp\n'}
+[0.420339] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__builder.hpp\n'}
+[0.420542] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__struct.hpp\n'}
+[0.420798] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__traits.hpp\n'}
+[0.421005] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__type_support.hpp\n'}
+[0.421237] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__builder.hpp\n'}
+[0.421538] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__struct.hpp\n'}
+[0.421864] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__traits.hpp\n'}
+[0.422097] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__type_support.hpp\n'}
+[0.422413] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__builder.hpp\n'}
+[0.422732] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__struct.hpp\n'}
+[0.422994] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__traits.hpp\n'}
+[0.423313] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__type_support.hpp\n'}
+[0.423549] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__builder.hpp\n'}
+[0.423789] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__struct.hpp\n'}
+[0.424039] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__traits.hpp\n'}
+[0.424323] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__type_support.hpp\n'}
+[0.424692] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__builder.hpp\n'}
+[0.424958] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__struct.hpp\n'}
+[0.425225] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__traits.hpp\n'}
+[0.425485] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__type_support.hpp\n'}
+[0.425701] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__builder.hpp\n'}
+[0.425934] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__struct.hpp\n'}
+[0.426324] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__traits.hpp\n'}
+[0.426724] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__type_support.hpp\n'}
+[0.426963] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__builder.hpp\n'}
+[0.427286] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__struct.hpp\n'}
+[0.427525] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__traits.hpp\n'}
+[0.427902] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__type_support.hpp\n'}
+[0.428164] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__builder.hpp\n'}
+[0.428464] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__struct.hpp\n'}
+[0.428738] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__traits.hpp\n'}
+[0.428972] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__type_support.hpp\n'}
+[0.429214] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__builder.hpp\n'}
+[0.429568] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__struct.hpp\n'}
+[0.429919] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__traits.hpp\n'}
+[0.430061] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__type_support.hpp\n'}
+[0.430404] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__builder.hpp\n'}
+[0.430665] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__struct.hpp\n'}
+[0.430858] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__traits.hpp\n'}
+[0.431186] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__type_support.hpp\n'}
+[0.431569] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__builder.hpp\n'}
+[0.432029] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__struct.hpp\n'}
+[0.432259] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__traits.hpp\n'}
+[0.432546] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__type_support.hpp\n'}
+[0.432826] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_loaded_program.hpp\n'}
+[0.501209] (-) TimerEvent: {}
+[0.530663] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_program_state.hpp\n'}
+[0.531306] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_robot_mode.hpp\n'}
+[0.531923] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/get_safety_mode.hpp\n'}
+[0.532670] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/is_in_remote_control.hpp\n'}
+[0.532958] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/is_program_running.hpp\n'}
+[0.533284] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/is_program_saved.hpp\n'}
+[0.533772] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/load.hpp\n'}
+[0.534147] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/popup.hpp\n'}
+[0.534472] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/raw_request.hpp\n'}
+[0.534787] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.535379] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.536379] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.538609] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.539436] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[0.539735] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.540054] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.540342] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.540699] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.541190] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.541485] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.541743] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.541976] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.542286] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.542550] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.542880] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.543171] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/action/detail/set_mode__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.543451] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/program_state__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.543741] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/robot_mode__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.543980] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/msg/detail/safety_mode__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.544230] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/add_to_log__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.544488] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_loaded_program__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.544723] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_program_state__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.544937] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_robot_mode__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.545207] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/get_safety_mode__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.545494] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_in_remote_control__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.545752] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_running__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.546005] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/is_program_saved__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.546382] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/load__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.546691] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/popup__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.547187] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/include/ur_dashboard_msgs/ur_dashboard_msgs/srv/detail/raw_request__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.547678] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/pythonpath.sh\n'}
+[0.548071] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/pythonpath.dsv\n'}
+[0.550196] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs-4.5.0-py3.10.egg-info/PKG-INFO\n'}
+[0.555559] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs-4.5.0-py3.10.egg-info/SOURCES.txt\n'}
+[0.556596] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs-4.5.0-py3.10.egg-info/dependency_links.txt\n'}
+[0.557610] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs-4.5.0-py3.10.egg-info/top_level.txt\n'}
+[0.559016] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/__init__.py\n'}
+[0.560604] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/_ur_dashboard_msgs_s.ep.rosidl_typesupport_c.c\n'}
+[0.566908] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/_ur_dashboard_msgs_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[0.569702] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/_ur_dashboard_msgs_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[0.570094] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/action/__init__.py\n'}
+[0.570647] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/action/_set_mode.py\n'}
+[0.571012] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/action/_set_mode_s.c\n'}
+[0.573021] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/libur_dashboard_msgs__rosidl_generator_py.so\n'}
+[0.573833] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/__init__.py\n'}
+[0.574167] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/_program_state.py\n'}
+[0.575382] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/_program_state_s.c\n'}
+[0.577158] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/_robot_mode.py\n'}
+[0.577450] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/_robot_mode_s.c\n'}
+[0.577727] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/_safety_mode.py\n'}
+[0.579327] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg/_safety_mode_s.c\n'}
+[0.579746] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/__init__.py\n'}
+[0.580061] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_add_to_log.py\n'}
+[0.580361] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_add_to_log_s.c\n'}
+[0.580887] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_loaded_program.py\n'}
+[0.581253] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_loaded_program_s.c\n'}
+[0.581623] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_program_state.py\n'}
+[0.584211] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_program_state_s.c\n'}
+[0.584734] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_robot_mode.py\n'}
+[0.585370] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_robot_mode_s.c\n'}
+[0.586005] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_safety_mode.py\n'}
+[0.586374] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_get_safety_mode_s.c\n'}
+[0.586593] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_is_in_remote_control.py\n'}
+[0.587077] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_is_in_remote_control_s.c\n'}
+[0.587356] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_is_program_running.py\n'}
+[0.587643] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_is_program_running_s.c\n'}
+[0.595172] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_is_program_saved.py\n'}
+[0.595640] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_is_program_saved_s.c\n'}
+[0.595922] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_load.py\n'}
+[0.596451] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_load_s.c\n'}
+[0.596694] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_popup.py\n'}
+[0.597637] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_popup_s.c\n'}
+[0.598036] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_raw_request.py\n'}
+[0.598571] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv/_raw_request_s.c\n'}
+[0.598907] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/ur_dashboard_msgs_s__rosidl_typesupport_c.cpython-310-aarch64-linux-gnu.so\n'}
+[0.599230] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/ur_dashboard_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-aarch64-linux-gnu.so\n'}
+[0.599645] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/ur_dashboard_msgs_s__rosidl_typesupport_introspection_c.cpython-310-aarch64-linux-gnu.so\n'}
+[0.599916] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/ur_dashboard_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-aarch64-linux-gnu.so\n'}
+[0.600230] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/ur_dashboard_msgs_s__rosidl_typesupport_introspection_c.cpython-310-aarch64-linux-gnu.so\n'}
+[0.600545] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/ur_dashboard_msgs_s__rosidl_typesupport_c.cpython-310-aarch64-linux-gnu.so\n'}
+[0.600939] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/msg/ProgramState.idl\n'}
+[0.601389] (-) TimerEvent: {}
+[0.601665] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/msg/RobotMode.idl\n'}
+[0.601922] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/msg/SafetyMode.idl\n'}
+[0.602352] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/AddToLog.idl\n'}
+[0.602693] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetLoadedProgram.idl\n'}
+[0.603297] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetProgramState.idl\n'}
+[0.603845] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetRobotMode.idl\n'}
+[0.604441] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetSafetyMode.idl\n'}
+[0.604627] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramRunning.idl\n'}
+[0.604920] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramSaved.idl\n'}
+[0.605297] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Load.idl\n'}
+[0.605640] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Popup.idl\n'}
+[0.605927] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/RawRequest.idl\n'}
+[0.606343] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsInRemoteControl.idl\n'}
+[0.606733] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/action/SetMode.idl\n'}
+[0.607145] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/msg/ProgramState.msg\n'}
+[0.607494] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/msg/RobotMode.msg\n'}
+[0.608130] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/msg/SafetyMode.msg\n'}
+[0.608588] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/AddToLog.srv\n'}
+[0.609113] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/AddToLog_Request.msg\n'}
+[0.609708] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/AddToLog_Response.msg\n'}
+[0.610034] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetLoadedProgram.srv\n'}
+[0.610345] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetLoadedProgram_Request.msg\n'}
+[0.611062] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetLoadedProgram_Response.msg\n'}
+[0.611362] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetProgramState.srv\n'}
+[0.611626] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetProgramState_Request.msg\n'}
+[0.611878] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetProgramState_Response.msg\n'}
+[0.612165] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetRobotMode.srv\n'}
+[0.612534] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetRobotMode_Request.msg\n'}
+[0.612813] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetRobotMode_Response.msg\n'}
+[0.613131] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetSafetyMode.srv\n'}
+[0.613444] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetSafetyMode_Request.msg\n'}
+[0.613755] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/GetSafetyMode_Response.msg\n'}
+[0.614114] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramRunning.srv\n'}
+[0.614414] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramRunning_Request.msg\n'}
+[0.614678] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramRunning_Response.msg\n'}
+[0.614947] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramSaved.srv\n'}
+[0.615254] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramSaved_Request.msg\n'}
+[0.615507] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsProgramSaved_Response.msg\n'}
+[0.615745] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Load.srv\n'}
+[0.615996] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Load_Request.msg\n'}
+[0.616236] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Load_Response.msg\n'}
+[0.616952] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Popup.srv\n'}
+[0.618100] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Popup_Request.msg\n'}
+[0.618919] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/Popup_Response.msg\n'}
+[0.619225] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/RawRequest.srv\n'}
+[0.619908] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/RawRequest_Request.msg\n'}
+[0.620299] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/RawRequest_Response.msg\n'}
+[0.621819] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsInRemoteControl.srv\n'}
+[0.626434] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsInRemoteControl_Request.msg\n'}
+[0.628687] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/srv/IsInRemoteControl_Response.msg\n'}
+[0.628949] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/action/SetMode.action\n'}
+[0.629188] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ament_index/resource_index/package_run_dependencies/ur_dashboard_msgs\n'}
+[0.629549] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ament_index/resource_index/parent_prefix_path/ur_dashboard_msgs\n'}
+[0.629805] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/ament_prefix_path.sh\n'}
+[0.630524] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/ament_prefix_path.dsv\n'}
+[0.631153] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/path.sh\n'}
+[0.631428] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/environment/path.dsv\n'}
+[0.631684] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/local_setup.bash\n'}
+[0.632081] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/local_setup.sh\n'}
+[0.632341] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/local_setup.zsh\n'}
+[0.633723] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/local_setup.dsv\n'}
+[0.634037] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/package.dsv\n'}
+[0.634467] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ament_index/resource_index/packages/ur_dashboard_msgs\n'}
+[0.634751] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/rosidl_cmake-extras.cmake\n'}
+[0.635001] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[0.635646] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[0.636771] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[0.637509] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[0.637905] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[0.638341] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[0.638619] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgsConfig.cmake\n'}
+[0.638906] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgsConfig-version.cmake\n'}
+[0.639386] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/package.xml\n'}
+[0.639763] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_generator_c.so\n'}
+[0.640264] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_typesupport_fastrtps_c.so\n'}
+[0.640779] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_typesupport_introspection_c.so\n'}
+[0.641166] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_typesupport_c.so\n'}
+[0.641376] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_typesupport_fastrtps_cpp.so\n'}
+[0.641738] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_typesupport_introspection_cpp.so\n'}
+[0.642008] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_typesupport_cpp.so\n'}
+[0.642363] (ur_dashboard_msgs) StdoutLine: {'line': b"Listing '/workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs'...\n"}
+[0.642673] (ur_dashboard_msgs) StdoutLine: {'line': b"Listing '/workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/action'...\n"}
+[0.642925] (ur_dashboard_msgs) StdoutLine: {'line': b"Listing '/workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/msg'...\n"}
+[0.643455] (ur_dashboard_msgs) StdoutLine: {'line': b"Listing '/workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages/ur_dashboard_msgs/srv'...\n"}
+[0.643730] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/lib/libur_dashboard_msgs__rosidl_generator_py.so\n'}
+[0.644031] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_generator_cExport.cmake\n'}
+[0.644342] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_generator_cExport-noconfig.cmake\n'}
+[0.644713] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[0.645110] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[0.645292] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_introspection_cExport.cmake\n'}
+[0.645722] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[0.645947] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_cExport.cmake\n'}
+[0.646338] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[0.646541] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_generator_cppExport.cmake\n'}
+[0.646873] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[0.647300] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[0.647779] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[0.647948] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[0.648233] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_cppExport.cmake\n'}
+[0.648634] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/ur_dashboard_msgs__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[0.649228] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_generator_pyExport.cmake\n'}
+[0.650001] (ur_dashboard_msgs) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake/export_ur_dashboard_msgs__rosidl_generator_pyExport-noconfig.cmake\n'}
+[0.650417] (ur_dashboard_msgs) CommandEnded: {'returncode': 0}
+[0.651041] (ur_dashboard_msgs) JobEnded: {'identifier': 'ur_dashboard_msgs', 'rc': 0}
+[0.654398] (ur_controllers) JobStarted: {'identifier': 'ur_controllers'}
+[0.660047] (ur_controllers) JobProgress: {'identifier': 'ur_controllers', 'progress': 'cmake'}
+[0.661681] (ur_controllers) Command: {'cmd': ['/usr/bin/cmake', '/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur_controllers'], 'cwd': '/workspace/ur5_ws/build/ur_controllers', 'env': OrderedDict([('HOSTNAME', 'f1c018568c46'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/workspace/ur5_ws/install/ur_dashboard_msgs/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_dashboard_msgs:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_controllers'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/ur5_ws/install/ur_dashboard_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_dashboard_msgs:/opt/ros/humble')]), 'shell': False}
+[0.683068] (ur_controllers) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.703431] (-) TimerEvent: {}
+[0.745935] (ur5_minimal_moveit) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/workspace/ur5_ws/build/ur5_minimal_moveit/build', '--no-deps', 'symlink_data'], 'cwd': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'env': {'HOSTNAME': 'f1c018568c46', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/workspace', 'ROS_PYTHON_VERSION': '3', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'AMENT_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble', 'PWD': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description'}, 'shell': False}
+[0.772747] (ur_controllers) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.783181] (ur_controllers) StdoutLine: {'line': b'-- Found angles: 1.15.0 (/opt/ros/humble/share/angles/cmake)\n'}
+[0.787229] (ur_controllers) StdoutLine: {'line': b'-- Found controller_interface: 2.53.0 (/opt/ros/humble/share/controller_interface/cmake)\n'}
+[0.806347] (-) TimerEvent: {}
+[0.889528] (ur_controllers) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.897984] (ur_controllers) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.907264] (-) TimerEvent: {}
+[0.909853] (ur_controllers) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.927452] (ur_controllers) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.932535] (ur5_minimal_moveit) StdoutLine: {'line': b'running develop\n'}
+[0.953499] (ur_controllers) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.989369] (ur5_minimal_moveit) StdoutLine: {'line': b'running egg_info\n'}
+[0.989822] (ur5_minimal_moveit) StdoutLine: {'line': b'writing ur5_minimal_moveit.egg-info/PKG-INFO\n'}
+[0.990375] (ur5_minimal_moveit) StdoutLine: {'line': b'writing dependency_links to ur5_minimal_moveit.egg-info/dependency_links.txt\n'}
+[0.990856] (ur5_minimal_moveit) StdoutLine: {'line': b'writing entry points to ur5_minimal_moveit.egg-info/entry_points.txt\n'}
+[0.991342] (ur5_minimal_moveit) StdoutLine: {'line': b'writing requirements to ur5_minimal_moveit.egg-info/requires.txt\n'}
+[0.991765] (ur5_minimal_moveit) StdoutLine: {'line': b'writing top-level names to ur5_minimal_moveit.egg-info/top_level.txt\n'}
+[0.994471] (ur5_minimal_moveit) StdoutLine: {'line': b"reading manifest file 'ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.996086] (ur5_minimal_moveit) StdoutLine: {'line': b"writing manifest file 'ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.997353] (ur5_minimal_moveit) StdoutLine: {'line': b'running build_ext\n'}
+[0.997856] (ur5_minimal_moveit) StdoutLine: {'line': b'Creating /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5-minimal-moveit.egg-link (link to .)\n'}
+[0.999417] (ur5_minimal_moveit) StdoutLine: {'line': b'Installing fake_joint_trajectory_controller script to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/ur5_minimal_moveit\n'}
+[1.000717] (ur5_minimal_moveit) StdoutLine: {'line': b'\n'}
+[1.001213] (ur5_minimal_moveit) StdoutLine: {'line': b'Installed /workspace/ur5_ws/build/ur5_minimal_moveit\n'}
+[1.001911] (ur5_minimal_moveit) StdoutLine: {'line': b'running symlink_data\n'}
+[1.008400] (-) TimerEvent: {}
+[1.020207] (ur5_minimal_moveit) CommandEnded: {'returncode': 0}
+[1.035040] (ur5_minimal_moveit) JobEnded: {'identifier': 'ur5_minimal_moveit', 'rc': 0}
+[1.109217] (-) TimerEvent: {}
+[1.178502] (ur_controllers) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[1.183289] (ur_controllers) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[1.210335] (-) TimerEvent: {}
+[1.215357] (ur_controllers) StdoutLine: {'line': b'-- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND\n'}
+[1.261337] (ur_controllers) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  \n'}
+[1.263454] (ur_controllers) StdoutLine: {'line': b'-- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND\n'}
+[1.271361] (ur_controllers) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/humble/include  \n'}
+[1.273896] (ur_controllers) StdoutLine: {'line': b'-- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND\n'}
+[1.280023] (ur_controllers) StdoutLine: {'line': b'-- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND\n'}
+[1.288455] (ur_controllers) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[1.305310] (ur_controllers) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[1.311179] (-) TimerEvent: {}
+[1.401935] (ur_controllers) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[1.403404] (ur_controllers) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[1.412199] (-) TimerEvent: {}
+[1.513321] (-) TimerEvent: {}
+[1.536334] (ur_controllers) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[1.538029] (ur_controllers) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[1.594728] (ur_controllers) StdoutLine: {'line': b'-- Found joint_trajectory_controller: 2.52.0 (/opt/ros/humble/share/joint_trajectory_controller/cmake)\n'}
+[1.614229] (-) TimerEvent: {}
+[1.680594] (ur_controllers) StdoutLine: {'line': b'-- Found std_srvs: 4.9.0 (/opt/ros/humble/share/std_srvs/cmake)\n'}
+[1.689938] (ur_controllers) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)\n'}
+[1.702299] (ur_controllers) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)\n'}
+[1.703783] (ur_controllers) StdoutLine: {'line': b'-- Found Eigen3: TRUE (found version "3.4.0") \n'}
+[1.704071] (ur_controllers) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[1.715184] (-) TimerEvent: {}
+[1.761813] (ur_controllers) StdoutLine: {'line': b'-- Found ur_dashboard_msgs: 4.5.0 (/workspace/ur5_ws/install/ur_dashboard_msgs/share/ur_dashboard_msgs/cmake)\n'}
+[1.792486] (ur_controllers) StderrLine: {'line': b'CMake Error at CMakeLists.txt:24 (find_package):\n'}
+[1.793049] (ur_controllers) StderrLine: {'line': b'  By not providing "Findur_msgs.cmake" in CMAKE_MODULE_PATH this project has\n'}
+[1.793505] (ur_controllers) StderrLine: {'line': b'  asked CMake to find a package configuration file provided by "ur_msgs", but\n'}
+[1.793896] (ur_controllers) StderrLine: {'line': b'  CMake did not find one.\n'}
+[1.794464] (ur_controllers) StderrLine: {'line': b'\n'}
+[1.794808] (ur_controllers) StderrLine: {'line': b'  Could not find a package configuration file provided by "ur_msgs" with any\n'}
+[1.795059] (ur_controllers) StderrLine: {'line': b'  of the following names:\n'}
+[1.799202] (ur_controllers) StderrLine: {'line': b'\n'}
+[1.799517] (ur_controllers) StderrLine: {'line': b'    ur_msgsConfig.cmake\n'}
+[1.799924] (ur_controllers) StderrLine: {'line': b'    ur_msgs-config.cmake\n'}
+[1.800307] (ur_controllers) StderrLine: {'line': b'\n'}
+[1.801393] (ur_controllers) StderrLine: {'line': b'  Add the installation prefix of "ur_msgs" to CMAKE_PREFIX_PATH or set\n'}
+[1.801586] (ur_controllers) StderrLine: {'line': b'  "ur_msgs_DIR" to a directory containing one of the above files.  If\n'}
+[1.801762] (ur_controllers) StderrLine: {'line': b'  "ur_msgs" provides a separate development package or SDK, be sure it has\n'}
+[1.801940] (ur_controllers) StderrLine: {'line': b'  been installed.\n'}
+[1.802151] (ur_controllers) StderrLine: {'line': b'\n'}
+[1.802331] (ur_controllers) StderrLine: {'line': b'\n'}
+[1.802507] (ur_controllers) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[1.802684] (ur_controllers) StdoutLine: {'line': b'See also "/workspace/ur5_ws/build/ur_controllers/CMakeFiles/CMakeOutput.log".\n'}
+[1.802851] (ur_controllers) CommandEnded: {'returncode': 1}
+[1.815068] (ur_controllers) JobEnded: {'identifier': 'ur_controllers', 'rc': 1}
+[1.816106] (-) TimerEvent: {}
+[1.825813] (ur_robot_driver) JobSkipped: {'identifier': 'ur_robot_driver'}
+[1.825884] (ur5_motion_planning) JobSkipped: {'identifier': 'ur5_motion_planning'}
+[1.825932] (ur_calibration) JobSkipped: {'identifier': 'ur_calibration'}
+[1.825970] (ur) JobSkipped: {'identifier': 'ur'}
+[1.826008] (-) EventReactorShutdown: {}

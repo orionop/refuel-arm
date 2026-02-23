@@ -20,4 +20,11 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+# Install Python Nodes
+install(PROGRAMS
+  scripts/ik_geometric.py
+  scripts/refuel_mission_commander.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

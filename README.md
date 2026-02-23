@@ -64,8 +64,9 @@ IKFlow ships with pre-trained models for Franka/Fetch, so we map out the specifi
 # Ensure you are in the venv (source venv/bin/activate)
 cd ikflow
 
-# 1. Install IKFlow into the venv
+# 1. Install IKFlow and Geometric IK dependencies into the venv
 uv pip install -e .
+uv pip install linearSubproblemSltns
 
 # 2. Generate 25 million valid KR6 joint poses
 uv run python scripts/build_dataset.py --robot_name=kr6_r700 --training_set_size=25000000 --only_non_self_colliding

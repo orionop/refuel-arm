@@ -1,0 +1,159 @@
+[0.000000] (-) TimerEvent: {}
+[0.001358] (-) JobUnselected: {'identifier': 'ur'}
+[0.001635] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.001784] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.001978] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.002137] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.002262] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.002318] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.002410] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.002482] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.004465] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config'), ('ur5_minimal_moveit', '/workspace/ur5_ws/install/ur5_minimal_moveit')])}
+[0.004548] (ur5_motion_planning) JobStarted: {'identifier': 'ur5_motion_planning'}
+[0.015081] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'cmake'}
+[0.016926] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'build'}
+[0.018218] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur5_motion_planning', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.051861] (ur5_motion_planning) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099904] (-) TimerEvent: {}
+[0.139868] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.160276] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.162061] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.165930] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.172998] (ur5_motion_planning) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.182019] (ur5_motion_planning) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.200872] (-) TimerEvent: {}
+[0.206306] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.208879] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.300802] (ur5_motion_planning) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.304220] (-) TimerEvent: {}
+[0.336054] (ur5_motion_planning) StdoutLine: {'line': b'-- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[0.344934] (ur5_motion_planning) StdoutLine: {'line': b'-- Found trajectory_msgs: 4.9.0 (/opt/ros/humble/share/trajectory_msgs/cmake)\n'}
+[0.357581] (ur5_motion_planning) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)\n'}
+[0.359980] (ur5_motion_planning) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)\n'}
+[0.361115] (ur5_motion_planning) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[0.404864] (-) TimerEvent: {}
+[0.419553] (ur5_motion_planning) StdoutLine: {'line': b'-- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)\n'}
+[0.430030] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread \n'}
+[0.450156] (ur5_motion_planning) StdoutLine: {'line': b'-- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)\n'}
+[0.454739] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[0.468849] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem \n'}
+[0.495292] (ur5_motion_planning) StdoutLine: {'line': b'-- library: /usr/lib/aarch64-linux-gnu/libcurl.so\n'}
+[0.505848] (-) TimerEvent: {}
+[0.607243] (-) TimerEvent: {}
+[0.639199] (ur5_motion_planning) StdoutLine: {'line': b'-- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)\n'}
+[0.648282] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread \n'}
+[0.689869] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono \n'}
+[0.707934] (-) TimerEvent: {}
+[0.719157] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options \n'}
+[0.773688] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread \n'}
+[0.808924] (-) TimerEvent: {}
+[0.905373] (ur5_motion_planning) StdoutLine: {'line': b'-- Configuring done\n'}
+[0.911337] (-) TimerEvent: {}
+[0.949107] (ur5_motion_planning) StdoutLine: {'line': b'-- Generating done\n'}
+[0.969887] (ur5_motion_planning) StdoutLine: {'line': b'-- Build files have been written to: /workspace/ur5_ws/build/ur5_motion_planning\n'}
+[1.011882] (-) TimerEvent: {}
+[1.112875] (-) TimerEvent: {}
+[1.181881] (ur5_motion_planning) StdoutLine: {'line': b'Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node\n'}
+[1.204008] (ur5_motion_planning) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o\n'}
+[1.214865] (-) TimerEvent: {}
+[1.319095] (-) TimerEvent: {}
+[1.422318] (-) TimerEvent: {}
+[1.528900] (-) TimerEvent: {}
+[1.631875] (-) TimerEvent: {}
+[1.732935] (-) TimerEvent: {}
+[1.833916] (-) TimerEvent: {}
+[1.934923] (-) TimerEvent: {}
+[2.035874] (-) TimerEvent: {}
+[2.136879] (-) TimerEvent: {}
+[2.237876] (-) TimerEvent: {}
+[2.338872] (-) TimerEvent: {}
+[2.439906] (-) TimerEvent: {}
+[2.540905] (-) TimerEvent: {}
+[2.641890] (-) TimerEvent: {}
+[2.746893] (-) TimerEvent: {}
+[2.847888] (-) TimerEvent: {}
+[2.948888] (-) TimerEvent: {}
+[3.049892] (-) TimerEvent: {}
+[3.150911] (-) TimerEvent: {}
+[3.251894] (-) TimerEvent: {}
+[3.352887] (-) TimerEvent: {}
+[3.453903] (-) TimerEvent: {}
+[3.554893] (-) TimerEvent: {}
+[3.655902] (-) TimerEvent: {}
+[3.756898] (-) TimerEvent: {}
+[3.857886] (-) TimerEvent: {}
+[3.958930] (-) TimerEvent: {}
+[4.060106] (-) TimerEvent: {}
+[4.164711] (-) TimerEvent: {}
+[4.267269] (-) TimerEvent: {}
+[4.370674] (-) TimerEvent: {}
+[4.473959] (-) TimerEvent: {}
+[4.576927] (-) TimerEvent: {}
+[4.680942] (-) TimerEvent: {}
+[4.781890] (-) TimerEvent: {}
+[4.882893] (-) TimerEvent: {}
+[4.983904] (-) TimerEvent: {}
+[5.084879] (-) TimerEvent: {}
+[5.185977] (-) TimerEvent: {}
+[5.290885] (-) TimerEvent: {}
+[5.391902] (-) TimerEvent: {}
+[5.492891] (-) TimerEvent: {}
+[5.593883] (-) TimerEvent: {}
+[5.694916] (-) TimerEvent: {}
+[5.795890] (-) TimerEvent: {}
+[5.896904] (-) TimerEvent: {}
+[5.997887] (-) TimerEvent: {}
+[6.098896] (-) TimerEvent: {}
+[6.199898] (-) TimerEvent: {}
+[6.300893] (-) TimerEvent: {}
+[6.401897] (-) TimerEvent: {}
+[6.502911] (-) TimerEvent: {}
+[6.603945] (-) TimerEvent: {}
+[6.704892] (-) TimerEvent: {}
+[6.805896] (-) TimerEvent: {}
+[6.906887] (-) TimerEvent: {}
+[7.007871] (-) TimerEvent: {}
+[7.108877] (-) TimerEvent: {}
+[7.209880] (-) TimerEvent: {}
+[7.310889] (-) TimerEvent: {}
+[7.412875] (-) TimerEvent: {}
+[7.513882] (-) TimerEvent: {}
+[7.614874] (-) TimerEvent: {}
+[7.715877] (-) TimerEvent: {}
+[7.816861] (-) TimerEvent: {}
+[7.917966] (-) TimerEvent: {}
+[8.019048] (-) TimerEvent: {}
+[8.120308] (-) TimerEvent: {}
+[8.197717] (ur5_motion_planning) StdoutLine: {'line': b'[100%] Linking CXX executable ur5_plan_and_analyze_node\n'}
+[8.220905] (-) TimerEvent: {}
+[8.321900] (-) TimerEvent: {}
+[8.424866] (-) TimerEvent: {}
+[8.525921] (-) TimerEvent: {}
+[8.534195] (ur5_motion_planning) StdoutLine: {'line': b'[100%] Built target ur5_plan_and_analyze_node\n'}
+[8.545266] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[8.548551] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'install'}
+[8.554656] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur5_motion_planning'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[8.559150] (ur5_motion_planning) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[8.559804] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node\n'}
+[8.580340] (ur5_motion_planning) StdoutLine: {'line': b'-- Set runtime path of "/workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node" to ""\n'}
+[8.580700] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch\n'}
+[8.581205] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch/run_plan_and_analyze.launch.py\n'}
+[8.583577] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/package_run_dependencies/ur5_motion_planning\n'}
+[8.586055] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/parent_prefix_path/ur5_motion_planning\n'}
+[8.588425] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.sh\n'}
+[8.589216] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.dsv\n'}
+[8.591720] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.sh\n'}
+[8.592685] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.dsv\n'}
+[8.594439] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.bash\n'}
+[8.594951] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.sh\n'}
+[8.595783] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.zsh\n'}
+[8.597120] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.dsv\n'}
+[8.599204] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.dsv\n'}
+[8.601005] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/packages/ur5_motion_planning\n'}
+[8.601390] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig.cmake\n'}
+[8.601759] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig-version.cmake\n'}
+[8.602196] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.xml\n'}
+[8.605221] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[8.626863] (-) TimerEvent: {}
+[8.641963] (ur5_motion_planning) JobEnded: {'identifier': 'ur5_motion_planning', 'rc': 0}
+[8.643702] (-) EventReactorShutdown: {}

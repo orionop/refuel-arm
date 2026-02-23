@@ -1,0 +1,97 @@
+[0.000000] (-) TimerEvent: {}
+[0.001237] (-) JobUnselected: {'identifier': 'ur'}
+[0.001432] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.001531] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.001667] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.001824] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.003768] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.003865] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.004113] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.004177] (ur5_kdl_ik) JobQueued: {'identifier': 'ur5_kdl_ik', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.004231] (ur5_kdl_ik) JobStarted: {'identifier': 'ur5_kdl_ik'}
+[0.011112] (ur5_kdl_ik) JobProgress: {'identifier': 'ur5_kdl_ik', 'progress': 'cmake'}
+[0.013984] (ur5_kdl_ik) Command: {'cmd': ['/usr/bin/cmake', '/workspace/ur5_ws/src/ur5_kdl_ik', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur5_kdl_ik'], 'cwd': '/workspace/ur5_ws/build/ur5_kdl_ik', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_kdl_ik'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.080627] (ur5_kdl_ik) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.100117] (-) TimerEvent: {}
+[0.133722] (ur5_kdl_ik) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.140735] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.201127] (-) TimerEvent: {}
+[0.216687] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.223597] (ur5_kdl_ik) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.224625] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.224976] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.228558] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.301953] (-) TimerEvent: {}
+[0.305286] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.312647] (ur5_kdl_ik) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.313522] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.313820] (ur5_kdl_ik) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.323351] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.403389] (-) TimerEvent: {}
+[0.407928] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter \n'}
+[0.452740] (ur5_kdl_ik) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.503926] (-) TimerEvent: {}
+[0.527384] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.603070] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.604794] (-) TimerEvent: {}
+[0.614706] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.628504] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.645704] (ur5_kdl_ik) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.667591] (ur5_kdl_ik) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.705915] (-) TimerEvent: {}
+[0.736672] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.742851] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.806924] (-) TimerEvent: {}
+[0.819297] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  \n'}
+[0.837628] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/humble/include  \n'}
+[0.864437] (ur5_kdl_ik) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.884473] (ur5_kdl_ik) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[0.907917] (-) TimerEvent: {}
+[0.962911] (ur5_kdl_ik) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[0.964050] (ur5_kdl_ik) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[1.009166] (-) TimerEvent: {}
+[1.039646] (ur5_kdl_ik) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[1.041652] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[1.101677] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[1.109865] (-) TimerEvent: {}
+[1.115825] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)\n'}
+[1.139433] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)\n'}
+[1.141121] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found Eigen3: TRUE (found version "3.4.0") \n'}
+[1.141386] (ur5_kdl_ik) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[1.210919] (-) TimerEvent: {}
+[1.265894] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)\n'}
+[1.311912] (-) TimerEvent: {}
+[1.334140] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread \n'}
+[1.392570] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)\n'}
+[1.413197] (-) TimerEvent: {}
+[1.466819] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[1.506153] (ur5_kdl_ik) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem \n'}
+[1.513865] (-) TimerEvent: {}
+[1.568276] (ur5_kdl_ik) StdoutLine: {'line': b'-- library: /usr/lib/aarch64-linux-gnu/libcurl.so\n'}
+[1.614885] (-) TimerEvent: {}
+[1.723389] (-) TimerEvent: {}
+[1.794877] (ur5_kdl_ik) StderrLine: {'line': b'CMake Error at CMakeLists.txt:13 (find_package):\n'}
+[1.795490] (ur5_kdl_ik) StderrLine: {'line': b'  By not providing "Findmoveit_ros_planning_interface.cmake" in\n'}
+[1.795980] (ur5_kdl_ik) StderrLine: {'line': b'  CMAKE_MODULE_PATH this project has asked CMake to find a package\n'}
+[1.796411] (ur5_kdl_ik) StderrLine: {'line': b'  configuration file provided by "moveit_ros_planning_interface", but CMake\n'}
+[1.796891] (ur5_kdl_ik) StderrLine: {'line': b'  did not find one.\n'}
+[1.797306] (ur5_kdl_ik) StderrLine: {'line': b'\n'}
+[1.797762] (ur5_kdl_ik) StderrLine: {'line': b'  Could not find a package configuration file provided by\n'}
+[1.804094] (ur5_kdl_ik) StderrLine: {'line': b'  "moveit_ros_planning_interface" with any of the following names:\n'}
+[1.804680] (ur5_kdl_ik) StderrLine: {'line': b'\n'}
+[1.805391] (ur5_kdl_ik) StderrLine: {'line': b'    moveit_ros_planning_interfaceConfig.cmake\n'}
+[1.806825] (ur5_kdl_ik) StderrLine: {'line': b'    moveit_ros_planning_interface-config.cmake\n'}
+[1.807338] (ur5_kdl_ik) StderrLine: {'line': b'\n'}
+[1.807692] (ur5_kdl_ik) StderrLine: {'line': b'  Add the installation prefix of "moveit_ros_planning_interface" to\n'}
+[1.808191] (ur5_kdl_ik) StderrLine: {'line': b'  CMAKE_PREFIX_PATH or set "moveit_ros_planning_interface_DIR" to a directory\n'}
+[1.808493] (ur5_kdl_ik) StderrLine: {'line': b'  containing one of the above files.  If "moveit_ros_planning_interface"\n'}
+[1.808731] (ur5_kdl_ik) StderrLine: {'line': b'  provides a separate development package or SDK, be sure it has been\n'}
+[1.809003] (ur5_kdl_ik) StderrLine: {'line': b'  installed.\n'}
+[1.809233] (ur5_kdl_ik) StderrLine: {'line': b'\n'}
+[1.809468] (ur5_kdl_ik) StderrLine: {'line': b'\n'}
+[1.809697] (ur5_kdl_ik) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[1.809927] (ur5_kdl_ik) StdoutLine: {'line': b'See also "/workspace/ur5_ws/build/ur5_kdl_ik/CMakeFiles/CMakeOutput.log".\n'}
+[1.810160] (ur5_kdl_ik) CommandEnded: {'returncode': 1}
+[1.823881] (-) TimerEvent: {}
+[1.825821] (ur5_kdl_ik) JobEnded: {'identifier': 'ur5_kdl_ik', 'rc': 1}
+[1.837497] (-) EventReactorShutdown: {}

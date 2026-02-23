@@ -1,0 +1,205 @@
+[0.000000] (-) TimerEvent: {}
+[0.001152] (-) JobUnselected: {'identifier': 'ur'}
+[0.001406] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.001987] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.002571] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.003225] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.003597] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.003671] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.003864] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.004171] (ur5_minimal_moveit) JobQueued: {'identifier': 'ur5_minimal_moveit', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.004599] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.004801] (ur5_minimal_moveit) JobStarted: {'identifier': 'ur5_minimal_moveit'}
+[0.013376] (ur5_motion_planning) JobStarted: {'identifier': 'ur5_motion_planning'}
+[0.100672] (-) TimerEvent: {}
+[0.202766] (-) TimerEvent: {}
+[0.250812] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'cmake'}
+[0.254878] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '/workspace/ur5_ws/src/ur5_motion_planning', '-DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur5_motion_planning'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.274623] (ur5_motion_planning) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.303006] (-) TimerEvent: {}
+[0.369030] (ur5_motion_planning) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.384345] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.404045] (-) TimerEvent: {}
+[0.412981] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.413423] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.417397] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.424862] (ur5_motion_planning) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.434348] (ur5_motion_planning) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.457759] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.459018] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.489587] (ur5_minimal_moveit) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--uninstall', '--editable', '--build-directory', '/workspace/ur5_ws/build/ur5_minimal_moveit/build'], 'cwd': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'env': {'HOSTNAME': '10a6f84be8b2', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/', 'ROS_PYTHON_VERSION': '3', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'AMENT_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble', 'PWD': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description'}, 'shell': False}
+[0.505128] (-) TimerEvent: {}
+[0.568321] (ur5_motion_planning) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.604130] (ur5_motion_planning) StdoutLine: {'line': b'-- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[0.605874] (-) TimerEvent: {}
+[0.614568] (ur5_motion_planning) StdoutLine: {'line': b'-- Found trajectory_msgs: 4.9.0 (/opt/ros/humble/share/trajectory_msgs/cmake)\n'}
+[0.628167] (ur5_motion_planning) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)\n'}
+[0.630467] (ur5_motion_planning) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)\n'}
+[0.631683] (ur5_motion_planning) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[0.631997] (ur5_minimal_moveit) StdoutLine: {'line': b'running develop\n'}
+[0.686059] (ur5_minimal_moveit) StdoutLine: {'line': b'Removing /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5-minimal-moveit.egg-link (link to .)\n'}
+[0.692360] (ur5_motion_planning) StdoutLine: {'line': b'-- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)\n'}
+[0.702910] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread \n'}
+[0.703934] (ur5_minimal_moveit) CommandEnded: {'returncode': 0}
+[0.706412] (ur5_minimal_moveit) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/ur5_minimal_moveit', 'build', '--build-base', '/workspace/ur5_ws/build/ur5_minimal_moveit/build', 'install', '--record', '/workspace/ur5_ws/build/ur5_minimal_moveit/install.log', '--single-version-externally-managed', 'install_data', '--force'], 'cwd': '/workspace/ur5_ws/src/ur5_minimal_moveit', 'env': {'HOSTNAME': '10a6f84be8b2', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/', 'ROS_PYTHON_VERSION': '3', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'AMENT_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble', 'PWD': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description'}, 'shell': False}
+[0.707126] (-) TimerEvent: {}
+[0.724923] (ur5_motion_planning) StdoutLine: {'line': b'-- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)\n'}
+[0.734006] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[0.744147] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem \n'}
+[0.769549] (ur5_motion_planning) StdoutLine: {'line': b'-- library: /usr/lib/aarch64-linux-gnu/libcurl.so\n'}
+[0.807986] (-) TimerEvent: {}
+[0.820910] (ur5_minimal_moveit) StdoutLine: {'line': b'running egg_info\n'}
+[0.821973] (ur5_minimal_moveit) StdoutLine: {'line': b'writing ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/PKG-INFO\n'}
+[0.822617] (ur5_minimal_moveit) StdoutLine: {'line': b'writing dependency_links to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/dependency_links.txt\n'}
+[0.823293] (ur5_minimal_moveit) StdoutLine: {'line': b'writing entry points to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/entry_points.txt\n'}
+[0.823856] (ur5_minimal_moveit) StdoutLine: {'line': b'writing requirements to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/requires.txt\n'}
+[0.824323] (ur5_minimal_moveit) StdoutLine: {'line': b'writing top-level names to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/top_level.txt\n'}
+[0.827659] (ur5_minimal_moveit) StdoutLine: {'line': b"reading manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.829485] (ur5_minimal_moveit) StdoutLine: {'line': b"writing manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.829882] (ur5_minimal_moveit) StdoutLine: {'line': b'running build\n'}
+[0.830126] (ur5_minimal_moveit) StdoutLine: {'line': b'running build_py\n'}
+[0.830769] (ur5_minimal_moveit) StdoutLine: {'line': b'copying ur5_minimal_moveit/fake_joint_trajectory_controller.py -> /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit\n'}
+[0.831994] (ur5_minimal_moveit) StdoutLine: {'line': b'running install\n'}
+[0.832577] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_lib\n'}
+[0.833097] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit\n'}
+[0.833529] (ur5_minimal_moveit) StdoutLine: {'line': b'copying /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit/__init__.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit\n'}
+[0.834520] (ur5_minimal_moveit) StdoutLine: {'line': b'copying /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit/fake_joint_trajectory_controller.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit\n'}
+[0.836141] (ur5_minimal_moveit) StdoutLine: {'line': b'byte-compiling /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit/__init__.py to __init__.cpython-310.pyc\n'}
+[0.837476] (ur5_minimal_moveit) StdoutLine: {'line': b'byte-compiling /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit/fake_joint_trajectory_controller.py to fake_joint_trajectory_controller.cpython-310.pyc\n'}
+[0.839054] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_data\n'}
+[0.839449] (ur5_minimal_moveit) StdoutLine: {'line': b'copying resource/ur5_minimal_moveit -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index/packages\n'}
+[0.840628] (ur5_minimal_moveit) StdoutLine: {'line': b'copying package.xml -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit\n'}
+[0.841791] (ur5_minimal_moveit) StdoutLine: {'line': b'copying launch/ur5_moveit_minimal.launch.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch\n'}
+[0.843039] (ur5_minimal_moveit) StdoutLine: {'line': b'copying launch/ur5_visualize.launch.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch\n'}
+[0.844998] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_egg_info\n'}
+[0.845968] (ur5_minimal_moveit) StdoutLine: {'line': b'Copying ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit-0.0.0-py3.10.egg-info\n'}
+[0.853161] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_scripts\n'}
+[0.864897] (ur5_minimal_moveit) StdoutLine: {'line': b'Installing fake_joint_trajectory_controller script to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/ur5_minimal_moveit\n'}
+[0.867241] (ur5_minimal_moveit) StdoutLine: {'line': b"writing list of installed files to '/workspace/ur5_ws/build/ur5_minimal_moveit/install.log'\n"}
+[0.886680] (ur5_minimal_moveit) CommandEnded: {'returncode': 0}
+[0.896148] (ur5_motion_planning) StdoutLine: {'line': b'-- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)\n'}
+[0.899760] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread \n'}
+[0.903294] (ur5_minimal_moveit) JobEnded: {'identifier': 'ur5_minimal_moveit', 'rc': 0}
+[0.908254] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono \n'}
+[0.908474] (-) TimerEvent: {}
+[0.931572] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options \n'}
+[0.947093] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread \n'}
+[1.009024] (-) TimerEvent: {}
+[1.035170] (ur5_motion_planning) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.085577] (ur5_motion_planning) StdoutLine: {'line': b'-- Generating done\n'}
+[1.102897] (ur5_motion_planning) StdoutLine: {'line': b'-- Build files have been written to: /workspace/ur5_ws/build/ur5_motion_planning\n'}
+[1.109658] (-) TimerEvent: {}
+[1.110288] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[1.111121] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'build'}
+[1.112391] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur5_motion_planning', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[1.145591] (ur5_motion_planning) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target ur5_plan_and_analyze_node\x1b[0m\n'}
+[1.210020] (-) TimerEvent: {}
+[1.311046] (-) TimerEvent: {}
+[1.364679] (ur5_motion_planning) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o\x1b[0m\n'}
+[1.412019] (-) TimerEvent: {}
+[1.518281] (-) TimerEvent: {}
+[1.620503] (-) TimerEvent: {}
+[1.724748] (-) TimerEvent: {}
+[1.828277] (-) TimerEvent: {}
+[1.934908] (-) TimerEvent: {}
+[2.042485] (-) TimerEvent: {}
+[2.147053] (-) TimerEvent: {}
+[2.248031] (-) TimerEvent: {}
+[2.349020] (-) TimerEvent: {}
+[2.450063] (-) TimerEvent: {}
+[2.551039] (-) TimerEvent: {}
+[2.652065] (-) TimerEvent: {}
+[2.754088] (-) TimerEvent: {}
+[2.858028] (-) TimerEvent: {}
+[2.959024] (-) TimerEvent: {}
+[3.060041] (-) TimerEvent: {}
+[3.161029] (-) TimerEvent: {}
+[3.262082] (-) TimerEvent: {}
+[3.363214] (-) TimerEvent: {}
+[3.464089] (-) TimerEvent: {}
+[3.565087] (-) TimerEvent: {}
+[3.671232] (-) TimerEvent: {}
+[3.772047] (-) TimerEvent: {}
+[3.873033] (-) TimerEvent: {}
+[3.974035] (-) TimerEvent: {}
+[4.075028] (-) TimerEvent: {}
+[4.176088] (-) TimerEvent: {}
+[4.277096] (-) TimerEvent: {}
+[4.378053] (-) TimerEvent: {}
+[4.479063] (-) TimerEvent: {}
+[4.583038] (-) TimerEvent: {}
+[4.684086] (-) TimerEvent: {}
+[4.785086] (-) TimerEvent: {}
+[4.886105] (-) TimerEvent: {}
+[4.987029] (-) TimerEvent: {}
+[5.088074] (-) TimerEvent: {}
+[5.189106] (-) TimerEvent: {}
+[5.294034] (-) TimerEvent: {}
+[5.395011] (-) TimerEvent: {}
+[5.496014] (-) TimerEvent: {}
+[5.597036] (-) TimerEvent: {}
+[5.698027] (-) TimerEvent: {}
+[5.799055] (-) TimerEvent: {}
+[5.900055] (-) TimerEvent: {}
+[6.001020] (-) TimerEvent: {}
+[6.102047] (-) TimerEvent: {}
+[6.203055] (-) TimerEvent: {}
+[6.304066] (-) TimerEvent: {}
+[6.405054] (-) TimerEvent: {}
+[6.510015] (-) TimerEvent: {}
+[6.611278] (-) TimerEvent: {}
+[6.713024] (-) TimerEvent: {}
+[6.814019] (-) TimerEvent: {}
+[6.915030] (-) TimerEvent: {}
+[7.016027] (-) TimerEvent: {}
+[7.117047] (-) TimerEvent: {}
+[7.219138] (-) TimerEvent: {}
+[7.321053] (-) TimerEvent: {}
+[7.424337] (-) TimerEvent: {}
+[7.528401] (-) TimerEvent: {}
+[7.630309] (-) TimerEvent: {}
+[7.735125] (-) TimerEvent: {}
+[7.836086] (-) TimerEvent: {}
+[7.940323] (-) TimerEvent: {}
+[8.041080] (-) TimerEvent: {}
+[8.144558] (-) TimerEvent: {}
+[8.249848] (-) TimerEvent: {}
+[8.352080] (-) TimerEvent: {}
+[8.454857] (-) TimerEvent: {}
+[8.556274] (-) TimerEvent: {}
+[8.657276] (-) TimerEvent: {}
+[8.758145] (-) TimerEvent: {}
+[8.859266] (-) TimerEvent: {}
+[8.959456] (ur5_motion_planning) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable ur5_plan_and_analyze_node\x1b[0m\n'}
+[8.960775] (-) TimerEvent: {}
+[9.061034] (-) TimerEvent: {}
+[9.166262] (-) TimerEvent: {}
+[9.268038] (-) TimerEvent: {}
+[9.369042] (-) TimerEvent: {}
+[9.432824] (ur5_motion_planning) StdoutLine: {'line': b'[100%] Built target ur5_plan_and_analyze_node\n'}
+[9.443169] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[9.446370] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'install'}
+[9.454098] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur5_motion_planning'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[9.459333] (ur5_motion_planning) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[9.460610] (ur5_motion_planning) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[9.461848] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node\n'}
+[9.463145] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch/run_plan_and_analyze.launch.py\n'}
+[9.463885] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/package_run_dependencies/ur5_motion_planning\n'}
+[9.464608] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/parent_prefix_path/ur5_motion_planning\n'}
+[9.465406] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.sh\n'}
+[9.466038] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.dsv\n'}
+[9.466907] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.sh\n'}
+[9.467723] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.dsv\n'}
+[9.468302] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.bash\n'}
+[9.468876] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.sh\n'}
+[9.469204] (-) TimerEvent: {}
+[9.469704] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.zsh\n'}
+[9.470578] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.dsv\n'}
+[9.471001] (ur5_motion_planning) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.dsv\n'}
+[9.478993] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/packages/ur5_motion_planning\n'}
+[9.479718] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig.cmake\n'}
+[9.480348] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig-version.cmake\n'}
+[9.480923] (ur5_motion_planning) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.xml\n'}
+[9.483118] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[9.515396] (ur5_motion_planning) JobEnded: {'identifier': 'ur5_motion_planning', 'rc': 0}
+[9.517528] (-) EventReactorShutdown: {}

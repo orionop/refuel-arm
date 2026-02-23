@@ -1,0 +1,1 @@
+ament_cmake_symlink_install_targets("TARGET_FILES" "/workspace/ur5_ws/build/ur5_motion_planning/ur5_plan_and_analyze_node" "TARGETS" "ur5_plan_and_analyze_node" "DESTINATION" "lib/ur5_motion_planning")

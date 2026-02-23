@@ -1,0 +1,81 @@
+[0.012s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[0.052s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.126s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.140s] -- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)
+[0.162s] -- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.167s] -- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.167s] -- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.174s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.183s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.206s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.206s] -- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.287s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.319s] -- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)
+[0.327s] -- Found trajectory_msgs: 4.9.0 (/opt/ros/humble/share/trajectory_msgs/cmake)
+[0.339s] -- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)
+[0.341s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)
+[0.342s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[0.401s] -- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)
+[0.412s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread 
+[0.432s] -- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)
+[0.435s] -- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)
+[0.450s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem 
+[0.479s] -- library: /usr/lib/aarch64-linux-gnu/libcurl.so
+[0.664s] -- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)
+[0.667s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread 
+[0.673s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono 
+[0.698s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options 
+[0.717s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread 
+[0.801s] -- Configuring done
+[0.851s] -- Generating done
+[0.878s] -- Build files have been written to: /workspace/ur5_ws/build/ur5_motion_planning
+[1.082s] Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node
+[1.111s] [ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o
+[4.525s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function ‘int main(int, char**)’:
+[4.529s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: error: no matching function for call to ‘max(size_t&, unsigned int)’
+[4.529s]   155 |   n_steps = std::max(n_steps, 2u);
+[4.530s]       |             ~~~~~~~~^~~~~~~~~~~~~
+[4.530s] In file included from /usr/include/c++/11/bits/specfun.h:45,
+[4.530s]                  from /usr/include/c++/11/cmath:1935,
+[4.530s]                  from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:9:
+[4.530s] /usr/include/c++/11/bits/stl_algobase.h:254:5: note: candidate: ‘template<class _Tp> constexpr const _Tp& std::max(const _Tp&, const _Tp&)’
+[4.531s]   254 |     max(const _Tp& __a, const _Tp& __b)
+[4.531s]       |     ^~~
+[4.531s] /usr/include/c++/11/bits/stl_algobase.h:254:5: note:   template argument deduction/substitution failed:
+[4.531s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   deduced conflicting types for parameter ‘const _Tp’ (‘long unsigned int’ and ‘unsigned int’)
+[4.531s]   155 |   n_steps = std::max(n_steps, 2u);
+[4.531s]       |             ~~~~~~~~^~~~~~~~~~~~~
+[4.532s] In file included from /usr/include/c++/11/bits/specfun.h:45,
+[4.532s]                  from /usr/include/c++/11/cmath:1935,
+[4.532s]                  from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:9:
+[4.532s] /usr/include/c++/11/bits/stl_algobase.h:300:5: note: candidate: ‘template<class _Tp, class _Compare> constexpr const _Tp& std::max(const _Tp&, const _Tp&, _Compare)’
+[4.532s]   300 |     max(const _Tp& __a, const _Tp& __b, _Compare __comp)
+[4.533s]       |     ^~~
+[4.533s] /usr/include/c++/11/bits/stl_algobase.h:300:5: note:   template argument deduction/substitution failed:
+[4.533s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   deduced conflicting types for parameter ‘const _Tp’ (‘long unsigned int’ and ‘unsigned int’)
+[4.533s]   155 |   n_steps = std::max(n_steps, 2u);
+[4.533s]       |             ~~~~~~~~^~~~~~~~~~~~~
+[4.533s] In file included from /usr/include/c++/11/functional:65,
+[4.534s]                  from /usr/include/eigen3/Eigen/Core:85,
+[4.534s]                  from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:16:
+[4.534s] /usr/include/c++/11/bits/stl_algo.h:3461:5: note: candidate: ‘template<class _Tp> constexpr _Tp std::max(std::initializer_list<_Tp>)’
+[4.534s]  3461 |     max(initializer_list<_Tp> __l)
+[4.534s]       |     ^~~
+[4.535s] /usr/include/c++/11/bits/stl_algo.h:3461:5: note:   template argument deduction/substitution failed:
+[4.535s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   mismatched types ‘std::initializer_list<_Tp>’ and ‘long unsigned int’
+[4.535s]   155 |   n_steps = std::max(n_steps, 2u);
+[4.535s]       |             ~~~~~~~~^~~~~~~~~~~~~
+[4.535s] In file included from /usr/include/c++/11/functional:65,
+[4.536s]                  from /usr/include/eigen3/Eigen/Core:85,
+[4.536s]                  from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:16:
+[4.536s] /usr/include/c++/11/bits/stl_algo.h:3467:5: note: candidate: ‘template<class _Tp, class _Compare> constexpr _Tp std::max(std::initializer_list<_Tp>, _Compare)’
+[4.536s]  3467 |     max(initializer_list<_Tp> __l, _Compare __comp)
+[4.537s]       |     ^~~
+[4.537s] /usr/include/c++/11/bits/stl_algo.h:3467:5: note:   template argument deduction/substitution failed:
+[4.537s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   mismatched types ‘std::initializer_list<_Tp>’ and ‘long unsigned int’
+[4.540s]   155 |   n_steps = std::max(n_steps, 2u);
+[4.540s]       |             ~~~~~~~~^~~~~~~~~~~~~
+[7.143s] gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1
+[7.143s] gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2
+[7.143s] gmake: *** [Makefile:146: all] Error 2
+[7.146s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '2': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11

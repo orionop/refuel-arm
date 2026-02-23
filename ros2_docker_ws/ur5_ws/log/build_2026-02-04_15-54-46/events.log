@@ -1,0 +1,58 @@
+[0.000000] (-) TimerEvent: {}
+[0.000504] (-) JobUnselected: {'identifier': 'ur'}
+[0.000611] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.000765] (-) JobUnselected: {'identifier': 'ur5_motion_planning'}
+[0.000954] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.001072] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.001264] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.001418] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.001557] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.001760] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.001891] (ur5_minimal_moveit) JobQueued: {'identifier': 'ur5_minimal_moveit', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.002051] (ur5_minimal_moveit) JobStarted: {'identifier': 'ur5_minimal_moveit'}
+[0.098061] (-) TimerEvent: {}
+[0.198870] (-) TimerEvent: {}
+[0.307288] (-) TimerEvent: {}
+[0.338130] (ur5_minimal_moveit) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/ur5_minimal_moveit', 'build', '--build-base', '/workspace/ur5_ws/build/ur5_minimal_moveit/build', 'install', '--record', '/workspace/ur5_ws/build/ur5_minimal_moveit/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/workspace/ur5_ws/src/ur5_minimal_moveit', 'env': {'HOSTNAME': '10a6f84be8b2', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/', 'ROS_PYTHON_VERSION': '3', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'AMENT_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble', 'PWD': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description'}, 'shell': False}
+[0.407915] (-) TimerEvent: {}
+[0.484940] (ur5_minimal_moveit) StdoutLine: {'line': b'running egg_info\n'}
+[0.486125] (ur5_minimal_moveit) StdoutLine: {'line': b'creating ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info\n'}
+[0.486780] (ur5_minimal_moveit) StdoutLine: {'line': b'writing ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/PKG-INFO\n'}
+[0.487864] (ur5_minimal_moveit) StdoutLine: {'line': b'writing dependency_links to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/dependency_links.txt\n'}
+[0.488890] (ur5_minimal_moveit) StdoutLine: {'line': b'writing entry points to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/entry_points.txt\n'}
+[0.490204] (ur5_minimal_moveit) StdoutLine: {'line': b'writing requirements to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/requires.txt\n'}
+[0.490736] (ur5_minimal_moveit) StdoutLine: {'line': b'writing top-level names to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/top_level.txt\n'}
+[0.491672] (ur5_minimal_moveit) StdoutLine: {'line': b"writing manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.494419] (ur5_minimal_moveit) StdoutLine: {'line': b"reading manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.496291] (ur5_minimal_moveit) StdoutLine: {'line': b"writing manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.497433] (ur5_minimal_moveit) StdoutLine: {'line': b'running build\n'}
+[0.497906] (ur5_minimal_moveit) StdoutLine: {'line': b'running build_py\n'}
+[0.498499] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/build/ur5_minimal_moveit/build\n'}
+[0.499147] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib\n'}
+[0.499404] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit\n'}
+[0.499701] (ur5_minimal_moveit) StdoutLine: {'line': b'copying ur5_minimal_moveit/__init__.py -> /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit\n'}
+[0.500524] (ur5_minimal_moveit) StdoutLine: {'line': b'copying ur5_minimal_moveit/fake_joint_trajectory_controller.py -> /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit\n'}
+[0.502894] (ur5_minimal_moveit) StdoutLine: {'line': b'running install\n'}
+[0.503618] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_lib\n'}
+[0.504490] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit\n'}
+[0.504943] (ur5_minimal_moveit) StdoutLine: {'line': b'copying /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit/__init__.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit\n'}
+[0.506322] (ur5_minimal_moveit) StdoutLine: {'line': b'copying /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit/fake_joint_trajectory_controller.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit\n'}
+[0.508141] (ur5_minimal_moveit) StdoutLine: {'line': b'byte-compiling /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit/__init__.py to __init__.cpython-310.pyc\n'}
+[0.508464] (-) TimerEvent: {}
+[0.511170] (ur5_minimal_moveit) StdoutLine: {'line': b'byte-compiling /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit/fake_joint_trajectory_controller.py to fake_joint_trajectory_controller.cpython-310.pyc\n'}
+[0.513153] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_data\n'}
+[0.513878] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index\n'}
+[0.514390] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index\n'}
+[0.514705] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index/packages\n'}
+[0.515113] (ur5_minimal_moveit) StdoutLine: {'line': b'copying resource/ur5_minimal_moveit -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index/packages\n'}
+[0.515935] (ur5_minimal_moveit) StdoutLine: {'line': b'copying package.xml -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit\n'}
+[0.516973] (ur5_minimal_moveit) StdoutLine: {'line': b'creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch\n'}
+[0.517537] (ur5_minimal_moveit) StdoutLine: {'line': b'copying launch/ur5_moveit_minimal.launch.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch\n'}
+[0.518875] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_egg_info\n'}
+[0.520282] (ur5_minimal_moveit) StdoutLine: {'line': b'Copying ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit-0.0.0-py3.10.egg-info\n'}
+[0.531084] (ur5_minimal_moveit) StdoutLine: {'line': b'running install_scripts\n'}
+[0.546275] (ur5_minimal_moveit) StdoutLine: {'line': b'Installing fake_joint_trajectory_controller script to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/ur5_minimal_moveit\n'}
+[0.548523] (ur5_minimal_moveit) StdoutLine: {'line': b"writing list of installed files to '/workspace/ur5_ws/build/ur5_minimal_moveit/install.log'\n"}
+[0.571037] (ur5_minimal_moveit) CommandEnded: {'returncode': 0}
+[0.596324] (ur5_minimal_moveit) JobEnded: {'identifier': 'ur5_minimal_moveit', 'rc': 0}
+[0.598505] (-) EventReactorShutdown: {}

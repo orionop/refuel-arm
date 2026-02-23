@@ -1,0 +1,14 @@
+[0.000000] (-) TimerEvent: {}
+[0.000164] (-) JobUnselected: {'identifier': 'ur'}
+[0.000295] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.001062] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.001146] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.001246] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.001295] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.001371] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.001487] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.001537] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.001604] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_dashboard_msgs', '/workspace/ur5_ws/install/ur_dashboard_msgs'), ('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_controllers', '/workspace/ur5_ws/install/ur_controllers'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config'), ('ur5_minimal_moveit', '/workspace/ur5_ws/install/ur5_minimal_moveit'), ('ur_robot_driver', '/workspace/ur5_ws/install/ur_robot_driver')])}
+[0.001695] (ur5_motion_planning) JobStarted: {'identifier': 'ur5_motion_planning'}
+[0.024254] (ur5_motion_planning) JobEnded: {'identifier': 'ur5_motion_planning', 'rc': 1}
+[0.035446] (-) EventReactorShutdown: {}

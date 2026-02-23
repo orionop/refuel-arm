@@ -1,0 +1,1 @@
+/workspace/ur5_ws/build/ur5_minimal_moveit/launch/ur5_moveit_minimal.launch.py

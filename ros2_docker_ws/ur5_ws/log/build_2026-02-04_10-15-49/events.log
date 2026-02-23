@@ -1,0 +1,167 @@
+[0.000000] (-) TimerEvent: {}
+[0.001140] (-) JobUnselected: {'identifier': 'ur'}
+[0.001323] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.001385] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.001501] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.001635] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.001774] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.003822] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.003948] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.004080] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.004188] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.004546] (ur5_motion_planning) JobStarted: {'identifier': 'ur5_motion_planning'}
+[0.011955] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'cmake'}
+[0.013786] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'build'}
+[0.014917] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur5_motion_planning', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.052108] (ur5_motion_planning) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099571] (-) TimerEvent: {}
+[0.130136] (ur5_motion_planning) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.141496] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.163162] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.167577] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.171566] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.175353] (ur5_motion_planning) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.184208] (ur5_motion_planning) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.200530] (-) TimerEvent: {}
+[0.206348] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.210557] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.288513] (ur5_motion_planning) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.301504] (-) TimerEvent: {}
+[0.322894] (ur5_motion_planning) StdoutLine: {'line': b'-- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[0.331544] (ur5_motion_planning) StdoutLine: {'line': b'-- Found trajectory_msgs: 4.9.0 (/opt/ros/humble/share/trajectory_msgs/cmake)\n'}
+[0.343639] (ur5_motion_planning) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)\n'}
+[0.345866] (ur5_motion_planning) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)\n'}
+[0.346957] (ur5_motion_planning) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[0.402509] (-) TimerEvent: {}
+[0.405001] (ur5_motion_planning) StdoutLine: {'line': b'-- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)\n'}
+[0.415976] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread \n'}
+[0.434338] (ur5_motion_planning) StdoutLine: {'line': b'-- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)\n'}
+[0.439427] (ur5_motion_planning) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[0.454668] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem \n'}
+[0.480438] (ur5_motion_planning) StdoutLine: {'line': b'-- library: /usr/lib/aarch64-linux-gnu/libcurl.so\n'}
+[0.503507] (-) TimerEvent: {}
+[0.604522] (-) TimerEvent: {}
+[0.661632] (ur5_motion_planning) StdoutLine: {'line': b'-- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)\n'}
+[0.668413] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread \n'}
+[0.677554] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono \n'}
+[0.701950] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options \n'}
+[0.705553] (-) TimerEvent: {}
+[0.721302] (ur5_motion_planning) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread \n'}
+[0.805146] (ur5_motion_planning) StdoutLine: {'line': b'-- Configuring done\n'}
+[0.806004] (-) TimerEvent: {}
+[0.855101] (ur5_motion_planning) StdoutLine: {'line': b'-- Generating done\n'}
+[0.876524] (ur5_motion_planning) StdoutLine: {'line': b'-- Build files have been written to: /workspace/ur5_ws/build/ur5_motion_planning\n'}
+[0.906541] (-) TimerEvent: {}
+[1.007526] (-) TimerEvent: {}
+[1.085710] (ur5_motion_planning) StdoutLine: {'line': b'Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node\n'}
+[1.108766] (-) TimerEvent: {}
+[1.115166] (ur5_motion_planning) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o\n'}
+[1.209587] (-) TimerEvent: {}
+[1.314525] (-) TimerEvent: {}
+[1.415533] (-) TimerEvent: {}
+[1.516541] (-) TimerEvent: {}
+[1.617520] (-) TimerEvent: {}
+[1.718526] (-) TimerEvent: {}
+[1.819515] (-) TimerEvent: {}
+[1.920531] (-) TimerEvent: {}
+[2.021536] (-) TimerEvent: {}
+[2.122509] (-) TimerEvent: {}
+[2.224533] (-) TimerEvent: {}
+[2.325529] (-) TimerEvent: {}
+[2.426553] (-) TimerEvent: {}
+[2.527519] (-) TimerEvent: {}
+[2.628540] (-) TimerEvent: {}
+[2.729561] (-) TimerEvent: {}
+[2.830561] (-) TimerEvent: {}
+[2.931537] (-) TimerEvent: {}
+[3.032536] (-) TimerEvent: {}
+[3.133535] (-) TimerEvent: {}
+[3.234587] (-) TimerEvent: {}
+[3.337579] (-) TimerEvent: {}
+[3.438591] (-) TimerEvent: {}
+[3.539564] (-) TimerEvent: {}
+[3.640567] (-) TimerEvent: {}
+[3.741609] (-) TimerEvent: {}
+[3.842566] (-) TimerEvent: {}
+[3.943712] (-) TimerEvent: {}
+[4.055737] (-) TimerEvent: {}
+[4.158581] (-) TimerEvent: {}
+[4.259556] (-) TimerEvent: {}
+[4.360580] (-) TimerEvent: {}
+[4.461607] (-) TimerEvent: {}
+[4.526561] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function \xe2\x80\x98int main(int, char**)\xe2\x80\x99:\n'}
+[4.533546] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: error: no matching function for call to \xe2\x80\x98max(size_t&, unsigned int)\xe2\x80\x99\n'}
+[4.533823] (ur5_motion_planning) StderrLine: {'line': b'  155 |   n_steps = std::max(n_steps, 2u);\n'}
+[4.534076] (ur5_motion_planning) StderrLine: {'line': b'      |             ~~~~~~~~^~~~~~~~~~~~~\n'}
+[4.534253] (ur5_motion_planning) StderrLine: {'line': b'In file included from /usr/include/c++/11/bits/specfun.h:45,\n'}
+[4.534425] (ur5_motion_planning) StderrLine: {'line': b'                 from /usr/include/c++/11/cmath:1935,\n'}
+[4.534605] (ur5_motion_planning) StderrLine: {'line': b'                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:9:\n'}
+[4.534784] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algobase.h:254:5: note: candidate: \xe2\x80\x98template<class _Tp> constexpr const _Tp& std::max(const _Tp&, const _Tp&)\xe2\x80\x99\n'}
+[4.534978] (ur5_motion_planning) StderrLine: {'line': b'  254 |     max(const _Tp& __a, const _Tp& __b)\n'}
+[4.535168] (ur5_motion_planning) StderrLine: {'line': b'      |     ^~~\n'}
+[4.535350] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algobase.h:254:5: note:   template argument deduction/substitution failed:\n'}
+[4.535525] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   deduced conflicting types for parameter \xe2\x80\x98const _Tp\xe2\x80\x99 (\xe2\x80\x98long unsigned int\xe2\x80\x99 and \xe2\x80\x98unsigned int\xe2\x80\x99)\n'}
+[4.535767] (ur5_motion_planning) StderrLine: {'line': b'  155 |   n_steps = std::max(n_steps, 2u);\n'}
+[4.535942] (ur5_motion_planning) StderrLine: {'line': b'      |             ~~~~~~~~^~~~~~~~~~~~~\n'}
+[4.536114] (ur5_motion_planning) StderrLine: {'line': b'In file included from /usr/include/c++/11/bits/specfun.h:45,\n'}
+[4.536300] (ur5_motion_planning) StderrLine: {'line': b'                 from /usr/include/c++/11/cmath:1935,\n'}
+[4.536478] (ur5_motion_planning) StderrLine: {'line': b'                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:9:\n'}
+[4.536661] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algobase.h:300:5: note: candidate: \xe2\x80\x98template<class _Tp, class _Compare> constexpr const _Tp& std::max(const _Tp&, const _Tp&, _Compare)\xe2\x80\x99\n'}
+[4.536840] (ur5_motion_planning) StderrLine: {'line': b'  300 |     max(const _Tp& __a, const _Tp& __b, _Compare __comp)\n'}
+[4.537017] (ur5_motion_planning) StderrLine: {'line': b'      |     ^~~\n'}
+[4.537188] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algobase.h:300:5: note:   template argument deduction/substitution failed:\n'}
+[4.537361] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   deduced conflicting types for parameter \xe2\x80\x98const _Tp\xe2\x80\x99 (\xe2\x80\x98long unsigned int\xe2\x80\x99 and \xe2\x80\x98unsigned int\xe2\x80\x99)\n'}
+[4.537547] (ur5_motion_planning) StderrLine: {'line': b'  155 |   n_steps = std::max(n_steps, 2u);\n'}
+[4.537721] (ur5_motion_planning) StderrLine: {'line': b'      |             ~~~~~~~~^~~~~~~~~~~~~\n'}
+[4.537897] (ur5_motion_planning) StderrLine: {'line': b'In file included from /usr/include/c++/11/functional:65,\n'}
+[4.538123] (ur5_motion_planning) StderrLine: {'line': b'                 from /usr/include/eigen3/Eigen/Core:85,\n'}
+[4.538298] (ur5_motion_planning) StderrLine: {'line': b'                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:16:\n'}
+[4.538473] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algo.h:3461:5: note: candidate: \xe2\x80\x98template<class _Tp> constexpr _Tp std::max(std::initializer_list<_Tp>)\xe2\x80\x99\n'}
+[4.538641] (ur5_motion_planning) StderrLine: {'line': b' 3461 |     max(initializer_list<_Tp> __l)\n'}
+[4.538818] (ur5_motion_planning) StderrLine: {'line': b'      |     ^~~\n'}
+[4.539034] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algo.h:3461:5: note:   template argument deduction/substitution failed:\n'}
+[4.539286] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   mismatched types \xe2\x80\x98std::initializer_list<_Tp>\xe2\x80\x99 and \xe2\x80\x98long unsigned int\xe2\x80\x99\n'}
+[4.539481] (ur5_motion_planning) StderrLine: {'line': b'  155 |   n_steps = std::max(n_steps, 2u);\n'}
+[4.539649] (ur5_motion_planning) StderrLine: {'line': b'      |             ~~~~~~~~^~~~~~~~~~~~~\n'}
+[4.539846] (ur5_motion_planning) StderrLine: {'line': b'In file included from /usr/include/c++/11/functional:65,\n'}
+[4.540047] (ur5_motion_planning) StderrLine: {'line': b'                 from /usr/include/eigen3/Eigen/Core:85,\n'}
+[4.540296] (ur5_motion_planning) StderrLine: {'line': b'                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:16:\n'}
+[4.540537] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algo.h:3467:5: note: candidate: \xe2\x80\x98template<class _Tp, class _Compare> constexpr _Tp std::max(std::initializer_list<_Tp>, _Compare)\xe2\x80\x99\n'}
+[4.540732] (ur5_motion_planning) StderrLine: {'line': b' 3467 |     max(initializer_list<_Tp> __l, _Compare __comp)\n'}
+[4.540954] (ur5_motion_planning) StderrLine: {'line': b'      |     ^~~\n'}
+[4.541195] (ur5_motion_planning) StderrLine: {'line': b'/usr/include/c++/11/bits/stl_algo.h:3467:5: note:   template argument deduction/substitution failed:\n'}
+[4.541370] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   mismatched types \xe2\x80\x98std::initializer_list<_Tp>\xe2\x80\x99 and \xe2\x80\x98long unsigned int\xe2\x80\x99\n'}
+[4.541546] (ur5_motion_planning) StderrLine: {'line': b'  155 |   n_steps = std::max(n_steps, 2u);\n'}
+[4.544637] (ur5_motion_planning) StderrLine: {'line': b'      |             ~~~~~~~~^~~~~~~~~~~~~\n'}
+[4.562540] (-) TimerEvent: {}
+[4.663579] (-) TimerEvent: {}
+[4.764575] (-) TimerEvent: {}
+[4.865577] (-) TimerEvent: {}
+[4.966567] (-) TimerEvent: {}
+[5.067652] (-) TimerEvent: {}
+[5.168564] (-) TimerEvent: {}
+[5.269526] (-) TimerEvent: {}
+[5.370529] (-) TimerEvent: {}
+[5.471521] (-) TimerEvent: {}
+[5.572544] (-) TimerEvent: {}
+[5.673581] (-) TimerEvent: {}
+[5.774541] (-) TimerEvent: {}
+[5.880605] (-) TimerEvent: {}
+[5.983548] (-) TimerEvent: {}
+[6.084545] (-) TimerEvent: {}
+[6.185558] (-) TimerEvent: {}
+[6.286568] (-) TimerEvent: {}
+[6.387551] (-) TimerEvent: {}
+[6.488572] (-) TimerEvent: {}
+[6.589579] (-) TimerEvent: {}
+[6.690547] (-) TimerEvent: {}
+[6.794588] (-) TimerEvent: {}
+[6.895575] (-) TimerEvent: {}
+[6.996585] (-) TimerEvent: {}
+[7.097577] (-) TimerEvent: {}
+[7.146709] (ur5_motion_planning) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1\n'}
+[7.147213] (ur5_motion_planning) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2\n'}
+[7.147492] (ur5_motion_planning) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[7.150292] (ur5_motion_planning) CommandEnded: {'returncode': 2}
+[7.171576] (ur5_motion_planning) JobEnded: {'identifier': 'ur5_motion_planning', 'rc': 2}
+[7.184386] (-) EventReactorShutdown: {}

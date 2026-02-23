@@ -1,0 +1,26 @@
+[0.006s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[0.212s] Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node
+[0.228s] [ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o
+[5.165s] [100%] Linking CXX executable ur5_plan_and_analyze_node
+[5.410s] [100%] Built target ur5_plan_and_analyze_node
+[5.419s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[5.427s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_motion_planning
+[5.432s] -- Install configuration: ""
+[5.433s] -- Execute custom install script
+[5.435s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node
+[5.443s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/package_run_dependencies/ur5_motion_planning
+[5.450s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/parent_prefix_path/ur5_motion_planning
+[5.456s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.sh
+[5.463s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.dsv
+[5.469s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.sh
+[5.476s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.dsv
+[5.481s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.bash
+[5.487s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.sh
+[5.493s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.zsh
+[5.500s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.dsv
+[5.508s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.dsv
+[5.517s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/packages/ur5_motion_planning
+[5.525s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig.cmake
+[5.532s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig-version.cmake
+[5.539s] -- Symlinking: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.xml
+[5.549s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_motion_planning

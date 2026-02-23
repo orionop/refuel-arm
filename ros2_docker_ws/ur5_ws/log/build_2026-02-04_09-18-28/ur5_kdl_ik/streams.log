@@ -1,0 +1,65 @@
+[0.012s] Invoking command in '/workspace/ur5_ws/build/ur5_kdl_ik': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake /workspace/ur5_ws/src/ur5_kdl_ik -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur5_kdl_ik
+[0.077s] -- The C compiler identification is GNU 11.4.0
+[0.130s] -- The CXX compiler identification is GNU 11.4.0
+[0.137s] -- Detecting C compiler ABI info
+[0.213s] -- Detecting C compiler ABI info - done
+[0.220s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.221s] -- Detecting C compile features
+[0.221s] -- Detecting C compile features - done
+[0.225s] -- Detecting CXX compiler ABI info
+[0.301s] -- Detecting CXX compiler ABI info - done
+[0.309s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.309s] -- Detecting CXX compile features
+[0.310s] -- Detecting CXX compile features - done
+[0.319s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.405s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.449s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.525s] -- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)
+[0.600s] -- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.614s] -- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.627s] -- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.642s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.664s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.733s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.740s] -- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.817s] -- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[0.836s] -- Found FastRTPS: /opt/ros/humble/include  
+[0.862s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.880s] -- Looking for pthread.h
+[0.959s] -- Looking for pthread.h - found
+[0.960s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.037s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[1.038s] -- Found Threads: TRUE  
+[1.104s] -- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)
+[1.113s] -- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)
+[1.137s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)
+[1.137s] -- Found Eigen3: TRUE (found version "3.4.0") 
+[1.137s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[1.264s] -- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)
+[1.333s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread 
+[1.389s] -- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)
+[1.464s] -- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)
+[1.503s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem 
+[1.565s] -- library: /usr/lib/aarch64-linux-gnu/libcurl.so
+[1.791s] CMake Error at CMakeLists.txt:13 (find_package):
+[1.792s]   By not providing "Findmoveit_ros_planning_interface.cmake" in
+[1.792s]   CMAKE_MODULE_PATH this project has asked CMake to find a package
+[1.792s]   configuration file provided by "moveit_ros_planning_interface", but CMake
+[1.793s]   did not find one.
+[1.793s] 
+[1.794s]   Could not find a package configuration file provided by
+[1.800s]   "moveit_ros_planning_interface" with any of the following names:
+[1.801s] 
+[1.801s]     moveit_ros_planning_interfaceConfig.cmake
+[1.803s]     moveit_ros_planning_interface-config.cmake
+[1.803s] 
+[1.804s]   Add the installation prefix of "moveit_ros_planning_interface" to
+[1.804s]   CMAKE_PREFIX_PATH or set "moveit_ros_planning_interface_DIR" to a directory
+[1.804s]   containing one of the above files.  If "moveit_ros_planning_interface"
+[1.805s]   provides a separate development package or SDK, be sure it has been
+[1.805s]   installed.
+[1.805s] 
+[1.805s] 
+[1.806s] -- Configuring incomplete, errors occurred!
+[1.806s] See also "/workspace/ur5_ws/build/ur5_kdl_ik/CMakeFiles/CMakeOutput.log".
+[1.806s] Invoked command in '/workspace/ur5_ws/build/ur5_kdl_ik' returned '1': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake /workspace/ur5_ws/src/ur5_kdl_ik -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur5_kdl_ik

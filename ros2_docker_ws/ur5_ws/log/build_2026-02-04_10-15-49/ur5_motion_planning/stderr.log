@@ -1,0 +1,47 @@
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function ‘int main(int, char**)’:
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: error: no matching function for call to ‘max(size_t&, unsigned int)’
+  155 |   n_steps = std::max(n_steps, 2u);
+      |             ~~~~~~~~^~~~~~~~~~~~~
+In file included from /usr/include/c++/11/bits/specfun.h:45,
+                 from /usr/include/c++/11/cmath:1935,
+                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:9:
+/usr/include/c++/11/bits/stl_algobase.h:254:5: note: candidate: ‘template<class _Tp> constexpr const _Tp& std::max(const _Tp&, const _Tp&)’
+  254 |     max(const _Tp& __a, const _Tp& __b)
+      |     ^~~
+/usr/include/c++/11/bits/stl_algobase.h:254:5: note:   template argument deduction/substitution failed:
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   deduced conflicting types for parameter ‘const _Tp’ (‘long unsigned int’ and ‘unsigned int’)
+  155 |   n_steps = std::max(n_steps, 2u);
+      |             ~~~~~~~~^~~~~~~~~~~~~
+In file included from /usr/include/c++/11/bits/specfun.h:45,
+                 from /usr/include/c++/11/cmath:1935,
+                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:9:
+/usr/include/c++/11/bits/stl_algobase.h:300:5: note: candidate: ‘template<class _Tp, class _Compare> constexpr const _Tp& std::max(const _Tp&, const _Tp&, _Compare)’
+  300 |     max(const _Tp& __a, const _Tp& __b, _Compare __comp)
+      |     ^~~
+/usr/include/c++/11/bits/stl_algobase.h:300:5: note:   template argument deduction/substitution failed:
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   deduced conflicting types for parameter ‘const _Tp’ (‘long unsigned int’ and ‘unsigned int’)
+  155 |   n_steps = std::max(n_steps, 2u);
+      |             ~~~~~~~~^~~~~~~~~~~~~
+In file included from /usr/include/c++/11/functional:65,
+                 from /usr/include/eigen3/Eigen/Core:85,
+                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:16:
+/usr/include/c++/11/bits/stl_algo.h:3461:5: note: candidate: ‘template<class _Tp> constexpr _Tp std::max(std::initializer_list<_Tp>)’
+ 3461 |     max(initializer_list<_Tp> __l)
+      |     ^~~
+/usr/include/c++/11/bits/stl_algo.h:3461:5: note:   template argument deduction/substitution failed:
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   mismatched types ‘std::initializer_list<_Tp>’ and ‘long unsigned int’
+  155 |   n_steps = std::max(n_steps, 2u);
+      |             ~~~~~~~~^~~~~~~~~~~~~
+In file included from /usr/include/c++/11/functional:65,
+                 from /usr/include/eigen3/Eigen/Core:85,
+                 from /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:16:
+/usr/include/c++/11/bits/stl_algo.h:3467:5: note: candidate: ‘template<class _Tp, class _Compare> constexpr _Tp std::max(std::initializer_list<_Tp>, _Compare)’
+ 3467 |     max(initializer_list<_Tp> __l, _Compare __comp)
+      |     ^~~
+/usr/include/c++/11/bits/stl_algo.h:3467:5: note:   template argument deduction/substitution failed:
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:155:21: note:   mismatched types ‘std::initializer_list<_Tp>’ and ‘long unsigned int’
+  155 |   n_steps = std::max(n_steps, 2u);
+      |             ~~~~~~~~^~~~~~~~~~~~~
+gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

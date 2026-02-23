@@ -1,0 +1,25 @@
+[0.339s] Invoking command in '/workspace/ur5_ws/src/ur5_minimal_moveit': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description PYTHONPATH=/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ur5_minimal_moveit build --build-base /workspace/ur5_ws/build/ur5_minimal_moveit/build install --record /workspace/ur5_ws/build/ur5_minimal_moveit/install.log --single-version-externally-managed install_data
+[0.453s] running egg_info
+[0.453s] writing ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/PKG-INFO
+[0.454s] writing dependency_links to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/dependency_links.txt
+[0.455s] writing entry points to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/entry_points.txt
+[0.456s] writing requirements to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/requires.txt
+[0.456s] writing top-level names to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/top_level.txt
+[0.459s] reading manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'
+[0.460s] writing manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'
+[0.460s] running build
+[0.461s] running build_py
+[0.462s] copying ur5_minimal_moveit/fake_joint_trajectory_controller.py -> /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit
+[0.463s] running install
+[0.464s] running install_lib
+[0.464s] copying /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit/fake_joint_trajectory_controller.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit
+[0.466s] byte-compiling /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit/fake_joint_trajectory_controller.py to fake_joint_trajectory_controller.cpython-310.pyc
+[0.467s] running install_data
+[0.468s] copying package.xml -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit
+[0.472s] running install_egg_info
+[0.472s] removing '/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit-0.0.0-py3.10.egg-info' (and everything under it)
+[0.474s] Copying ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit-0.0.0-py3.10.egg-info
+[0.487s] running install_scripts
+[0.500s] Installing fake_joint_trajectory_controller script to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/ur5_minimal_moveit
+[0.501s] writing list of installed files to '/workspace/ur5_ws/build/ur5_minimal_moveit/install.log'
+[0.523s] Invoked command in '/workspace/ur5_ws/src/ur5_minimal_moveit' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description PYTHONPATH=/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ur5_minimal_moveit build --build-base /workspace/ur5_ws/build/ur5_minimal_moveit/build install --record /workspace/ur5_ws/build/ur5_minimal_moveit/install.log --single-version-externally-managed install_data

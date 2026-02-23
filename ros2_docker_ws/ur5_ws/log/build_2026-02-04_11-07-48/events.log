@@ -1,0 +1,91 @@
+[0.000000] (-) TimerEvent: {}
+[0.000137] (-) JobUnselected: {'identifier': 'ur'}
+[0.002565] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.002665] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.002757] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.002939] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.003012] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.003170] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.004060] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.004422] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.004502] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.004634] (ur5_motion_planning) JobStarted: {'identifier': 'ur5_motion_planning'}
+[0.010584] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'cmake'}
+[0.012140] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'build'}
+[0.013461] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur5_motion_planning', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.098823] (-) TimerEvent: {}
+[0.199845] (-) TimerEvent: {}
+[0.259129] (ur5_motion_planning) StdoutLine: {'line': b'Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node\n'}
+[0.277881] (ur5_motion_planning) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o\n'}
+[0.300868] (-) TimerEvent: {}
+[0.402947] (-) TimerEvent: {}
+[0.506876] (-) TimerEvent: {}
+[0.607893] (-) TimerEvent: {}
+[0.712037] (-) TimerEvent: {}
+[0.814836] (-) TimerEvent: {}
+[0.915886] (-) TimerEvent: {}
+[1.016845] (-) TimerEvent: {}
+[1.117905] (-) TimerEvent: {}
+[1.218818] (-) TimerEvent: {}
+[1.323836] (-) TimerEvent: {}
+[1.424842] (-) TimerEvent: {}
+[1.525818] (-) TimerEvent: {}
+[1.626860] (-) TimerEvent: {}
+[1.727821] (-) TimerEvent: {}
+[1.828853] (-) TimerEvent: {}
+[1.929859] (-) TimerEvent: {}
+[2.034796] (-) TimerEvent: {}
+[2.135804] (-) TimerEvent: {}
+[2.236802] (-) TimerEvent: {}
+[2.337872] (-) TimerEvent: {}
+[2.438809] (-) TimerEvent: {}
+[2.539812] (-) TimerEvent: {}
+[2.640817] (-) TimerEvent: {}
+[2.741823] (-) TimerEvent: {}
+[2.842804] (-) TimerEvent: {}
+[2.943800] (-) TimerEvent: {}
+[3.044820] (-) TimerEvent: {}
+[3.145815] (-) TimerEvent: {}
+[3.246822] (-) TimerEvent: {}
+[3.347827] (-) TimerEvent: {}
+[3.452815] (-) TimerEvent: {}
+[3.553855] (-) TimerEvent: {}
+[3.650192] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function \xe2\x80\x98int main(int, char**)\xe2\x80\x99:\n'}
+[3.650718] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:488:4: error: expected \xe2\x80\x98}\xe2\x80\x99 at end of input\n'}
+[3.650925] (ur5_motion_planning) StderrLine: {'line': b'  488 |   }\n'}
+[3.651107] (ur5_motion_planning) StderrLine: {'line': b'      |    ^\n'}
+[3.651355] (ur5_motion_planning) StderrLine: {'line': b'/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:82:33: note: to match this \xe2\x80\x98{\xe2\x80\x99\n'}
+[3.651564] (ur5_motion_planning) StderrLine: {'line': b'   82 | int main(int argc, char** argv) {\n'}
+[3.651748] (ur5_motion_planning) StderrLine: {'line': b'      |                                 ^\n'}
+[3.654773] (-) TimerEvent: {}
+[3.755814] (-) TimerEvent: {}
+[3.856835] (-) TimerEvent: {}
+[3.957853] (-) TimerEvent: {}
+[4.058840] (-) TimerEvent: {}
+[4.160037] (-) TimerEvent: {}
+[4.260842] (-) TimerEvent: {}
+[4.361837] (-) TimerEvent: {}
+[4.462813] (-) TimerEvent: {}
+[4.563797] (-) TimerEvent: {}
+[4.664799] (-) TimerEvent: {}
+[4.765822] (-) TimerEvent: {}
+[4.866823] (-) TimerEvent: {}
+[4.967853] (-) TimerEvent: {}
+[5.068835] (-) TimerEvent: {}
+[5.172844] (-) TimerEvent: {}
+[5.273837] (-) TimerEvent: {}
+[5.374996] (-) TimerEvent: {}
+[5.475858] (-) TimerEvent: {}
+[5.576844] (-) TimerEvent: {}
+[5.677852] (-) TimerEvent: {}
+[5.778820] (-) TimerEvent: {}
+[5.879817] (-) TimerEvent: {}
+[5.980808] (-) TimerEvent: {}
+[6.081839] (-) TimerEvent: {}
+[6.182832] (-) TimerEvent: {}
+[6.239481] (ur5_motion_planning) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1\n'}
+[6.239962] (ur5_motion_planning) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2\n'}
+[6.240242] (ur5_motion_planning) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[6.241781] (ur5_motion_planning) CommandEnded: {'returncode': 2}
+[6.258123] (ur5_motion_planning) JobEnded: {'identifier': 'ur5_motion_planning', 'rc': 2}
+[6.270350] (-) EventReactorShutdown: {}

@@ -1,0 +1,1 @@
+/workspace/ur5_ws/build/ur_dashboard_msgs/ament_cmake_environment_hooks/pythonpath.sh

@@ -1,0 +1,16 @@
+running develop
+running egg_info
+writing ur5_minimal_moveit.egg-info/PKG-INFO
+writing dependency_links to ur5_minimal_moveit.egg-info/dependency_links.txt
+writing requirements to ur5_minimal_moveit.egg-info/requires.txt
+writing top-level names to ur5_minimal_moveit.egg-info/top_level.txt
+reading manifest file 'ur5_minimal_moveit.egg-info/SOURCES.txt'
+writing manifest file 'ur5_minimal_moveit.egg-info/SOURCES.txt'
+running build_ext
+Creating /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5-minimal-moveit.egg-link (link to .)
+
+Installed /workspace/ur5_ws/build/ur5_minimal_moveit
+running symlink_data
+symbolically linking /workspace/ur5_ws/build/ur5_minimal_moveit/resource/ur5_minimal_moveit -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index/packages
+symbolically linking /workspace/ur5_ws/build/ur5_minimal_moveit/package.xml -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit
+symbolically linking /workspace/ur5_ws/build/ur5_minimal_moveit/launch/ur5_moveit_minimal.launch.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch

@@ -1,0 +1,26 @@
+[0.010s] Invoking command in '/workspace/ur5_ws/build/ur5_kdl_ik': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_kdl_ik -- -j11 -l11
+[0.046s] [ 50%] Building CXX object CMakeFiles/ur5_kdl_ik_baseline.dir/src/ur5_kdl_ik_node.cpp.o
+[4.230s] [100%] Linking CXX executable ur5_kdl_ik_baseline
+[4.461s] [100%] Built target ur5_kdl_ik_baseline
+[4.469s] Invoked command in '/workspace/ur5_ws/build/ur5_kdl_ik' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_kdl_ik -- -j11 -l11
+[4.476s] Invoking command in '/workspace/ur5_ws/build/ur5_kdl_ik': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_kdl_ik
+[4.480s] -- Install configuration: ""
+[4.481s] -- Execute custom install script
+[4.483s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/lib/ur5_kdl_ik/ur5_kdl_ik_baseline
+[4.489s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/launch/run_ik_baseline.launch.py
+[4.495s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/package_run_dependencies/ur5_kdl_ik
+[4.502s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/parent_prefix_path/ur5_kdl_ik
+[4.508s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/ament_prefix_path.sh
+[4.512s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/ament_prefix_path.dsv
+[4.517s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/path.sh
+[4.522s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/path.dsv
+[4.527s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.bash
+[4.532s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.sh
+[4.537s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.zsh
+[4.542s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.dsv
+[4.547s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/package.dsv
+[4.553s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/packages/ur5_kdl_ik
+[4.558s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/cmake/ur5_kdl_ikConfig.cmake
+[4.563s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/cmake/ur5_kdl_ikConfig-version.cmake
+[4.568s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/package.xml
+[4.574s] Invoked command in '/workspace/ur5_ws/build/ur5_kdl_ik' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_kdl_ik

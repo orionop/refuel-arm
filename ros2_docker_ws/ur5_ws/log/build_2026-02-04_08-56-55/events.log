@@ -1,0 +1,306 @@
+[0.000000] (-) TimerEvent: {}
+[0.000193] (-) JobUnselected: {'identifier': 'ur'}
+[0.001225] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.002086] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.002200] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.002304] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.002412] (ur_description) JobQueued: {'identifier': 'ur_description', 'dependencies': OrderedDict()}
+[0.002549] (ur_moveit_config) JobQueued: {'identifier': 'ur_moveit_config', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description')])}
+[0.002625] (ur5_minimal_moveit) JobQueued: {'identifier': 'ur5_minimal_moveit', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.002682] (ur_description) JobStarted: {'identifier': 'ur_description'}
+[0.005193] (ur_description) JobProgress: {'identifier': 'ur_description', 'progress': 'cmake'}
+[0.006307] (ur_description) JobProgress: {'identifier': 'ur_description', 'progress': 'build'}
+[0.007747] (ur_description) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur_description', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur_description', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_description'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.039500] (ur_description) CommandEnded: {'returncode': 0}
+[0.042119] (ur_description) JobProgress: {'identifier': 'ur_description', 'progress': 'install'}
+[0.047060] (ur_description) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur_description'], 'cwd': '/workspace/ur5_ws/build/ur_description', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_description'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.051079] (ur_description) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[0.052238] (ur_description) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[0.062349] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/initial_positions.yaml\n'}
+[0.063031] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/default_kinematics.yaml\n'}
+[0.063719] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/joint_limits.yaml\n'}
+[0.064363] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/physical_parameters.yaml\n'}
+[0.064882] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10/visual_parameters.yaml\n'}
+[0.065465] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/default_kinematics.yaml\n'}
+[0.065968] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/joint_limits.yaml\n'}
+[0.066491] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/physical_parameters.yaml\n'}
+[0.066988] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur10e/visual_parameters.yaml\n'}
+[0.067587] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/default_kinematics.yaml\n'}
+[0.068162] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/joint_limits.yaml\n'}
+[0.068639] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/physical_parameters.yaml\n'}
+[0.069190] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur12e/visual_parameters.yaml\n'}
+[0.069689] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/default_kinematics.yaml\n'}
+[0.070146] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/joint_limits.yaml\n'}
+[0.070627] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/physical_parameters.yaml\n'}
+[0.071101] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur15/visual_parameters.yaml\n'}
+[0.071665] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/default_kinematics.yaml\n'}
+[0.072155] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/joint_limits.yaml\n'}
+[0.072623] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/physical_parameters.yaml\n'}
+[0.073098] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur16e/visual_parameters.yaml\n'}
+[0.073656] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/default_kinematics.yaml\n'}
+[0.074105] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/joint_limits.yaml\n'}
+[0.074674] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/physical_parameters.yaml\n'}
+[0.075280] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur18/visual_parameters.yaml\n'}
+[0.075890] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/default_kinematics.yaml\n'}
+[0.076380] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/joint_limits.yaml\n'}
+[0.076868] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/physical_parameters.yaml\n'}
+[0.077371] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur20/visual_parameters.yaml\n'}
+[0.077907] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/default_kinematics.yaml\n'}
+[0.078365] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/joint_limits.yaml\n'}
+[0.078817] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/physical_parameters.yaml\n'}
+[0.079282] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3/visual_parameters.yaml\n'}
+[0.079772] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/default_kinematics.yaml\n'}
+[0.080315] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/joint_limits.yaml\n'}
+[0.080784] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/physical_parameters.yaml\n'}
+[0.081277] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur30/visual_parameters.yaml\n'}
+[0.081828] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/default_kinematics.yaml\n'}
+[0.082330] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/joint_limits.yaml\n'}
+[0.082829] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/physical_parameters.yaml\n'}
+[0.083294] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur3e/visual_parameters.yaml\n'}
+[0.083881] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/default_kinematics.yaml\n'}
+[0.084419] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/joint_limits.yaml\n'}
+[0.084924] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/physical_parameters.yaml\n'}
+[0.085456] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5/visual_parameters.yaml\n'}
+[0.086192] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/default_kinematics.yaml\n'}
+[0.086778] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/joint_limits.yaml\n'}
+[0.087312] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/physical_parameters.yaml\n'}
+[0.087795] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur5e/visual_parameters.yaml\n'}
+[0.088363] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/default_kinematics.yaml\n'}
+[0.088820] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/joint_limits.yaml\n'}
+[0.089270] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/physical_parameters.yaml\n'}
+[0.089750] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur7e/visual_parameters.yaml\n'}
+[0.090292] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/default_kinematics.yaml\n'}
+[0.090753] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/joint_limits.yaml\n'}
+[0.091242] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/physical_parameters.yaml\n'}
+[0.091741] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/config/ur8long/visual_parameters.yaml\n'}
+[0.092569] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/launch/view_ur.launch.py\n'}
+[0.098053] (-) TimerEvent: {}
+[0.111277] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/base.stl\n'}
+[0.111848] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/forearm.stl\n'}
+[0.112446] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/shoulder.stl\n'}
+[0.112975] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/upperarm.stl\n'}
+[0.113531] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/wrist1.stl\n'}
+[0.114067] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/wrist2.stl\n'}
+[0.114589] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/collision/wrist3.stl\n'}
+[0.115118] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/base.dae\n'}
+[0.115629] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/forearm.dae\n'}
+[0.116139] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/shoulder.dae\n'}
+[0.116693] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/upperarm.dae\n'}
+[0.117242] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/wrist1.dae\n'}
+[0.117705] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/wrist2.dae\n'}
+[0.118184] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10/visual/wrist3.dae\n'}
+[0.118776] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/base.stl\n'}
+[0.119260] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/forearm.stl\n'}
+[0.119755] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/shoulder.stl\n'}
+[0.120269] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/upperarm.stl\n'}
+[0.120772] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/wrist1.stl\n'}
+[0.121252] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/wrist2.stl\n'}
+[0.121747] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/collision/wrist3.stl\n'}
+[0.122365] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/base.dae\n'}
+[0.122922] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/forearm.dae\n'}
+[0.123645] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/shoulder.dae\n'}
+[0.124212] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/upperarm.dae\n'}
+[0.124800] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/wrist1.dae\n'}
+[0.125250] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/wrist2.dae\n'}
+[0.125781] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur10e/visual/wrist3.dae\n'}
+[0.126445] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/LICENSE.txt\n'}
+[0.126980] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/base.stl\n'}
+[0.127490] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/forearm.stl\n'}
+[0.127961] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/shoulder.stl\n'}
+[0.128438] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/upperarm.stl\n'}
+[0.128922] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/wrist1.stl\n'}
+[0.129401] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/wrist2.stl\n'}
+[0.129968] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/collision/wrist3.stl\n'}
+[0.130539] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/UR15_DIFF_8bit_2K.jpg\n'}
+[0.131028] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/base.dae\n'}
+[0.131504] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/forearm.dae\n'}
+[0.131985] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/shoulder.dae\n'}
+[0.132479] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/upperarm.dae\n'}
+[0.132931] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/wrist1.dae\n'}
+[0.133412] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/wrist2.dae\n'}
+[0.134038] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur15/visual/wrist3.dae\n'}
+[0.134685] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/collision/forearm.stl\n'}
+[0.135176] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/collision/upperarm.stl\n'}
+[0.135848] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/visual/forearm.dae\n'}
+[0.136314] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur16e/visual/upperarm.dae\n'}
+[0.136851] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/LICENSE.txt\n'}
+[0.137378] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/collision/forearm.stl\n'}
+[0.137869] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/collision/upperarm.stl\n'}
+[0.138359] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/visual/UR18_DIFF_8bit_2K.jpg\n'}
+[0.138837] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/visual/forearm.dae\n'}
+[0.139298] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur18/visual/upperarm.dae\n'}
+[0.139863] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/LICENSE.txt\n'}
+[0.140341] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/base.stl\n'}
+[0.140825] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/forearm.stl\n'}
+[0.141357] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/shoulder.stl\n'}
+[0.141815] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/upperarm.stl\n'}
+[0.142277] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/wrist1.stl\n'}
+[0.142712] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/wrist2.stl\n'}
+[0.143165] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/collision/wrist3.stl\n'}
+[0.143768] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/UR20_DIFF_8bit_2K.png\n'}
+[0.144245] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/base.dae\n'}
+[0.144836] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/forearm.dae\n'}
+[0.145321] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/shoulder.dae\n'}
+[0.145824] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/upperarm.dae\n'}
+[0.146307] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/wrist1.dae\n'}
+[0.146827] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/wrist2.dae\n'}
+[0.147340] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur20/visual/wrist3.dae\n'}
+[0.147938] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/base.stl\n'}
+[0.148384] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/forearm.stl\n'}
+[0.148821] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/shoulder.stl\n'}
+[0.149341] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/upperarm.stl\n'}
+[0.149837] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/wrist1.stl\n'}
+[0.150301] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/wrist2.stl\n'}
+[0.150829] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/collision/wrist3.stl\n'}
+[0.151420] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/base.dae\n'}
+[0.151877] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/forearm.dae\n'}
+[0.152355] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/shoulder.dae\n'}
+[0.152804] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/upperarm.dae\n'}
+[0.153344] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/wrist1.dae\n'}
+[0.153812] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/wrist2.dae\n'}
+[0.154303] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3/visual/wrist3.dae\n'}
+[0.154864] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/LICENSE.txt\n'}
+[0.155413] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/collision/forearm.stl\n'}
+[0.156000] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/collision/upperarm.stl\n'}
+[0.156667] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/visual/UR30_DIFF_8bit_2K.png\n'}
+[0.157158] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/visual/forearm.dae\n'}
+[0.157708] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur30/visual/upperarm.dae\n'}
+[0.158273] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/base.stl\n'}
+[0.158742] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/forearm.stl\n'}
+[0.159260] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/shoulder.stl\n'}
+[0.159791] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/upperarm.stl\n'}
+[0.160287] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/wrist1.stl\n'}
+[0.160748] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/wrist2.stl\n'}
+[0.161242] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/collision/wrist3.stl\n'}
+[0.161785] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/base.dae\n'}
+[0.162274] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/forearm.dae\n'}
+[0.162712] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/shoulder.dae\n'}
+[0.163163] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/upperarm.dae\n'}
+[0.163660] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/wrist1.dae\n'}
+[0.164174] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/wrist2.dae\n'}
+[0.164659] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur3e/visual/wrist3.dae\n'}
+[0.165220] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/base.stl\n'}
+[0.165669] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/forearm.stl\n'}
+[0.166106] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/shoulder.stl\n'}
+[0.166540] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/upperarm.stl\n'}
+[0.167115] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/wrist1.stl\n'}
+[0.167811] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/wrist2.stl\n'}
+[0.168317] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/collision/wrist3.stl\n'}
+[0.168899] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/base.dae\n'}
+[0.169351] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/forearm.dae\n'}
+[0.169859] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/shoulder.dae\n'}
+[0.170405] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/upperarm.dae\n'}
+[0.170874] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/wrist1.dae\n'}
+[0.171368] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/wrist2.dae\n'}
+[0.171871] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5/visual/wrist3.dae\n'}
+[0.172431] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/base.stl\n'}
+[0.172980] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/forearm.stl\n'}
+[0.173473] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/shoulder.stl\n'}
+[0.173954] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/upperarm.stl\n'}
+[0.174420] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/wrist1.stl\n'}
+[0.174902] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/wrist2.stl\n'}
+[0.175401] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/collision/wrist3.stl\n'}
+[0.175908] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/base.dae\n'}
+[0.176368] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/forearm.dae\n'}
+[0.176852] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/shoulder.dae\n'}
+[0.177326] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/upperarm.dae\n'}
+[0.177842] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/wrist1.dae\n'}
+[0.178382] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/wrist2.dae\n'}
+[0.178941] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur5e/visual/wrist3.dae\n'}
+[0.179513] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/LICENSE.txt\n'}
+[0.180047] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/collision/forearm.stl\n'}
+[0.180511] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/collision/upperarm.stl\n'}
+[0.181134] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/visual/UR8Long_DIFF_8bit_2K.jpg\n'}
+[0.181602] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/visual/forearm.dae\n'}
+[0.182086] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/meshes/ur8long/visual/upperarm.dae\n'}
+[0.182922] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/rviz/view_robot.rviz\n'}
+[0.184475] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_common.xacro\n'}
+[0.184999] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_joint_control.xacro\n'}
+[0.185537] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_sensors.xacro\n'}
+[0.186066] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/inc/ur_transmissions.xacro\n'}
+[0.186502] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ros2_control_mock_hardware.xacro\n'}
+[0.186897] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ur.urdf.xacro\n'}
+[0.187375] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ur_macro.xacro\n'}
+[0.187852] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/urdf/ur_mocked.urdf.xacro\n'}
+[0.188723] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/test/test_ur_urdf_xacro.py\n'}
+[0.189470] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/test/test_view_ur_launch.py\n'}
+[0.190123] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ament_index/resource_index/package_run_dependencies/ur_description\n'}
+[0.190728] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ament_index/resource_index/parent_prefix_path/ur_description\n'}
+[0.191398] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/ament_prefix_path.sh\n'}
+[0.192005] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/ament_prefix_path.dsv\n'}
+[0.192522] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/path.sh\n'}
+[0.193053] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/environment/path.dsv\n'}
+[0.193520] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.bash\n'}
+[0.194003] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.sh\n'}
+[0.194532] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.zsh\n'}
+[0.195064] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/local_setup.dsv\n'}
+[0.195581] (ur_description) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur_description/share/ur_description/package.dsv\n'}
+[0.199245] (-) TimerEvent: {}
+[0.201509] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ament_index/resource_index/packages/ur_description\n'}
+[0.202117] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/cmake/ur_descriptionConfig.cmake\n'}
+[0.202595] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/cmake/ur_descriptionConfig-version.cmake\n'}
+[0.203069] (ur_description) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_description/share/ur_description/package.xml\n'}
+[0.204396] (ur_description) CommandEnded: {'returncode': 0}
+[0.232754] (ur_description) JobEnded: {'identifier': 'ur_description', 'rc': 0}
+[0.236240] (ur_moveit_config) JobStarted: {'identifier': 'ur_moveit_config'}
+[0.238709] (ur_moveit_config) JobProgress: {'identifier': 'ur_moveit_config', 'progress': 'cmake'}
+[0.239819] (ur_moveit_config) JobProgress: {'identifier': 'ur_moveit_config', 'progress': 'build'}
+[0.240498] (ur_moveit_config) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur_moveit_config', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur_moveit_config', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_moveit_config'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.264357] (ur_moveit_config) CommandEnded: {'returncode': 0}
+[0.265885] (ur_moveit_config) JobProgress: {'identifier': 'ur_moveit_config', 'progress': 'install'}
+[0.266947] (ur_moveit_config) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur_moveit_config'], 'cwd': '/workspace/ur5_ws/build/ur_moveit_config', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur_moveit_config'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.271171] (ur_moveit_config) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[0.272232] (ur_moveit_config) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[0.273172] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ament_index/resource_index/package_run_dependencies/ur_moveit_config\n'}
+[0.273895] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ament_index/resource_index/parent_prefix_path/ur_moveit_config\n'}
+[0.274690] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/ament_prefix_path.sh\n'}
+[0.275399] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/ament_prefix_path.dsv\n'}
+[0.275976] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/path.sh\n'}
+[0.276655] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/environment/path.dsv\n'}
+[0.277165] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.bash\n'}
+[0.277707] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.sh\n'}
+[0.278269] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.zsh\n'}
+[0.278839] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/local_setup.dsv\n'}
+[0.279314] (ur_moveit_config) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/package.dsv\n'}
+[0.284863] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ament_index/resource_index/packages/ur_moveit_config\n'}
+[0.285527] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/cmake/ur_moveit_configConfig.cmake\n'}
+[0.286007] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/cmake/ur_moveit_configConfig-version.cmake\n'}
+[0.286555] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/package.xml\n'}
+[0.288046] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/chomp_planning.yaml\n'}
+[0.288576] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/joint_limits.yaml\n'}
+[0.289076] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/kinematics.yaml\n'}
+[0.289560] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/moveit.rviz\n'}
+[0.290010] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/moveit_controllers.yaml\n'}
+[0.290444] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/ompl_planning.yaml\n'}
+[0.290905] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/pilz_cartesian_limits.yaml\n'}
+[0.291413] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/pilz_industrial_motion_planner_planning.yaml\n'}
+[0.291946] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/config/ur_servo.yaml\n'}
+[0.292795] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/launch/ur_moveit.launch.py\n'}
+[0.293784] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/srdf/ur.srdf.xacro\n'}
+[0.294309] (ur_moveit_config) StdoutLine: {'line': b'-- Up-to-date symlink: /workspace/ur5_ws/install/ur_moveit_config/share/ur_moveit_config/srdf/ur_macro.srdf.xacro\n'}
+[0.295768] (ur_moveit_config) CommandEnded: {'returncode': 0}
+[0.300046] (-) TimerEvent: {}
+[0.320343] (ur_moveit_config) JobEnded: {'identifier': 'ur_moveit_config', 'rc': 0}
+[0.321967] (ur5_minimal_moveit) JobStarted: {'identifier': 'ur5_minimal_moveit'}
+[0.403332] (-) TimerEvent: {}
+[0.504097] (-) TimerEvent: {}
+[0.610186] (-) TimerEvent: {}
+[0.616192] (ur5_minimal_moveit) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/workspace/ur5_ws/build/ur5_minimal_moveit/build', '--no-deps', 'symlink_data'], 'cwd': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'env': {'HOSTNAME': '10a6f84be8b2', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/', 'ROS_PYTHON_VERSION': '3', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'AMENT_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble', 'PWD': '/workspace/ur5_ws/build/ur5_minimal_moveit', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description'}, 'shell': False}
+[0.711123] (-) TimerEvent: {}
+[0.732743] (ur5_minimal_moveit) StdoutLine: {'line': b'running develop\n'}
+[0.780873] (ur5_minimal_moveit) StdoutLine: {'line': b'running egg_info\n'}
+[0.781430] (ur5_minimal_moveit) StdoutLine: {'line': b'writing ur5_minimal_moveit.egg-info/PKG-INFO\n'}
+[0.781869] (ur5_minimal_moveit) StdoutLine: {'line': b'writing dependency_links to ur5_minimal_moveit.egg-info/dependency_links.txt\n'}
+[0.782601] (ur5_minimal_moveit) StdoutLine: {'line': b'writing requirements to ur5_minimal_moveit.egg-info/requires.txt\n'}
+[0.783146] (ur5_minimal_moveit) StdoutLine: {'line': b'writing top-level names to ur5_minimal_moveit.egg-info/top_level.txt\n'}
+[0.786071] (ur5_minimal_moveit) StdoutLine: {'line': b"reading manifest file 'ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.787625] (ur5_minimal_moveit) StdoutLine: {'line': b"writing manifest file 'ur5_minimal_moveit.egg-info/SOURCES.txt'\n"}
+[0.788816] (ur5_minimal_moveit) StdoutLine: {'line': b'running build_ext\n'}
+[0.789157] (ur5_minimal_moveit) StdoutLine: {'line': b'Creating /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5-minimal-moveit.egg-link (link to .)\n'}
+[0.790323] (ur5_minimal_moveit) StdoutLine: {'line': b'\n'}
+[0.790663] (ur5_minimal_moveit) StdoutLine: {'line': b'Installed /workspace/ur5_ws/build/ur5_minimal_moveit\n'}
+[0.790977] (ur5_minimal_moveit) StdoutLine: {'line': b'running symlink_data\n'}
+[0.808971] (ur5_minimal_moveit) CommandEnded: {'returncode': 0}
+[0.812088] (-) TimerEvent: {}
+[0.824724] (ur5_minimal_moveit) JobEnded: {'identifier': 'ur5_minimal_moveit', 'rc': 0}
+[0.825918] (-) EventReactorShutdown: {}

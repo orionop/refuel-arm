@@ -1,0 +1,116 @@
+[0.000000] (-) TimerEvent: {}
+[0.000236] (-) JobUnselected: {'identifier': 'ur'}
+[0.000338] (-) JobUnselected: {'identifier': 'ur5_kdl_ik'}
+[0.000393] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.002453] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.002534] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.002644] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.002717] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.002879] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.002946] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.003015] (ur5_motion_planning) JobQueued: {'identifier': 'ur5_motion_planning', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config'), ('ur5_minimal_moveit', '/workspace/ur5_ws/install/ur5_minimal_moveit')])}
+[0.003736] (ur5_motion_planning) JobStarted: {'identifier': 'ur5_motion_planning'}
+[0.010228] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'cmake'}
+[0.011581] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'build'}
+[0.012731] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur5_motion_planning', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.098797] (-) TimerEvent: {}
+[0.199800] (-) TimerEvent: {}
+[0.252222] (ur5_motion_planning) StdoutLine: {'line': b'Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node\n'}
+[0.271538] (ur5_motion_planning) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o\n'}
+[0.300817] (-) TimerEvent: {}
+[0.406829] (-) TimerEvent: {}
+[0.511796] (-) TimerEvent: {}
+[0.612797] (-) TimerEvent: {}
+[0.713819] (-) TimerEvent: {}
+[0.814827] (-) TimerEvent: {}
+[0.916804] (-) TimerEvent: {}
+[1.017795] (-) TimerEvent: {}
+[1.118793] (-) TimerEvent: {}
+[1.219786] (-) TimerEvent: {}
+[1.320795] (-) TimerEvent: {}
+[1.421785] (-) TimerEvent: {}
+[1.522784] (-) TimerEvent: {}
+[1.623794] (-) TimerEvent: {}
+[1.724793] (-) TimerEvent: {}
+[1.825792] (-) TimerEvent: {}
+[1.926803] (-) TimerEvent: {}
+[2.027792] (-) TimerEvent: {}
+[2.128791] (-) TimerEvent: {}
+[2.229787] (-) TimerEvent: {}
+[2.330798] (-) TimerEvent: {}
+[2.431805] (-) TimerEvent: {}
+[2.532804] (-) TimerEvent: {}
+[2.633793] (-) TimerEvent: {}
+[2.734800] (-) TimerEvent: {}
+[2.835797] (-) TimerEvent: {}
+[2.936818] (-) TimerEvent: {}
+[3.037810] (-) TimerEvent: {}
+[3.138847] (-) TimerEvent: {}
+[3.243887] (-) TimerEvent: {}
+[3.345345] (-) TimerEvent: {}
+[3.447824] (-) TimerEvent: {}
+[3.548803] (-) TimerEvent: {}
+[3.653827] (-) TimerEvent: {}
+[3.757795] (-) TimerEvent: {}
+[3.858790] (-) TimerEvent: {}
+[3.959794] (-) TimerEvent: {}
+[4.060796] (-) TimerEvent: {}
+[4.161791] (-) TimerEvent: {}
+[4.262803] (-) TimerEvent: {}
+[4.363792] (-) TimerEvent: {}
+[4.464825] (-) TimerEvent: {}
+[4.565807] (-) TimerEvent: {}
+[4.666799] (-) TimerEvent: {}
+[4.767820] (-) TimerEvent: {}
+[4.868807] (-) TimerEvent: {}
+[4.969796] (-) TimerEvent: {}
+[5.070789] (-) TimerEvent: {}
+[5.171791] (-) TimerEvent: {}
+[5.272803] (-) TimerEvent: {}
+[5.373797] (-) TimerEvent: {}
+[5.474789] (-) TimerEvent: {}
+[5.575802] (-) TimerEvent: {}
+[5.676796] (-) TimerEvent: {}
+[5.777798] (-) TimerEvent: {}
+[5.880802] (-) TimerEvent: {}
+[5.981907] (-) TimerEvent: {}
+[6.082792] (-) TimerEvent: {}
+[6.183803] (-) TimerEvent: {}
+[6.284799] (-) TimerEvent: {}
+[6.385805] (-) TimerEvent: {}
+[6.486821] (-) TimerEvent: {}
+[6.587826] (-) TimerEvent: {}
+[6.689080] (-) TimerEvent: {}
+[6.751467] (ur5_motion_planning) StdoutLine: {'line': b'[100%] Linking CXX executable ur5_plan_and_analyze_node\n'}
+[6.790046] (-) TimerEvent: {}
+[6.891853] (-) TimerEvent: {}
+[6.996010] (-) TimerEvent: {}
+[7.099044] (-) TimerEvent: {}
+[7.107984] (ur5_motion_planning) StdoutLine: {'line': b'[100%] Built target ur5_plan_and_analyze_node\n'}
+[7.115530] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[7.117983] (ur5_motion_planning) JobProgress: {'identifier': 'ur5_motion_planning', 'progress': 'install'}
+[7.123853] (ur5_motion_planning) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur5_motion_planning'], 'cwd': '/workspace/ur5_ws/build/ur5_motion_planning', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_motion_planning'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[7.128252] (ur5_motion_planning) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[7.129586] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node\n'}
+[7.151224] (ur5_motion_planning) StdoutLine: {'line': b'-- Set runtime path of "/workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node" to ""\n'}
+[7.151585] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch\n'}
+[7.153046] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch/run_plan_and_analyze.launch.py\n'}
+[7.156784] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/package_run_dependencies/ur5_motion_planning\n'}
+[7.159296] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/parent_prefix_path/ur5_motion_planning\n'}
+[7.162094] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.sh\n'}
+[7.164208] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.dsv\n'}
+[7.166009] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.sh\n'}
+[7.167654] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.dsv\n'}
+[7.169534] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.bash\n'}
+[7.171515] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.sh\n'}
+[7.173453] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.zsh\n'}
+[7.175173] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.dsv\n'}
+[7.177049] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.dsv\n'}
+[7.179947] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/packages/ur5_motion_planning\n'}
+[7.182221] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig.cmake\n'}
+[7.183988] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig-version.cmake\n'}
+[7.185940] (ur5_motion_planning) StdoutLine: {'line': b'-- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.xml\n'}
+[7.188767] (ur5_motion_planning) CommandEnded: {'returncode': 0}
+[7.199811] (-) TimerEvent: {}
+[7.218083] (ur5_motion_planning) JobEnded: {'identifier': 'ur5_motion_planning', 'rc': 0}
+[7.220148] (-) EventReactorShutdown: {}

@@ -1,0 +1,28 @@
+[0.011s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble PYTHONPATH=/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[0.249s] Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node
+[0.268s] [ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o
+[6.748s] [100%] Linking CXX executable ur5_plan_and_analyze_node
+[7.104s] [100%] Built target ur5_plan_and_analyze_node
+[7.112s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble PYTHONPATH=/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[7.120s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble PYTHONPATH=/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_motion_planning
+[7.125s] -- Install configuration: ""
+[7.126s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node
+[7.147s] -- Set runtime path of "/workspace/ur5_ws/install/ur5_motion_planning/lib/ur5_motion_planning/ur5_plan_and_analyze_node" to ""
+[7.148s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch
+[7.150s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/launch/run_plan_and_analyze.launch.py
+[7.153s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/package_run_dependencies/ur5_motion_planning
+[7.155s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/parent_prefix_path/ur5_motion_planning
+[7.159s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.sh
+[7.160s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/ament_prefix_path.dsv
+[7.162s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.sh
+[7.164s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/environment/path.dsv
+[7.166s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.bash
+[7.168s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.sh
+[7.170s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.zsh
+[7.171s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/local_setup.dsv
+[7.173s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.dsv
+[7.176s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ament_index/resource_index/packages/ur5_motion_planning
+[7.178s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig.cmake
+[7.180s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/cmake/ur5_motion_planningConfig-version.cmake
+[7.182s] -- Installing: /workspace/ur5_ws/install/ur5_motion_planning/share/ur5_motion_planning/package.xml
+[7.187s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur5_minimal_moveit:/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble PYTHONPATH=/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_motion_planning

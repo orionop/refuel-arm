@@ -1,0 +1,58 @@
+[0.011s] Invoking command in '/workspace/ur5_ws/build/ur5_kdl_ik': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_kdl_ik -- -j11 -l11
+[0.041s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.117s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.129s] -- Found rclcpp: 16.0.17 (/opt/ros/humble/share/rclcpp/cmake)
+[0.153s] -- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.155s] -- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.159s] -- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.164s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.172s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.191s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.193s] -- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.281s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.307s] -- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)
+[0.316s] -- Found tf2_geometry_msgs: 0.25.18 (/opt/ros/humble/share/tf2_geometry_msgs/cmake)
+[0.318s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)
+[0.319s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[0.376s] -- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)
+[0.387s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread 
+[0.411s] -- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)
+[0.415s] -- Found rclcpp_lifecycle: 16.0.17 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)
+[0.425s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem 
+[0.452s] -- library: /usr/lib/aarch64-linux-gnu/libcurl.so
+[0.585s] -- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)
+[0.585s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread 
+[0.593s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono 
+[0.617s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options 
+[0.632s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread 
+[0.653s] -- Found moveit_kinematics: 2.5.9 (/opt/ros/humble/share/moveit_kinematics/cmake)
+[0.656s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: program_options system 
+[0.728s] -- Configuring done
+[0.772s] -- Generating done
+[0.796s] -- Build files have been written to: /workspace/ur5_ws/build/ur5_kdl_ik
+[0.973s] Consolidate compiler generated dependencies of target ur5_kdl_ik_baseline
+[0.993s] [ 50%] Building CXX object CMakeFiles/ur5_kdl_ik_baseline.dir/src/ur5_kdl_ik_node.cpp.o
+[5.810s] [100%] Linking CXX executable ur5_kdl_ik_baseline
+[6.111s] [100%] Built target ur5_kdl_ik_baseline
+[6.122s] Invoked command in '/workspace/ur5_ws/build/ur5_kdl_ik' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_kdl_ik -- -j11 -l11
+[6.132s] Invoking command in '/workspace/ur5_ws/build/ur5_kdl_ik': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_kdl_ik
+[6.137s] -- Install configuration: ""
+[6.137s] -- Execute custom install script
+[6.138s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/lib/ur5_kdl_ik/ur5_kdl_ik_baseline
+[6.139s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/launch/run_ik_baseline.launch.py
+[6.140s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/package_run_dependencies/ur5_kdl_ik
+[6.141s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/parent_prefix_path/ur5_kdl_ik
+[6.141s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/ament_prefix_path.sh
+[6.142s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/ament_prefix_path.dsv
+[6.143s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/path.sh
+[6.143s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/path.dsv
+[6.143s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.bash
+[6.144s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.sh
+[6.144s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.zsh
+[6.145s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.dsv
+[6.146s] -- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/package.dsv
+[6.153s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/packages/ur5_kdl_ik
+[6.153s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/cmake/ur5_kdl_ikConfig.cmake
+[6.153s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/cmake/ur5_kdl_ikConfig-version.cmake
+[6.155s] -- Up-to-date symlink: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/package.xml
+[6.157s] Invoked command in '/workspace/ur5_ws/build/ur5_kdl_ik' returned '0': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur5_kdl_ik

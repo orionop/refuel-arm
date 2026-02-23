@@ -1,0 +1,15 @@
+[0.009s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[0.250s] Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node
+[0.268s] [ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o
+[3.813s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function ‘int main(int, char**)’:
+[3.813s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:485:11: error: expected initializer at end of input
+[3.813s]   485 |   auto act
+[3.814s]       |           ^
+[3.814s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:485:11: error: expected ‘}’ at end of input
+[3.814s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:83:33: note: to match this ‘{’
+[3.814s]    83 | int main(int argc, char** argv) {
+[3.814s]       |                                 ^
+[6.929s] gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1
+[6.929s] gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2
+[6.930s] gmake: *** [Makefile:146: all] Error 2
+[6.932s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '2': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11

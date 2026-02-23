@@ -1,0 +1,17 @@
+[0.010s] Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
+[0.257s] Consolidate compiler generated dependencies of target ur5_plan_and_analyze_node
+[0.282s] [ 50%] Building CXX object CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o
+[3.663s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function ‘int main(int, char**)’:
+[3.663s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:486:3: error: ‘au’ was not declared in this scope
+[3.663s]   486 |   au
+[3.664s]       |   ^~
+[3.664s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:486:5: error: expected ‘}’ at end of input
+[3.664s]   486 |   au
+[3.664s]       |     ^
+[3.664s] /workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:83:33: note: to match this ‘{’
+[3.665s]    83 | int main(int argc, char** argv) {
+[3.665s]       |                                 ^
+[6.102s] gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1
+[6.103s] gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2
+[6.103s] gmake: *** [Makefile:146: all] Error 2
+[6.104s] Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '2': AMENT_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11

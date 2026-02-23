@@ -1,0 +1,34 @@
+[0.332s] Invoking command in '/workspace/ur5_ws/src/ur5_minimal_moveit': PYTHONPATH=/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ur5_minimal_moveit build --build-base /workspace/ur5_ws/build/ur5_minimal_moveit/build install --record /workspace/ur5_ws/build/ur5_minimal_moveit/install.log --single-version-externally-managed install_data
+[0.442s] running egg_info
+[0.442s] creating ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info
+[0.443s] writing ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/PKG-INFO
+[0.444s] writing dependency_links to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/dependency_links.txt
+[0.445s] writing requirements to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/requires.txt
+[0.445s] writing top-level names to ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/top_level.txt
+[0.446s] writing manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'
+[0.448s] reading manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'
+[0.449s] writing manifest file '../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info/SOURCES.txt'
+[0.450s] running build
+[0.450s] running build_py
+[0.450s] creating /workspace/ur5_ws/build/ur5_minimal_moveit/build
+[0.451s] creating /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib
+[0.451s] creating /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit
+[0.452s] copying ur5_minimal_moveit/__init__.py -> /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit
+[0.453s] running install
+[0.454s] running install_lib
+[0.455s] creating /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit
+[0.455s] copying /workspace/ur5_ws/build/ur5_minimal_moveit/build/lib/ur5_minimal_moveit/__init__.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit
+[0.456s] byte-compiling /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit/__init__.py to __init__.cpython-310.pyc
+[0.458s] running install_data
+[0.458s] creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index
+[0.459s] creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index
+[0.459s] creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index/packages
+[0.459s] copying resource/ur5_minimal_moveit -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ament_index/resource_index/packages
+[0.460s] copying package.xml -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit
+[0.461s] creating /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch
+[0.462s] copying launch/ur5_moveit_minimal.launch.py -> /workspace/ur5_ws/install/ur5_minimal_moveit/share/ur5_minimal_moveit/launch
+[0.464s] running install_egg_info
+[0.464s] Copying ../../build/ur5_minimal_moveit/ur5_minimal_moveit.egg-info to /workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages/ur5_minimal_moveit-0.0.0-py3.10.egg-info
+[0.472s] running install_scripts
+[0.484s] writing list of installed files to '/workspace/ur5_ws/build/ur5_minimal_moveit/install.log'
+[0.502s] Invoked command in '/workspace/ur5_ws/src/ur5_minimal_moveit' returned '0': PYTHONPATH=/workspace/ur5_ws/build/ur5_minimal_moveit/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/ur5_ws/install/ur5_minimal_moveit/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ur5_minimal_moveit build --build-base /workspace/ur5_ws/build/ur5_minimal_moveit/build install --record /workspace/ur5_ws/build/ur5_minimal_moveit/install.log --single-version-externally-managed install_data

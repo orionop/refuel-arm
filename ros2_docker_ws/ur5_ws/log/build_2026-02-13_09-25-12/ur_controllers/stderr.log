@@ -1,0 +1,693 @@
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/tool_contact_controller.cpp:42:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/tool_contact_controller.hpp:56:10: fatal error: realtime_tools/realtime_thread_safe_box.hpp: No such file or directory
+   56 | #include <realtime_tools/realtime_thread_safe_box.hpp>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:76: CMakeFiles/ur_controllers.dir/src/tool_contact_controller.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/passthrough_trajectory_controller.cpp:52:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/passthrough_trajectory_controller.hpp:54:10: fatal error: realtime_tools/realtime_thread_safe_box.hpp: No such file or directory
+   54 | #include <realtime_tools/realtime_thread_safe_box.hpp>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:160: CMakeFiles/ur_controllers.dir/src/passthrough_trajectory_controller.cpp.o] Error 1
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/ur_configuration_controller.cpp:41:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/ur_configuration_controller.hpp:47:10: fatal error: realtime_tools/realtime_thread_safe_box.hpp: No such file or directory
+   47 | #include <realtime_tools/realtime_thread_safe_box.hpp>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:174: CMakeFiles/ur_controllers.dir/src/ur_configuration_controller.cpp.o] Error 1
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/force_mode_controller.cpp:42:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/force_mode_controller.hpp:44:10: fatal error: realtime_tools/realtime_thread_safe_box.hpp: No such file or directory
+   44 | #include <realtime_tools/realtime_thread_safe_box.hpp>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:90: CMakeFiles/ur_controllers.dir/src/force_mode_controller.cpp.o] Error 1
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/speed_scaling_state_broadcaster.cpp: In member function ‘virtual controller_interface::return_type ur_controllers::SpeedScalingStateBroadcaster::update(const rclcpp::Time&, const rclcpp::Duration&)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/speed_scaling_state_broadcaster.cpp:138:58: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  138 |     speed_scaling_state_msg_.data = state_interfaces_[0].get_optional().value_or(1.0) * 100.0;
+      |                                                          ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp: In member function ‘virtual controller_interface::CallbackReturn ur_controllers::FreedriveModeController::on_activate(const rclcpp_lifecycle::State&)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:156:53: error: could not convert ‘(&((ur_controllers::FreedriveModeController*)this)->ur_controllers::FreedriveModeController::abort_command_interface_.std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface> >::operator->()->std::reference_wrapper<hardware_interface::LoanedCommandInterface>::get())->hardware_interface::LoanedCommandInterface::set_value(0.0)’ from ‘void’ to ‘bool’
+  156 |       if (!abort_command_interface_->get().set_value(0.0)) {
+      |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+      |                                                     |
+      |                                                     void
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:156:53: error: in argument to unary !
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp: In member function ‘virtual controller_interface::CallbackReturn ur_controllers::FreedriveModeController::on_cleanup(const rclcpp_lifecycle::State&)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:172:49: error: could not convert ‘(&((ur_controllers::FreedriveModeController*)this)->ur_controllers::FreedriveModeController::abort_command_interface_.std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface> >::operator->()->std::reference_wrapper<hardware_interface::LoanedCommandInterface>::get())->hardware_interface::LoanedCommandInterface::set_value(1.0e+0)’ from ‘void’ to ‘bool’
+  172 |   if (!abort_command_interface_->get().set_value(1.0)) {
+      |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+      |                                                 |
+      |                                                 void
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:172:49: error: in argument to unary !
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp: In member function ‘virtual controller_interface::return_type ur_controllers::FreedriveModeController::update(const rclcpp::Time&, const rclcpp::Duration&)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:196:58: error: ‘class hardware_interface::LoanedCommandInterface’ has no member named ‘get_optional’
+  196 |   async_state_ = async_success_command_interface_->get().get_optional().value_or(ASYNC_WAITING);
+      |                                                          ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:203:44: error: ‘class hardware_interface::LoanedCommandInterface’ has no member named ‘get_optional’
+  203 |       if ((abort_command_interface_->get().get_optional().has_value()) &&
+      |                                            ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:204:43: error: ‘class hardware_interface::LoanedCommandInterface’ has no member named ‘get_optional’
+  204 |           abort_command_interface_->get().get_optional().value() == 1.0) {
+      |                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:212:68: error: void value not ignored as it ought to be
+  212 |         write_success &= enable_command_interface_->get().set_value(1.0);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:214:75: error: void value not ignored as it ought to be
+  214 |         write_success &= async_success_command_interface_->get().set_value(ASYNC_WAITING);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:221:65: error: void value not ignored as it ought to be
+  221 |       write_success &= abort_command_interface_->get().set_value(1.0);
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/freedrive_mode_controller.cpp:223:73: error: void value not ignored as it ought to be
+  223 |       write_success &= async_success_command_interface_->get().set_value(ASYNC_WAITING);
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘void ur_controllers::GPIOController::publishIO()’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:200:82: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  200 |     io_msg_.digital_out_states[i].state = static_cast<bool>(state_interfaces_[i].get_optional().value_or(0.0));
+      |                                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:204:82: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  204 |         static_cast<bool>(state_interfaces_[i + StateInterfaces::DIGITAL_INPUTS].get_optional().value_or(0.0));
+      |                                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:210:82: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  210 |         static_cast<float>(state_interfaces_[i + StateInterfaces::ANALOG_INPUTS].get_optional().value_or(0.0));
+      |                                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:212:86: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  212 |         static_cast<uint8_t>(state_interfaces_[i + StateInterfaces::ANALOG_IO_TYPES].get_optional().value_or(0.0));
+      |                                                                                      ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:218:83: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  218 |         static_cast<float>(state_interfaces_[i + StateInterfaces::ANALOG_OUTPUTS].get_optional().value_or(0.0));
+      |                                                                                   ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:220:90: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  220 |         static_cast<uint8_t>(state_interfaces_[i + StateInterfaces::ANALOG_IO_TYPES + 2].get_optional().value_or(0.0));
+      |                                                                                          ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘void ur_controllers::GPIOController::publishToolData()’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:229:74: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  229 |       static_cast<uint8_t>(state_interfaces_[StateInterfaces::TOOL_MODE].get_optional().value_or(0.0));
+      |                                                                          ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:231:85: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  231 |       static_cast<uint8_t>(state_interfaces_[StateInterfaces::TOOL_ANALOG_IO_TYPES].get_optional().value_or(0.0));
+      |                                                                                     ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:233:89: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  233 |       static_cast<uint8_t>(state_interfaces_[StateInterfaces::TOOL_ANALOG_IO_TYPES + 1].get_optional().value_or(0.0));
+      |                                                                                         ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:235:81: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  235 |       static_cast<float>(state_interfaces_[StateInterfaces::TOOL_ANALOG_INPUTS].get_optional().value_or(0.0));
+      |                                                                                 ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:237:85: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  237 |       static_cast<float>(state_interfaces_[StateInterfaces::TOOL_ANALOG_INPUTS + 1].get_optional().value_or(0.0));
+      |                                                                                     ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:239:84: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  239 |       static_cast<uint8_t>(state_interfaces_[StateInterfaces::TOOL_OUTPUT_VOLTAGE].get_optional().value_or(0.0));
+      |                                                                                    ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:241:82: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  241 |       static_cast<float>(state_interfaces_[StateInterfaces::TOOL_OUTPUT_CURRENT].get_optional().value_or(0.0));
+      |                                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:243:79: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  243 |       static_cast<float>(state_interfaces_[StateInterfaces::TOOL_TEMPERATURE].get_optional().value_or(0.0));
+      |                                                                               ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘void ur_controllers::GPIOController::publishRobotMode()’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:249:88: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  249 |   auto robot_mode = static_cast<int8_t>(state_interfaces_[StateInterfaces::ROBOT_MODE].get_optional().value_or(0.0));
+      |                                                                                        ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘void ur_controllers::GPIOController::publishSafetyMode()’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:259:91: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  259 |   auto safety_mode = static_cast<uint8_t>(state_interfaces_[StateInterfaces::SAFETY_MODE].get_optional().value_or(0.0));
+      |                                                                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘void ur_controllers::GPIOController::publishProgramRunning()’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:270:80: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  270 |       static_cast<uint8_t>(state_interfaces_[StateInterfaces::PROGRAM_RUNNING].get_optional().value_or(0.0));
+      |                                                                                ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘virtual controller_interface::CallbackReturn ur_controllers::GPIOController::on_activate(const rclcpp_lifecycle::State&)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:281:63: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedStateInterface>, hardware_interface::LoanedStateInterface>::value_type’ {aka ‘class hardware_interface::LoanedStateInterface’} has no member named ‘get_optional’
+  281 |   while (state_interfaces_[StateInterfaces::INITIALIZED_FLAG].get_optional().value_or(0.0) == 0.0) {
+      |                                                               ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:353:99: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  353 |     std::ignore = command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                   ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple: In substitution of ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const [with _Tp = void]’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:353:99:   required from here
+/usr/include/c++/11/tuple:1779:7: error: forming reference to void
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:354:90: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  354 |     std::ignore = command_interfaces_[req->pin].set_value(static_cast<double>(req->state));
+      |                                                                                          ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:359:75: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  359 |           return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |                                                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:358:29: error: cannot convert ‘ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  358 |     if (!waitForAsyncCommand([&]() {
+      |          ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  359 |           return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  360 |         })) {
+      |         ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:365:77: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  365 |     resp->success = static_cast<bool>(command_interfaces_[IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                             ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:369:99: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  369 |     std::ignore = command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                   ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:371:40: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  371 |         static_cast<double>(req->state));
+      |                                        ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:376:75: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  376 |           return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |                                                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:375:29: error: cannot convert ‘ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  375 |     if (!waitForAsyncCommand([&]() {
+      |          ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  376 |           return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  377 |         })) {
+      |         ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:383:66: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  383 |         command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:386:99: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  386 |     std::ignore = command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                   ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:387:117: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  387 |     std::ignore = command_interfaces_[CommandInterfaces::TOOL_VOLTAGE_CMD].set_value(static_cast<double>(req->state));
+      |                                                                                                                     ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:392:75: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  392 |           return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |                                                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:391:29: error: cannot convert ‘ur_controllers::GPIOController::setIO(ur_msgs::srv::SetIO_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetIO_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  391 |     if (!waitForAsyncCommand([&]() {
+      |          ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  392 |           return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  393 |         })) {
+      |         ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:399:66: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  399 |         command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setAnalogOutput(ur_msgs::srv::SetAnalogOutput_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetAnalogOutput_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:430:97: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  430 |   std::ignore = command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                 ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:432:43: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  432 |       static_cast<double>(req->data.state));
+      |                                           ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:434:116: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  434 |       command_interfaces_[CommandInterfaces::ANALOG_OUTPUTS_DOMAIN].set_value(static_cast<double>(req->data.domain));
+      |                                                                                                                    ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:440:73: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  440 |         return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |                                                                         ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setAnalogOutput(ur_msgs::srv::SetAnalogOutput_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetAnalogOutput_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:439:27: error: cannot convert ‘ur_controllers::GPIOController::setAnalogOutput(ur_msgs::srv::SetAnalogOutput_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetAnalogOutput_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  439 |   if (!waitForAsyncCommand([&]() {
+      |        ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  440 |         return command_interfaces_[CommandInterfaces::IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  441 |       })) {
+      |       ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:446:75: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  446 |   resp->success = static_cast<bool>(command_interfaces_[IO_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setSpeedSlider(ur_msgs::srv::SetSpeedSliderFraction_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetSpeedSliderFraction_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:456:118: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  456 |     std::ignore = command_interfaces_[CommandInterfaces::TARGET_SPEED_FRACTION_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                                      ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:459:56: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  459 |         static_cast<double>(req->speed_slider_fraction));
+      |                                                        ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:462:94: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  462 |           return command_interfaces_[CommandInterfaces::TARGET_SPEED_FRACTION_ASYNC_SUCCESS].get_optional().value_or(
+      |                                                                                              ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setSpeedSlider(ur_msgs::srv::SetSpeedSliderFraction_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetSpeedSliderFraction_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:461:29: error: cannot convert ‘ur_controllers::GPIOController::setSpeedSlider(ur_msgs::srv::SetSpeedSliderFraction_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetSpeedSliderFraction_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  461 |     if (!waitForAsyncCommand([&]() {
+      |          ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  462 |           return command_interfaces_[CommandInterfaces::TARGET_SPEED_FRACTION_ASYNC_SUCCESS].get_optional().value_or(
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  463 |               ASYNC_WAITING);
+      |               ~~~~~~~~~~~~~~~
+  464 |         })) {
+      |         ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:469:85: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  469 |         command_interfaces_[CommandInterfaces::TARGET_SPEED_FRACTION_ASYNC_SUCCESS].get_optional().value_or(
+      |                                                                                     ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::resendRobotProgram(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:484:115: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  484 |   std::ignore = command_interfaces_[CommandInterfaces::RESEND_ROBOT_PROGRAM_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                                   ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:486:95: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  486 |   std::ignore = command_interfaces_[CommandInterfaces::RESEND_ROBOT_PROGRAM_CMD].set_value(1.0);
+      |                                                                                               ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:489:91: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  489 |         return command_interfaces_[CommandInterfaces::RESEND_ROBOT_PROGRAM_ASYNC_SUCCESS].get_optional().value_or(
+      |                                                                                           ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::resendRobotProgram(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:488:27: error: cannot convert ‘ur_controllers::GPIOController::resendRobotProgram(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  488 |   if (!waitForAsyncCommand([&]() {
+      |        ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  489 |         return command_interfaces_[CommandInterfaces::RESEND_ROBOT_PROGRAM_ASYNC_SUCCESS].get_optional().value_or(
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  490 |             ASYNC_WAITING);
+      |             ~~~~~~~~~~~~~~~
+  491 |       })) {
+      |       ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:496:82: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  496 |       command_interfaces_[CommandInterfaces::RESEND_ROBOT_PROGRAM_ASYNC_SUCCESS].get_optional().value_or(
+      |                                                                                  ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::handBackControl(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:513:112: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  513 |   std::ignore = command_interfaces_[CommandInterfaces::HAND_BACK_CONTROL_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                                ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:515:92: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  515 |   std::ignore = command_interfaces_[CommandInterfaces::HAND_BACK_CONTROL_CMD].set_value(1.0);
+      |                                                                                            ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:518:88: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  518 |         return command_interfaces_[CommandInterfaces::HAND_BACK_CONTROL_ASYNC_SUCCESS].get_optional().value_or(
+      |                                                                                        ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::handBackControl(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:517:27: error: cannot convert ‘ur_controllers::GPIOController::handBackControl(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  517 |   if (!waitForAsyncCommand([&]() {
+      |        ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  518 |         return command_interfaces_[CommandInterfaces::HAND_BACK_CONTROL_ASYNC_SUCCESS].get_optional().value_or(
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  519 |             ASYNC_WAITING);
+      |             ~~~~~~~~~~~~~~~
+  520 |       })) {
+      |       ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:525:79: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  525 |       command_interfaces_[CommandInterfaces::HAND_BACK_CONTROL_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                               ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setPayload(ur_msgs::srv::SetPayload_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetPayload_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:541:102: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  541 |   std::ignore = command_interfaces_[CommandInterfaces::PAYLOAD_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                      ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:543:110: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  543 |   std::ignore = command_interfaces_[CommandInterfaces::PAYLOAD_MASS].set_value(static_cast<double>(req->mass));
+      |                                                                                                              ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:544:105: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  544 |   std::ignore = command_interfaces_[CommandInterfaces::PAYLOAD_COG_X].set_value(req->center_of_gravity.x);
+      |                                                                                                         ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:545:105: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  545 |   std::ignore = command_interfaces_[CommandInterfaces::PAYLOAD_COG_Y].set_value(req->center_of_gravity.y);
+      |                                                                                                         ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:546:105: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  546 |   std::ignore = command_interfaces_[CommandInterfaces::PAYLOAD_COG_Z].set_value(req->center_of_gravity.z);
+      |                                                                                                         ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:549:78: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  549 |         return command_interfaces_[CommandInterfaces::PAYLOAD_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |                                                                              ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::setPayload(ur_msgs::srv::SetPayload_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetPayload_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:548:27: error: cannot convert ‘ur_controllers::GPIOController::setPayload(ur_msgs::srv::SetPayload_Request_<std::allocator<void> >::SharedPtr, ur_msgs::srv::SetPayload_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  548 |   if (!waitForAsyncCommand([&]() {
+      |        ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  549 |         return command_interfaces_[CommandInterfaces::PAYLOAD_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING);
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  550 |       })) {
+      |       ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:556:69: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  556 |       command_interfaces_[CommandInterfaces::PAYLOAD_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                     ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::zeroFTSensor(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:572:108: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  572 |   std::ignore = command_interfaces_[CommandInterfaces::ZERO_FTSENSOR_ASYNC_SUCCESS].set_value(ASYNC_WAITING);
+      |                                                                                                            ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:574:88: error: no match for ‘operator=’ (operand types are ‘const std::_Swallow_assign’ and ‘void’)
+  574 |   std::ignore = command_interfaces_[CommandInterfaces::ZERO_FTSENSOR_CMD].set_value(1.0);
+      |                                                                                        ^
+In file included from /usr/include/c++/11/bits/unique_ptr.h:37,
+                 from /usr/include/c++/11/memory:76,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:41,
+                 from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/usr/include/c++/11/tuple:1779:7: note: candidate: ‘template<class _Tp> constexpr const std::_Swallow_assign& std::_Swallow_assign::operator=(const _Tp&) const’
+ 1779 |       operator=(const _Tp&) const
+      |       ^~~~~~~~
+/usr/include/c++/11/tuple:1779:7: note:   template argument deduction/substitution failed:
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(const std::_Swallow_assign&)’
+ 1775 |   struct _Swallow_assign
+      |          ^~~~~~~~~~~~~~~
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘const std::_Swallow_assign&’
+/usr/include/c++/11/tuple:1775:10: note: candidate: ‘constexpr std::_Swallow_assign& std::_Swallow_assign::operator=(std::_Swallow_assign&&)’
+/usr/include/c++/11/tuple:1775:10: note:   no known conversion for argument 1 from ‘void’ to ‘std::_Swallow_assign&&’
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In lambda function:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:577:84: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  577 |         return command_interfaces_[CommandInterfaces::ZERO_FTSENSOR_ASYNC_SUCCESS].get_optional().value_or(
+      |                                                                                    ^~~~~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp: In member function ‘bool ur_controllers::GPIOController::zeroFTSensor(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)’:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:576:27: error: cannot convert ‘ur_controllers::GPIOController::zeroFTSensor(std_srvs::srv::Trigger_Request_<std::allocator<void> >::SharedPtr, std_srvs::srv::Trigger_Response_<std::allocator<void> >::SharedPtr)::<lambda()>’ to ‘std::function<double()>’
+  576 |   if (!waitForAsyncCommand([&]() {
+      |        ~~~~~~~~~~~~~~~~~~~^~~~~~~~
+  577 |         return command_interfaces_[CommandInterfaces::ZERO_FTSENSOR_ASYNC_SUCCESS].get_optional().value_or(
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  578 |             ASYNC_WAITING);
+      |             ~~~~~~~~~~~~~~~
+  579 |       })) {
+      |       ~~                   
+In file included from /workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:38:
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/include/ur_controllers/gpio_controller.hpp:198:56: note:   initializing argument 1 of ‘bool ur_controllers::GPIOController::waitForAsyncCommand(std::function<double()>)’
+  198 |   bool waitForAsyncCommand(std::function<double(void)> get_value);
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/ur5_ws/src/Universal_Robots_ROS2_Driver/ur_controllers/src/gpio_controller.cpp:585:75: error: ‘__gnu_cxx::__alloc_traits<std::allocator<hardware_interface::LoanedCommandInterface>, hardware_interface::LoanedCommandInterface>::value_type’ {aka ‘class hardware_interface::LoanedCommandInterface’} has no member named ‘get_optional’
+  585 |       command_interfaces_[CommandInterfaces::ZERO_FTSENSOR_ASYNC_SUCCESS].get_optional().value_or(ASYNC_WAITING));
+      |                                                                           ^~~~~~~~~~~~
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:118: CMakeFiles/ur_controllers.dir/src/speed_scaling_state_broadcaster.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:132: CMakeFiles/ur_controllers.dir/src/freedrive_mode_controller.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/ur_controllers.dir/build.make:146: CMakeFiles/ur_controllers.dir/src/gpio_controller.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:409: CMakeFiles/ur_controllers.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

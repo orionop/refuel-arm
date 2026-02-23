@@ -1,0 +1,22 @@
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:399:23: warning: missing terminating " character
+  399 |   RCLCPP_INFO(logger, "  7.
+      |                       ^
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:399:28: error: unterminated argument list invoking macro "RCLCPP_INFO"
+  399 |   RCLCPP_INFO(logger, "  7.
+      |                            ^
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp: In function ‘int main(int, char**)’:
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:399:3: error: ‘RCLCPP_INFO’ was not declared in this scope
+  399 |   RCLCPP_INFO(logger, "  7.
+      |   ^~~~~~~~~~~
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:399:14: error: expected ‘}’ at end of input
+  399 |   RCLCPP_INFO(logger, "  7.
+      |              ^
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:72:33: note: to match this ‘{’
+   72 | int main(int argc, char** argv) {
+      |                                 ^
+/workspace/ur5_ws/src/ur5_motion_planning/src/ur5_plan_and_analyze_node.cpp:391:8: warning: unused variable ‘all_ok’ [-Wunused-variable]
+  391 |   bool all_ok = cohesion_ok && workspace_ok && singularity_ok;
+      |        ^~~~~~
+gmake[2]: *** [CMakeFiles/ur5_plan_and_analyze_node.dir/build.make:76: CMakeFiles/ur5_plan_and_analyze_node.dir/src/ur5_plan_and_analyze_node.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/ur5_plan_and_analyze_node.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

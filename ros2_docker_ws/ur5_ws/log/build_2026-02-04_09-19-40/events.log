@@ -1,0 +1,87 @@
+[0.000000] (-) TimerEvent: {}
+[0.000378] (-) JobUnselected: {'identifier': 'ur'}
+[0.001253] (-) JobUnselected: {'identifier': 'ur5_minimal_moveit'}
+[0.001451] (-) JobUnselected: {'identifier': 'ur_calibration'}
+[0.001504] (-) JobUnselected: {'identifier': 'ur_controllers'}
+[0.001611] (-) JobUnselected: {'identifier': 'ur_dashboard_msgs'}
+[0.003475] (-) JobUnselected: {'identifier': 'ur_description'}
+[0.003589] (-) JobUnselected: {'identifier': 'ur_moveit_config'}
+[0.003684] (-) JobUnselected: {'identifier': 'ur_robot_driver'}
+[0.003824] (ur5_kdl_ik) JobQueued: {'identifier': 'ur5_kdl_ik', 'dependencies': OrderedDict([('ur_description', '/workspace/ur5_ws/install/ur_description'), ('ur_moveit_config', '/workspace/ur5_ws/install/ur_moveit_config')])}
+[0.003911] (ur5_kdl_ik) JobStarted: {'identifier': 'ur5_kdl_ik'}
+[0.009653] (ur5_kdl_ik) JobProgress: {'identifier': 'ur5_kdl_ik', 'progress': 'cmake'}
+[0.010732] (ur5_kdl_ik) JobProgress: {'identifier': 'ur5_kdl_ik', 'progress': 'build'}
+[0.011850] (ur5_kdl_ik) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/ur5_ws/build/ur5_kdl_ik', '--', '-j11', '-l11'], 'cwd': '/workspace/ur5_ws/build/ur5_kdl_ik', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_kdl_ik'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[0.049781] (ur5_kdl_ik) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/ur5_kdl_ik_baseline.dir/src/ur5_kdl_ik_node.cpp.o\n'}
+[0.099403] (-) TimerEvent: {}
+[0.202376] (-) TimerEvent: {}
+[0.303345] (-) TimerEvent: {}
+[0.404375] (-) TimerEvent: {}
+[0.505348] (-) TimerEvent: {}
+[0.606368] (-) TimerEvent: {}
+[0.707366] (-) TimerEvent: {}
+[0.808377] (-) TimerEvent: {}
+[0.909377] (-) TimerEvent: {}
+[1.010378] (-) TimerEvent: {}
+[1.111362] (-) TimerEvent: {}
+[1.212399] (-) TimerEvent: {}
+[1.313391] (-) TimerEvent: {}
+[1.416423] (-) TimerEvent: {}
+[1.517404] (-) TimerEvent: {}
+[1.618378] (-) TimerEvent: {}
+[1.719391] (-) TimerEvent: {}
+[1.825406] (-) TimerEvent: {}
+[1.927895] (-) TimerEvent: {}
+[2.030868] (-) TimerEvent: {}
+[2.131652] (-) TimerEvent: {}
+[2.235408] (-) TimerEvent: {}
+[2.339482] (-) TimerEvent: {}
+[2.442135] (-) TimerEvent: {}
+[2.546448] (-) TimerEvent: {}
+[2.647387] (-) TimerEvent: {}
+[2.748624] (-) TimerEvent: {}
+[2.849425] (-) TimerEvent: {}
+[2.950890] (-) TimerEvent: {}
+[3.052133] (-) TimerEvent: {}
+[3.154641] (-) TimerEvent: {}
+[3.258431] (-) TimerEvent: {}
+[3.359650] (-) TimerEvent: {}
+[3.463385] (-) TimerEvent: {}
+[3.568698] (-) TimerEvent: {}
+[3.670164] (-) TimerEvent: {}
+[3.773411] (-) TimerEvent: {}
+[3.875654] (-) TimerEvent: {}
+[3.980199] (-) TimerEvent: {}
+[4.081631] (-) TimerEvent: {}
+[4.184644] (-) TimerEvent: {}
+[4.233992] (ur5_kdl_ik) StdoutLine: {'line': b'[100%] Linking CXX executable ur5_kdl_ik_baseline\n'}
+[4.285388] (-) TimerEvent: {}
+[4.386430] (-) TimerEvent: {}
+[4.465069] (ur5_kdl_ik) StdoutLine: {'line': b'[100%] Built target ur5_kdl_ik_baseline\n'}
+[4.472371] (ur5_kdl_ik) CommandEnded: {'returncode': 0}
+[4.474187] (ur5_kdl_ik) JobProgress: {'identifier': 'ur5_kdl_ik', 'progress': 'install'}
+[4.479886] (ur5_kdl_ik) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/ur5_ws/build/ur5_kdl_ik'], 'cwd': '/workspace/ur5_ws/build/ur5_kdl_ik', 'env': OrderedDict([('HOSTNAME', '10a6f84be8b2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/'), ('ROS_PYTHON_VERSION', '3'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('AMENT_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble'), ('PWD', '/workspace/ur5_ws/build/ur5_kdl_ik'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/ur5_ws/install/ur_moveit_config:/workspace/ur5_ws/install/ur_description:/opt/ros/humble')]), 'shell': False}
+[4.483824] (ur5_kdl_ik) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[4.484931] (ur5_kdl_ik) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[4.486929] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/lib/ur5_kdl_ik/ur5_kdl_ik_baseline\n'}
+[4.487379] (-) TimerEvent: {}
+[4.493202] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/launch/run_ik_baseline.launch.py\n'}
+[4.499039] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/package_run_dependencies/ur5_kdl_ik\n'}
+[4.505857] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/parent_prefix_path/ur5_kdl_ik\n'}
+[4.511412] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/ament_prefix_path.sh\n'}
+[4.516254] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/ament_prefix_path.dsv\n'}
+[4.520988] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/path.sh\n'}
+[4.526067] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/environment/path.dsv\n'}
+[4.530980] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.bash\n'}
+[4.535552] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.sh\n'}
+[4.540547] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.zsh\n'}
+[4.545553] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/local_setup.dsv\n'}
+[4.550787] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/package.dsv\n'}
+[4.556542] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ament_index/resource_index/packages/ur5_kdl_ik\n'}
+[4.561640] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/cmake/ur5_kdl_ikConfig.cmake\n'}
+[4.566767] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/cmake/ur5_kdl_ikConfig-version.cmake\n'}
+[4.571990] (ur5_kdl_ik) StdoutLine: {'line': b'-- Symlinking: /workspace/ur5_ws/install/ur5_kdl_ik/share/ur5_kdl_ik/package.xml\n'}
+[4.577489] (ur5_kdl_ik) CommandEnded: {'returncode': 0}
+[4.588326] (-) TimerEvent: {}
+[4.608961] (ur5_kdl_ik) JobEnded: {'identifier': 'ur5_kdl_ik', 'rc': 0}
+[4.610534] (-) EventReactorShutdown: {}
