@@ -107,7 +107,7 @@ class IkfLitModel(LightningModule):
                 about in training is our generalization error. Epoch is an unneccessary construct.
         """
         lr_scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=self.hparams.step_lr_every, gamma=self.hparams.gamma, verbose=False
+            optimizer, step_size=self.hparams.step_lr_every, gamma=self.hparams.gamma
         )
 
         # See 'configure_optimizers' in these docs to see the format of this dict: https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html
