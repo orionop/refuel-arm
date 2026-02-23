@@ -1,1 +1,0 @@
-/workspace/ur5_ws/build/ur_dashboard_msgs/rosidl_typesupport_introspection_cpp/ur_dashboard_msgs/msg/detail/robot_mode__rosidl_typesupport_introspection_cpp.hpp

@@ -1,1 +1,0 @@
-/workspace/ur5_ws/build/ur_dashboard_msgs/rosidl_cmake/srv/RawRequest_Request.msg

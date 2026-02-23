@@ -1,4 +1,0 @@
-Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /workspace/ur5_ws/src/ur5_motion_planning -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur5_motion_planning
-Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /workspace/ur5_ws/src/ur5_motion_planning -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/workspace/ur5_ws/install/ur5_motion_planning
-Invoking command in '/workspace/ur5_ws/build/ur5_motion_planning': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11
-Invoked command in '/workspace/ur5_ws/build/ur5_motion_planning' returned '2': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur5_motion_planning -- -j11 -l11

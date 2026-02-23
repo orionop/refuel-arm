@@ -1,1 +1,0 @@
-/workspace/ur5_ws/build/ur5_motion_planning/ament_cmake_environment_hooks/local_setup.sh

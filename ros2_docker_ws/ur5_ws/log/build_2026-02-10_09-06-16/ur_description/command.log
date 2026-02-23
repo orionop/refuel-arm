@@ -1,4 +1,0 @@
-Invoking command in '/workspace/ur5_ws/build/ur_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/ur5_ws/install/ur5_minimal_moveit:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur_description -- -j11 -l11
-Invoked command in '/workspace/ur5_ws/build/ur_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/ur5_ws/install/ur5_minimal_moveit:/opt/ros/humble /usr/bin/cmake --build /workspace/ur5_ws/build/ur_description -- -j11 -l11
-Invoking command in '/workspace/ur5_ws/build/ur_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/ur5_ws/install/ur5_minimal_moveit:/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur_description
-Invoked command in '/workspace/ur5_ws/build/ur_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/ur5_ws/install/ur5_minimal_moveit:/opt/ros/humble /usr/bin/cmake --install /workspace/ur5_ws/build/ur_description
