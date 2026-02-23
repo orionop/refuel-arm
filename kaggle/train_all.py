@@ -173,12 +173,18 @@ configs_shuffled = configs[perm]
 poses_shuffled = poses[perm]
 
 best_loss = float("inf")
+import time as _time
+t_start = _time.time()
 
 for epoch in range(N_EPOCHS):
     epoch_loss = 0.0
     n_batches = 0
+    n_total_batches = (configs_shuffled.shape[0] - BATCH_SIZE) // BATCH_SIZE
 
-    for i in range(0, configs_shuffled.shape[0] - BATCH_SIZE, BATCH_SIZE):
+    pbar = tqdm(range(0, configs_shuffled.shape[0] - BATCH_SIZE, BATCH_SIZE),
+                desc=f"Epoch {epoch+1:2d}/{N_EPOCHS}", leave=True)
+
+    for i in pbar:
         q_batch = configs_shuffled[i:i+BATCH_SIZE].to(device)
         pose_batch = poses_shuffled[i:i+BATCH_SIZE].to(device)
 
@@ -197,15 +203,25 @@ for epoch in range(N_EPOCHS):
         epoch_loss += loss.item()
         n_batches += 1
 
+        if n_batches % 500 == 0:
+            elapsed = _time.time() - t_start
+            pbar.set_postfix(loss=f"{epoch_loss/n_batches:.4f}", elapsed=f"{elapsed/60:.1f}m")
+
     scheduler.step()
     avg_loss = epoch_loss / max(n_batches, 1)
     lr = scheduler.get_last_lr()[0]
+    elapsed = _time.time() - t_start
+    eta = elapsed / (epoch + 1) * (N_EPOCHS - epoch - 1)
 
     if avg_loss < best_loss:
         best_loss = avg_loss
         torch.save(nn_model.state_dict(), os.path.join(SAVE_DIR, "kuka_kr6_ikflow_best.pt"))
+        saved = " ★ saved"
+    else:
+        saved = ""
 
-    print(f"  Epoch {epoch+1:3d}/{N_EPOCHS} | Loss: {avg_loss:.4f} | Best: {best_loss:.4f} | LR: {lr:.6f}")
+    print(f"  Epoch {epoch+1:3d}/{N_EPOCHS} | Loss: {avg_loss:.4f} | Best: {best_loss:.4f} | "
+          f"LR: {lr:.6f} | Elapsed: {elapsed/60:.1f}m | ETA: {eta/60:.1f}m{saved}")
 
 final_path = os.path.join(SAVE_DIR, "kuka_kr6_ikflow_final.pt")
 torch.save(nn_model.state_dict(), final_path)
