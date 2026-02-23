@@ -10,6 +10,14 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
+# Patch StepLR to remove deprecated 'verbose' kwarg (removed in PyTorch 2.4)
+_OrigStepLR = torch.optim.lr_scheduler.StepLR
+class _PatchedStepLR(_OrigStepLR):
+    def __init__(self, *args, **kwargs):
+        kwargs.pop("verbose", None)
+        super().__init__(*args, **kwargs)
+torch.optim.lr_scheduler.StepLR = _PatchedStepLR
+
 # ═══════════════════════════════════════════════════════════════════
 # PART 1: Generate URDF + Register Robot
 # ═══════════════════════════════════════════════════════════════════
