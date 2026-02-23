@@ -141,13 +141,12 @@ print(f"   Workspace Z: [{pos[:,2].min():.3f}, {pos[:,2].max():.3f}]")
 from ikflow.model import IkflowModelParameters
 from ikflow.ikflow_solver import IKFlowSolver
 
-model_params = IkflowModelParameters(
-    nb_nodes=12,
-    dim_latent_space=6,
-    coeff_fn_config=3,
-    coeff_fn_internal_size=1024,
-    rnvp_clamp=2.5,
-)
+model_params = IkflowModelParameters()
+model_params.nb_nodes = 12
+model_params.dim_latent_space = 6
+model_params.coeff_fn_config = 3
+model_params.coeff_fn_internal_size = 1024
+model_params.rnvp_clamp = 2.5
 
 solver = IKFlowSolver(model_params, robot)
 nn_model = solver.nn_model
