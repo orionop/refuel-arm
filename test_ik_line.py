@@ -53,7 +53,7 @@ def is_valid(q):
     return True
 
 
-def solve_closest_ik(target_pos, prev_q):
+def solve_closest_ik(target_pos, prev_q, wp_index):
     """Solve IK-Geo for a Cartesian point, pick the valid pose closest to prev_q."""
     Q_all = ik.IK_spherical_2_parallel(TARGET_R, target_pos)
     
@@ -62,19 +62,30 @@ def solve_closest_ik(target_pos, prev_q):
 
     best_q = None
     min_dist = float('inf')
+    
+    print(f"\n--- WP {wp_index:2d} | Target XYZ: {np.round(target_pos, 3)} ---")
 
     # Q_all is 6xN matrix of solutions
+    valid_count = 0
     for i in range(Q_all.shape[1]):
         q = Q_all[:, i]
         # Normalize between -pi and pi
         q = (q + np.pi) % (2 * np.pi) - np.pi
         
+        status = "INVALID (Limits)"
         if is_valid(q):
+            status = "VALID"
+            valid_count += 1
             # L2 norm (Euclidean distance in joint space)
             dist = np.linalg.norm(q - prev_q)
             if dist < min_dist:
                 min_dist = dist
                 best_q = q
+            print(f"  Sol {i+1}: {np.round(q, 3)} | Dist to prev: {dist:.3f} rad | [{status}]")
+        else:
+            print(f"  Sol {i+1}: {np.round(q, 3)} | [{status}]")
+            
+    print(f"  -> Total Valid: {valid_count}/{Q_all.shape[1]}")
 
     return best_q
 
@@ -98,7 +109,7 @@ def generate_line_trajectory():
         cartesian_points.append(wp_pos)
         
         # 1. Solve IK for this waypoint
-        solved_q = solve_closest_ik(wp_pos, current_q)
+        solved_q = solve_closest_ik(wp_pos, current_q, i+1)
         
         if solved_q is None:
             print(f"\n[ERROR] IK-Geo failed to find valid solution for Waypoint {i+1} at XYZ={np.round(wp_pos, 3)}")
@@ -120,7 +131,7 @@ def generate_line_trajectory():
             print(f"Target: {wp_pos}, FK Output: {p_check}")
             sys.exit(1)
             
-        print(f"  WP {i+1:2d} -> IK Success | Jump from prev: {jump:.2f} rad | FK Error: {err:.2e} m")
+        print(f"  => SELECTED: {np.round(solved_q, 3)} | FK Error: {err:.2e} m")
         
         trajectory.append(solved_q)
         current_q = solved_q  # Update reference for next waypoint
@@ -133,37 +144,59 @@ def execute_ros(trajectory, cartesian_points, mode="ros"):
     import rospy
     from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
     from sensor_msgs.msg import JointState
-    from visualization_msgs.msg import Marker
+    from visualization_msgs.msg import Marker, MarkerArray
 
     rospy.init_node('pure_ik_line_tracker', anonymous=True)
     
-    # ── 1. Draw Blue Line Marker ──
-    marker_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
+    marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
     rospy.sleep(0.5)
+    
+    ma = MarkerArray()
     
     line = Marker()
     line.header.frame_id = "world"
-    line.ns = "ik_path"
+    line.ns = "ik_path_line"
     line.id = 0
     line.type = Marker.LINE_STRIP
     line.action = Marker.ADD
-    line.scale.x = 0.015 # Line width
+    line.scale.x = 0.008 # Line width
     
-    # Neon Blue
+    # Neon Blue Line
     line.color.r = 0.0
     line.color.g = 0.5
     line.color.b = 1.0
     line.color.a = 1.0
     line.pose.orientation.w = 1.0
     
+    dots = Marker()
+    dots.header.frame_id = "world"
+    dots.ns = "ik_path_dots"
+    dots.id = 1
+    dots.type = Marker.SPHERE_LIST
+    dots.action = Marker.ADD
+    dots.scale.x = 0.02 # Dot diameter
+    dots.scale.y = 0.02
+    dots.scale.z = 0.02
+    
+    # White Dots
+    dots.color.r = 1.0
+    dots.color.g = 1.0
+    dots.color.b = 1.0
+    dots.color.a = 1.0
+    dots.pose.orientation.w = 1.0
+    
     from geometry_msgs.msg import Point
     for p in cartesian_points:
         pt = Point()
         pt.x, pt.y, pt.z = p
         line.points.append(pt)
+        dots.points.append(pt)
         
-    marker_pub.publish(line)
-    print("\n[Visuals] Published blue Cartesian path line to RViz/Gazebo")
+    ma.markers.append(line)
+    ma.markers.append(dots)
+    
+    marker_pub.publish(ma)
+    print("\n[Visuals] Published blue Cartesian path line with white waypoint dots to RViz/Gazebo")
 
     # ── 2. Execute Trajectory ──
     if mode == "ros":
