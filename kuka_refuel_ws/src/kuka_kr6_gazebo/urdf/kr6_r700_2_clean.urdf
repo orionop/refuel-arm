@@ -1,201 +1,195 @@
-<robot name="kr6_r700_2">
-  
-  <link name="base" />
+<?xml version="1.0"?>
+<!-- KUKA KR6 R700 sixx URDF with proper 3D meshes from ROS-Industrial -->
+<!-- Source: ros-industrial/kuka_experimental/kuka_kr6_support -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kr6_r700">
+
   <link name="base_link">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.15" radius="0.08"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/base_link.dae"/>
       </geometry>
-      <origin rpy="0.0 -0.0 0.0" xyz="0.0 0.0 0.075" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/base_link.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.16209200415615" ixy="0.0" ixz="0.0" iyy="0.10881181598555635" iyz="0.0" izz="0.18461591505869543" />
-      <mass value="1.6916E1" />
-      <origin rpy="1.6165592773339865 -1.221289277333065 3.10031147437779" xyz="-0.03713348309292976 2.6602033577676952E-5 0.10863850792149446" />
+      <mass value="5.0"/>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
     </inertial>
-    <visual>
-      <geometry>
-        <cylinder length="0.15" radius="0.08"/>
-      </geometry>
-      <origin rpy="0.0 -0.0 0.0" xyz="0.0 0.0 0.075" />
-    </visual>
   </link>
-  <link name="flange" />
+
   <link name="link_1">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.18" radius="0.06"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/link_1.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.0 0.0 -0.09" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/link_1.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.07406183855390856" ixy="0.0" ixz="0.0" iyy="0.0890478351825312" iyz="0.0" izz="0.11039570662759428" />
-      <mass value="8.416E0" />
-      <origin rpy="1.304519343134156 -0.9428616016893944 -1.4226510948637578" xyz="0.00641040874524715 -0.016268053707224336 -0.1065889377376426" />
+      <mass value="4.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
     </inertial>
-    <visual>
-      <geometry>
-        <cylinder length="0.18" radius="0.06"/>
-      </geometry>
-      <origin rpy="0 0 0" xyz="0.0 0.0 -0.09" />
-    </visual>
   </link>
+
   <link name="link_2">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.335 0.06 0.06"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/link_2.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.1675 0.0 0.0" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/link_2.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.2791393962851823" ixy="0.0" ixz="0.0" iyy="0.0812068241212874" iyz="0.0" izz="0.3188594096256082" />
-      <mass value="1.55659E1" />
-      <origin rpy="-1.3903732489969955 -1.5149954424356888 -0.19980852830399726" xyz="0.0968897140544395 -0.004085391785890956 -0.07157586711979391" />
+      <mass value="3.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
     </inertial>
-    <visual>
-      <geometry>
-        <box size="0.335 0.06 0.06"/>
-      </geometry>
-      <origin rpy="0 0 0" xyz="0.1675 0.0 0.0" />
-    </visual>
   </link>
+
   <link name="link_3">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.141 0.05 0.05"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/link_3.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.07 0.0 0.0" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/link_3.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.016743444555446366" ixy="0.0" ixz="0.0" iyy="0.02548253701645681" iyz="0.0" izz="0.02822390996140249" />
-      <mass value="5.303E0" />
-      <origin rpy="2.358120324062734 -0.2189419917733543 -3.0042851780780877" xyz="0.022228738449934005 -0.011136149349424855 -0.06927623986422782" />
+      <mass value="2.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.005" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.005"/>
     </inertial>
-    <visual>
-      <geometry>
-        <box size="0.141 0.05 0.05"/>
-      </geometry>
-      <origin rpy="0 0 0" xyz="0.07 0.0 0.0" />
-    </visual>
   </link>
+
   <link name="link_4">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.224" radius="0.03"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/link_4.dae"/>
       </geometry>
-      <origin rpy="0 1.5707963 0" xyz="0.0 0.0 -0.112" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/link_4.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.01053127278723183" ixy="0.0" ixz="0.0" iyy="0.03425565311920861" iyz="0.0" izz="0.03735903294944075" />
-      <mass value="4.6129999999999995E0" />
-      <origin rpy="-2.0540104905408416 -1.5266176566842766 2.01813464445371" xyz="1.0969000650336042E-4 0.010267591588987646 -0.09163862995881207" />
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.003" ixy="0" ixz="0" iyy="0.003" iyz="0" izz="0.003"/>
     </inertial>
-    <visual>
-      <geometry>
-        <cylinder length="0.224" radius="0.03"/>
-      </geometry>
-      <origin rpy="0 1.5707963 0" xyz="0.0 0.0 -0.112" />
-    </visual>
   </link>
+
   <link name="link_5">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.06" radius="0.025"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/link_5.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/link_5.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.0017317756133102902" ixy="0.0" ixz="0.0" iyy="0.0022195008054406813" iyz="0.0" izz="0.002467090055442976" />
-      <mass value="1.6128E0" />
-      <origin rpy="1.567898714902773 -0.8611716764868312 -3.100280255900494" xyz="0.009320696924603175 7.83482142857143E-4 -0.026462549603174602" />
+      <mass value="1.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
     </inertial>
-    <visual>
-      <geometry>
-        <cylinder length="0.06" radius="0.025"/>
-      </geometry>
-      <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
-    </visual>
   </link>
+
   <link name="link_6">
-    <collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.03" radius="0.02"/>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/visual/link_6.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.0 0.0 -0.015" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_gazebo/meshes/collision/link_6.stl"/>
+      </geometry>
     </collision>
     <inertial>
-      <inertia ixx="1.83698267603013E-4" ixy="0.0" ixz="0.0" iyy="1.8213621766783165E-4" iyz="0.0" izz="2.9589000000000004E-4" />
-      <mass value="7.34E-1" />
-      <origin rpy="0.0 -0.0 1.2234271886965395" xyz="0.0 0.0 -0.011764604904632152" />
+      <mass value="0.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
     </inertial>
-    <visual>
-      <geometry>
-        <cylinder length="0.03" radius="0.02"/>
-      </geometry>
-      <origin rpy="0 0 0" xyz="0.0 0.0 -0.015" />
-    </visual>
   </link>
-  <link name="tool0" />
-  <link name="world" />
-  <joint name="base_link-base" type="fixed">
-    <child link="base" />
-    <parent link="base_link" />
-  <origin xyz="0 0 0" rpy="0 0 0" /></joint>
+
+  <!-- Joints — matching ROS-Industrial kinematic chain -->
   <joint name="joint_1" type="revolute">
-    <axis xyz="0.0 0.0 1.0" />
-    <child link="link_1" />
-    <limit effort="1.86E2" lower="-2.967059725E0" upper="2.967059725E0" velocity="6.2831853071795862E0" />
-    <origin rpy="3.141592653589793 -0.0 0.0" xyz="0.0 0.0 0.20800000000000002" />
-    <parent link="base_link" />
+    <origin xyz="0 0 0.4" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="-2.967059725" upper="2.967059725" effort="100" velocity="6.2832"/>
   </joint>
+
   <joint name="joint_2" type="revolute">
-    <axis xyz="0.0 0.0 1.0" />
-    <child link="link_2" />
-    <limit effort="1.6893729997505432E2" lower="-3.316125575E0" upper="7.853981625E-1" velocity="5.2359877559829888E0" />
-    <origin rpy="1.5707963267948966 -0.0 0.0" xyz="0.025 -0.0907 -0.192" />
-    <parent link="link_1" />
+    <origin xyz="0.025 0 0" rpy="0 0 0"/>
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.316125575" upper="0.785398163" effort="100" velocity="5.2360"/>
   </joint>
+
   <joint name="joint_3" type="revolute">
-    <axis xyz="0.0 0.0 1.0" />
-    <child link="link_3" />
-    <limit effort="8.1493186258254326E1" lower="-2.0943951E0" upper="2.72271363E0" velocity="6.2831853071795862E0" />
-    <origin rpy="0.0 -0.0 0.0" xyz="0.335 0.0 -0.004200000000000001" />
-    <parent link="link_2" />
+    <origin xyz="0.315 0 0" rpy="0 0 0"/>
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.094395100" upper="2.722713630" effort="100" velocity="6.2832"/>
   </joint>
+
   <joint name="joint_4" type="revolute">
-    <axis xyz="0.0 0.0 1.0" />
-    <child link="link_4" />
-    <limit effort="4.8879867848304357E1" lower="-3.2288591125E0" upper="3.2288591125E0" velocity="7.8539816339744828E0" />
-    <origin rpy="1.5707963267948966 -0.0 -1.5707963267948966" xyz="0.14100000000000001 -0.025 -0.08650000000000001" />
-    <parent link="link_3" />
+    <origin xyz="0 0 0.035" rpy="0 0 0"/>
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <axis xyz="-1 0 0"/>
+    <limit lower="-3.228859113" upper="3.228859113" effort="100" velocity="6.6497"/>
   </joint>
+
   <joint name="joint_5" type="revolute">
-    <axis xyz="0.0 0.0 1.0" />
-    <child link="link_5" />
-    <limit effort="4.0135638235238289E1" lower="-2.0943951E0" upper="2.0943951E0" velocity="7.8539816339744828E0" />
-    <origin rpy="0.0 1.5707963267948966 1.5707963267948966" xyz="0.0 0.0505 -0.224" />
-    <parent link="link_4" />
+    <origin xyz="0.365 0 0" rpy="0 0 0"/>
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.094395100" upper="2.094395100" effort="100" velocity="6.7720"/>
   </joint>
+
   <joint name="joint_6" type="revolute">
-    <axis xyz="0.0 0.0 1.0" />
-    <child link="link_6" />
-    <limit effort="2.7358196129032258E1" lower="-6.108652375E0" upper="6.108652375E0" velocity="9.42477796076938E0" />
-    <origin rpy="1.5707963267948966 -0.0 -1.5707963267948966" xyz="0.0615 0.0 -0.0505" />
-    <parent link="link_5" />
+    <origin xyz="0.080 0 0" rpy="0 0 0"/>
+    <parent link="link_5"/>
+    <child link="link_6"/>
+    <axis xyz="-1 0 0"/>
+    <limit lower="-6.108652375" upper="6.108652375" effort="100" velocity="10.7338"/>
   </joint>
-  <joint name="link6-flange" type="fixed">
-    <child link="flange" />
-    <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.0 0.0 -0.0285" />
-    <parent link="link_6" />
-  </joint>
-  <joint name="link6-tool0" type="fixed">
-    <child link="tool0" />
-    <origin rpy="3.141592653589793 1.2246467991473532E-16 3.141592653589793" xyz="0.0 0.0 -0.0285" />
-    <parent link="link_6" />
-  </joint>
-  <joint name="world-base_link" type="fixed">
-    <child link="base_link" />
-    <parent link="world" />
-    <origin rpy="0 0 0" xyz="0 0 0" />
-  </joint>
+
 </robot>
