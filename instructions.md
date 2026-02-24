@@ -42,7 +42,7 @@ git clone https://github.com/orionop/refuel-arm.git
 cd /home/armslab-exp4/Desktop/anurag_ws
 python3 -m venv venv
 source venv/bin/activate
-pip install numpy
+pip install numpy linearsubproblemsltns
 ```
 
 Verify isolation:
