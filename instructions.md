@@ -21,7 +21,7 @@ If GPU is heavily used by others, **do not proceed** with Gazebo.
 ## Step 2: Create Workspace
 
 ```bash
-cd /home/admin/Desktop
+cd /home/armslab-exp4/Desktop
 mkdir -p anurag_ws/src
 cd anurag_ws/src
 ```
@@ -39,7 +39,7 @@ git clone https://github.com/orionop/refuel-arm.git
 ## Step 4: Python Virtual Environment (SAFE_DEV_RULES Rule 4)
 
 ```bash
-cd /home/admin/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws
 python3 -m venv venv
 source venv/bin/activate
 pip install numpy
@@ -47,8 +47,8 @@ pip install numpy
 
 Verify isolation:
 ```bash
-pwd        # Must show: /home/admin/Desktop/anurag_ws
-which python  # Must show: /home/admin/Desktop/anurag_ws/venv/bin/python
+pwd        # Must show: /home/armslab-exp4/Desktop/anurag_ws
+which python  # Must show: /home/armslab-exp4/Desktop/anurag_ws/venv/bin/python
 ```
 
 ---
@@ -56,7 +56,7 @@ which python  # Must show: /home/admin/Desktop/anurag_ws/venv/bin/python
 ## Step 5: Test Pipeline Locally (No ROS Needed)
 
 ```bash
-cd /home/admin/Desktop/anurag_ws/src/refuel-arm
+cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
 python3 test_full_pipeline.py
 ```
 
@@ -73,7 +73,7 @@ Expected output:
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/admin/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws
 catkin_make
 source devel/setup.bash
 ```
@@ -84,7 +84,7 @@ source devel/setup.bash
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/admin/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws
 source devel/setup.bash
 roslaunch kuka_kr6_gazebo gazebo.launch
 ```
@@ -95,7 +95,7 @@ roslaunch kuka_kr6_gazebo gazebo.launch
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/admin/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws
 source devel/setup.bash
 source venv/bin/activate
 cd src/refuel-arm
