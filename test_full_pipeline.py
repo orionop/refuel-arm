@@ -1,34 +1,29 @@
 #!/usr/bin/env python3
 """
-Full IK-Geo + CppFlow Refueling Pipeline
-=========================================
+KUKA KR6 R700 — Autonomous Refueling Mission
+=============================================
 
-Architecture:
+Mission sequence:
+  REST → YELLOW (pick nozzle) → REST → RED (refuel, 5s dwell) → REST → YELLOW (return nozzle) → REST
+
+Components:
   1. IK-Geo  → exact terminal joint configuration  (10^-16 precision)
-  2. Waypoint IK with joint-limit + jump filtering  (Gazebo-safe)
-  3. ROS 2   → JointTrajectoryController execution  (Gazebo physics)
+  2. STOMP   → smooth trajectory optimization       (Kalakrishnan, ICRA 2011)
+  3. ROS Noetic → JointTrajectoryController execution (Gazebo physics)
 
-Safety features:
-  ✅ Joint limit enforcement (from official KUKA URDF)
-  ✅ Elbow flip prevention (max 0.5 rad jump between waypoints)
-  ✅ Greedy nearest-neighbor solution selection
-
-Run locally (no ROS required):
-  source venv/bin/activate
-  python test_full_pipeline.py
-
-Run on Ubuntu PC with ROS 2 + Gazebo:
-  python test_full_pipeline.py --ros
+Run locally:   python3 test_full_pipeline.py
+Run in Gazebo: python3 test_full_pipeline.py --ros
 """
 import sys
+import time
 import argparse
 import numpy as np
 
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
 from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700
+from stomp_planner import stomp_optimize
 
 # ── Official KUKA KR6 R700-2 Joint Limits (from URDF) ───────────
-# Source: kuka_robot_descriptions/kuka_agilus_support/urdf/kr6_r700_2_macro.xacro
 JOINT_LIMITS = np.array([
     [-2.967059725,  2.967059725],   # joint_1: ±170°
     [-3.316125575,  0.785398163],   # joint_2: -190° to +45°
@@ -38,7 +33,12 @@ JOINT_LIMITS = np.array([
     [-6.108652375,  6.108652375],   # joint_6: ±350°
 ])
 
-MAX_JUMP_RAD = 0.5  # Maximum allowed joint jump between consecutive waypoints
+# ── Mission Waypoints ────────────────────────────────────────────
+Q_HOME = np.zeros(6)                                         # REST position
+Q_NOZZLE = np.array([0.5, -0.4, 0.6, 0.0, -0.3, 0.0])     # YELLOW dot (hardcoded FK)
+REFUEL_TARGET_XYZ = np.array([0.3, 0.4, 0.25])              # RED dot (IK-Geo solved)
+REFUEL_TARGET_R = np.eye(3)                                  # Tool orientation
+DWELL_TIME = 5.0                                             # Seconds to hold at refuel position
 
 
 def within_joint_limits(q):
@@ -53,7 +53,6 @@ def wrap_to_limits(q):
     """Wrap joint angles to [-pi, pi] then check limits."""
     q_wrapped = np.copy(q)
     for i in range(6):
-        # Wrap to [-pi, pi]
         while q_wrapped[i] > np.pi:
             q_wrapped[i] -= 2 * np.pi
         while q_wrapped[i] < -np.pi:
@@ -61,13 +60,8 @@ def wrap_to_limits(q):
     return q_wrapped
 
 
-def filter_solutions(Q, q_prev=None, max_jump=MAX_JUMP_RAD):
-    """
-    Filter IK solutions:
-    1. Reject solutions outside joint limits
-    2. Sort by distance to q_prev
-    3. Reject solutions with any single joint jump > max_jump
-    """
+def filter_solutions(Q, q_prev=None, max_jump=0.5):
+    """Filter IK solutions by joint limits and proximity."""
     if Q.size == 0:
         return np.empty((6, 0))
 
@@ -80,232 +74,166 @@ def filter_solutions(Q, q_prev=None, max_jump=MAX_JUMP_RAD):
     if not valid:
         return np.empty((6, 0))
 
-    valid = np.array(valid).T  # (6, N)
+    valid = np.array(valid).T
 
     if q_prev is not None:
-        # Sort by total distance to previous config
         dists = np.linalg.norm(valid.T - q_prev, axis=1)
         order = np.argsort(dists)
         valid = valid[:, order]
 
-        # Filter by max jump per joint
-        filtered = []
-        for i in range(valid.shape[1]):
-            max_joint_jump = np.max(np.abs(valid[:, i] - q_prev))
-            if max_joint_jump <= max_jump:
-                filtered.append(valid[:, i])
-
-        if filtered:
-            return np.array(filtered).T
-        # If no solution passes the jump filter, relax and return the closest
-        return valid[:, :1]
-
     return valid
 
 
-def pick_best_solution(Q, q_prev=None):
-    """Pick the best filtered IK solution."""
-    filtered = filter_solutions(Q, q_prev)
-    if filtered.size == 0:
-        return None, -1
-    return filtered[:, 0], 0
-
-
-def generate_cartesian_waypoints(p_start, p_end, R_start, R_end, n_waypoints=30):
-    """Generate linearly interpolated Cartesian waypoints."""
-    waypoints = []
-    for i in range(n_waypoints):
-        alpha = i / (n_waypoints - 1)
-        p = (1 - alpha) * p_start + alpha * p_end
-        R = (1 - alpha) * R_start + alpha * R_end
-        waypoints.append((p, R))
-    return waypoints
-
-
-def solve_trajectory_ik_geo(waypoints, q_start):
-    """
-    Solve IK for each Cartesian waypoint with safety filters:
-    - Joint limits enforced
-    - Max jump threshold prevents elbow flips
-    - Greedy nearest-neighbor selection
-    """
-    trajectory = [q_start]
-    q_prev = q_start.copy()
-    n_relaxed = 0
-
-    for i, (p, R) in enumerate(waypoints[1:], 1):
-        Q = IK_spherical_2_parallel(R, p)
-        if Q.size == 0:
-            trajectory.append(q_prev.copy())
-            continue
-
-        q_best, _ = pick_best_solution(Q, q_prev)
-        if q_best is None:
-            trajectory.append(q_prev.copy())
-            continue
-
-        # Check if we had to relax the jump filter
-        max_jump = np.max(np.abs(q_best - q_prev))
-        if max_jump > MAX_JUMP_RAD:
-            n_relaxed += 1
-
-        trajectory.append(q_best)
-        q_prev = q_best.copy()
-
-    if n_relaxed > 0:
-        print(f"  ⚠️  {n_relaxed} waypoints required relaxed jump filter")
-
-    return np.array(trajectory)
-
-
-def main():
-    parser = argparse.ArgumentParser(description="KUKA KR6 R700 Refueling Pipeline")
-    parser.add_argument("--ros", action="store_true", help="Send trajectory to ROS 2 controller")
-    parser.add_argument("--waypoints", type=int, default=30, help="Number of waypoints (more = smoother)")
-    args = parser.parse_args()
-
-    print("=" * 65)
-    print("  KUKA KR6 R700 — Gazebo-Safe Refueling Pipeline")
-    print("  IK-Geo + Joint Limits + Elbow Flip Prevention")
-    print("=" * 65)
-
-    # ── Phase 1: IK-Geo exact terminal solution ──────────────────
-    target_xyz = np.array([0.3, 0.4, 0.25])
-    target_R = np.eye(3)
-    q_home = np.zeros(6)
-
-    print(f"\n[Phase 1] IK-Geo: Computing exact terminal joint configuration")
-    print(f"  Target: position={target_xyz}")
-    print(f"  Joint limits enforced: ✅")
-
-    Q = IK_spherical_2_parallel(target_R, target_xyz)
-    n_total = Q.shape[1]
-
-    # Filter for joint limits
-    Q_filtered = filter_solutions(Q, q_home)
-    n_valid = Q_filtered.shape[1] if Q_filtered.size > 0 else 0
-
-    print(f"  Found {n_total} algebraic solutions, {n_valid} within joint limits")
-
-    if n_valid == 0:
-        print("  ❌ No valid solutions within joint limits!")
-        return
-
-    q_terminal = Q_filtered[:, 0]
-
-    # Verify
-    R_check, p_check = fwd_kinematics(q_terminal)
-    pos_err = np.linalg.norm(p_check - target_xyz)
-    print(f"  Selected: {np.round(q_terminal, 4)}")
-    print(f"  FK verification: {pos_err:.2e} m")
-
-    # Show limit margins
-    for j in range(6):
-        margin_lo = q_terminal[j] - JOINT_LIMITS[j, 0]
-        margin_hi = JOINT_LIMITS[j, 1] - q_terminal[j]
-        margin = min(margin_lo, margin_hi)
-        print(f"    J{j+1}: {q_terminal[j]:+.3f} rad  (margin: {np.degrees(margin):.1f}°)")
-
-    # ── Phase 2: STOMP trajectory optimization ─────────────────────
-    n_wp = args.waypoints
-    print(f"\n[Phase 2] STOMP Trajectory Optimization: HOME → TARGET ({n_wp} waypoints)")
-    print(f"  Reference: Kalakrishnan et al., ICRA 2011")
-
-    from stomp_planner import stomp_optimize
-
+def plan_segment(q_start, q_goal, name, n_waypoints=30):
+    """Plan a STOMP-optimized trajectory between two joint configs."""
+    print(f"\n  📍 Planning: {name}")
     trajectory = stomp_optimize(
-        q_start=q_home,
-        q_goal=q_terminal,
+        q_start=q_start,
+        q_goal=q_goal,
         joint_limits=JOINT_LIMITS,
-        n_waypoints=n_wp,
+        n_waypoints=n_waypoints,
         n_iterations=80,
         n_rollouts=10,
         noise_stddev=0.08,
-        verbose=True,
+        verbose=False,
     )
-
-    # Verify each waypoint FK for Cartesian tracking error
-    cart_errors = []
-    p_home = fwd_kinematics(q_home)[1]
-    for i in range(n_wp):
-        alpha = i / (n_wp - 1)
-        p_desired = (1 - alpha) * p_home + alpha * target_xyz
-        _, p_actual = fwd_kinematics(trajectory[i])
-        cart_errors.append(np.linalg.norm(p_actual - p_desired))
-
-    # Smoothness analysis
-    joint_diffs = np.diff(trajectory, axis=0)
-    max_jump = np.max(np.abs(joint_diffs))
-    mean_jump = np.mean(np.abs(joint_diffs))
-    max_cart_err = max(cart_errors)
-
-    print(f"\n  Trajectory stats:")
-    print(f"    Shape:       {trajectory.shape}")
-    print(f"    Max jump:    {max_jump:.4f} rad ({np.degrees(max_jump):.1f}°)")
-    print(f"    Mean jump:   {mean_jump:.4f} rad ({np.degrees(mean_jump):.1f}°)")
-    print(f"    Max EE deviation from straight line: {max_cart_err:.4f} m")
-
-    # Verify all waypoints are within limits
+    diffs = np.diff(trajectory, axis=0)
+    max_jump = np.max(np.abs(diffs))
     all_valid = all(within_joint_limits(trajectory[i]) for i in range(len(trajectory)))
-    print(f"    All within limits: {'✅' if all_valid else '❌'}")
-    print(f"    ✅ STOMP-optimized trajectory is Gazebo-safe!")
+    print(f"     → {n_waypoints} waypoints, max_jump={np.degrees(max_jump):.1f}°, "
+          f"limits OK: {'✅' if all_valid else '❌'}")
+    return trajectory
 
-    # ── Phase 3: Execute ─────────────────────────────────────────
+
+def send_trajectory_ros(trajectory, dt=0.15):
+    """Send a single trajectory segment to the ROS controller."""
+    import rospy
+    import actionlib
+    from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+    from trajectory_msgs.msg import JointTrajectoryPoint
+
+    client = actionlib.SimpleActionClient(
+        '/kr6_arm_controller/follow_joint_trajectory',
+        FollowJointTrajectoryAction
+    )
+    client.wait_for_server(timeout=rospy.Duration(5.0))
+
+    goal = FollowJointTrajectoryGoal()
+    goal.trajectory.joint_names = [
+        'joint_1', 'joint_2', 'joint_3',
+        'joint_4', 'joint_5', 'joint_6'
+    ]
+
+    for i, q in enumerate(trajectory):
+        pt = JointTrajectoryPoint()
+        pt.positions = q.tolist()
+        pt.velocities = [0.0] * 6
+        pt.time_from_start = rospy.Duration.from_sec(i * dt)
+        goal.trajectory.points.append(pt)
+
+    client.send_goal(goal)
+    client.wait_for_result(timeout=rospy.Duration(len(trajectory) * dt + 10.0))
+    return client.get_result()
+
+
+def main():
+    parser = argparse.ArgumentParser(description="KUKA KR6 R700 Refueling Mission")
+    parser.add_argument("--ros", action="store_true", help="Execute on ROS Noetic + Gazebo")
+    parser.add_argument("--waypoints", type=int, default=30, help="Waypoints per segment")
+    args = parser.parse_args()
+
+    print("=" * 65)
+    print("  KUKA KR6 R700 — Autonomous Refueling Mission")
+    print("  IK-Geo + STOMP + ROS Noetic")
+    print("=" * 65)
+
+    # ── Step 0: Verify waypoints ─────────────────────────────────
+    print("\n[Setup] Verifying mission waypoints...")
+
+    # Verify nozzle station (yellow dot) FK
+    R_nozzle, p_nozzle = fwd_kinematics(Q_NOZZLE)
+    print(f"  🟡 YELLOW (nozzle station): {np.round(p_nozzle, 4)} m")
+    print(f"     Joint config: {np.round(Q_NOZZLE, 4)}")
+    assert within_joint_limits(Q_NOZZLE), "Nozzle config violates joint limits!"
+
+    # Solve IK for refueling target (red dot)
+    print(f"  🔴 RED (refuel inlet):      {REFUEL_TARGET_XYZ} m")
+    Q = IK_spherical_2_parallel(REFUEL_TARGET_R, REFUEL_TARGET_XYZ)
+    Q_valid = filter_solutions(Q, Q_HOME)
+
+    if Q_valid.size == 0:
+        print("  ❌ No valid IK solution for refuel target!")
+        return
+
+    q_refuel = Q_valid[:, 0]
+    R_check, p_check = fwd_kinematics(q_refuel)
+    fk_err = np.linalg.norm(p_check - REFUEL_TARGET_XYZ)
+    print(f"     IK-Geo: {Q.shape[1]} solutions, {Q_valid.shape[1]} valid")
+    print(f"     Selected: {np.round(q_refuel, 4)}")
+    print(f"     FK error: {fk_err:.2e} m")
+
+    # ── Plan all 6 trajectory segments ───────────────────────────
+    print(f"\n[Planning] STOMP trajectory optimization for 6 mission segments")
+    n_wp = args.waypoints
+
+    seg1 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (pick up nozzle)",  n_wp)
+    seg2 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (nozzle acquired)", n_wp)
+    seg3 = plan_segment(Q_HOME,    q_refuel, "REST → RED (approach refuel)",     n_wp)
+    seg4 = plan_segment(q_refuel,  Q_HOME,   "RED → REST (refueling done)",     n_wp)
+    seg5 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (return nozzle)",   n_wp)
+    seg6 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)", n_wp)
+
+    all_segments = [
+        ("REST → YELLOW (pick up nozzle)", seg1, None),
+        ("YELLOW → REST (nozzle acquired)", seg2, None),
+        ("REST → RED (approach refuel)", seg3, None),
+        ("🔴 REFUELING — holding position", None, DWELL_TIME),
+        ("RED → REST (refueling done)", seg4, None),
+        ("REST → YELLOW (return nozzle)", seg5, None),
+        ("YELLOW → REST (mission complete)", seg6, None),
+    ]
+
+    # ── Execute ──────────────────────────────────────────────────
     if args.ros:
-        print(f"\n[Phase 3] Sending trajectory to ROS Noetic JointTrajectoryController...")
+        print(f"\n[Execute] Running mission on ROS Noetic + Gazebo")
         try:
             import rospy
-            import actionlib
-            from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
-            from trajectory_msgs.msg import JointTrajectoryPoint
-            from std_msgs.msg import Duration
+            rospy.init_node('refuel_mission', anonymous=True)
 
-            rospy.init_node('refuel_pipeline', anonymous=True)
-            client = actionlib.SimpleActionClient(
-                '/kr6_arm_controller/follow_joint_trajectory',
-                FollowJointTrajectoryAction
-            )
-            print("  Waiting for JointTrajectoryController action server...")
-            client.wait_for_server(timeout=rospy.Duration(10.0))
-            print("  ✅ Connected to action server")
+            for i, (name, traj, dwell) in enumerate(all_segments, 1):
+                print(f"\n  Step {i}/7: {name}")
+                if dwell is not None:
+                    print(f"     ⏱️  Holding for {dwell:.0f} seconds...")
+                    rospy.sleep(dwell)
+                    print(f"     ✅ Dwell complete")
+                else:
+                    result = send_trajectory_ros(traj)
+                    if result:
+                        print(f"     ✅ Segment executed")
+                    else:
+                        print(f"     ⚠️  Segment timed out")
 
-            goal = FollowJointTrajectoryGoal()
-            goal.trajectory.joint_names = [
-                'joint_1', 'joint_2', 'joint_3',
-                'joint_4', 'joint_5', 'joint_6'
-            ]
-
-            dt = 0.15  # seconds between waypoints
-            for i, q in enumerate(trajectory):
-                pt = JointTrajectoryPoint()
-                pt.positions = q.tolist()
-                pt.velocities = [0.0] * 6
-                t = i * dt
-                pt.time_from_start = rospy.Duration.from_sec(t)
-                goal.trajectory.points.append(pt)
-
-            print(f"  Sending {len(trajectory)} waypoints ({len(trajectory)*dt:.1f}s trajectory)...")
-            client.send_goal(goal)
-            client.wait_for_result(timeout=rospy.Duration(30.0))
-
-            result = client.get_result()
-            if result:
-                print("  ✅ Trajectory executed in Gazebo!")
-            else:
-                print("  ⚠️  Trajectory execution timed out")
-
+            print(f"\n  🎉 Mission complete!")
         except ImportError:
             print("  ⚠️  ROS Noetic not available. Source /opt/ros/noetic/setup.bash first.")
     else:
-        print(f"\n[Phase 3] Local mode — trajectory preview")
-        print(f"  Joint trajectory (every 5th waypoint):")
-        for i in range(0, len(trajectory), 5):
-            print(f"    wp{i:02d}: {np.round(trajectory[i], 4)}")
-        if (len(trajectory) - 1) % 5 != 0:
-            print(f"    wp{len(trajectory)-1:02d}: {np.round(trajectory[-1], 4)}")
+        print(f"\n[Preview] Mission trajectory summary")
+        total_waypoints = 0
+        for i, (name, traj, dwell) in enumerate(all_segments, 1):
+            if dwell is not None:
+                print(f"  Step {i}/7: {name} ({dwell:.0f}s dwell)")
+            else:
+                total_waypoints += len(traj)
+                start = np.round(traj[0], 3)
+                end = np.round(traj[-1], 3)
+                print(f"  Step {i}/7: {name}")
+                print(f"           start={start}")
+                print(f"           end  ={end}")
+        print(f"\n  Total waypoints: {total_waypoints}")
+        print(f"  Total segments: 6 motion + 1 dwell ({DWELL_TIME:.0f}s)")
 
     print(f"\n{'=' * 65}")
-    print("  Pipeline complete!")
+    print("  Mission complete!")
     print(f"{'=' * 65}")
 
 
