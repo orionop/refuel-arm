@@ -1,0 +1,32 @@
+<launch>
+  <!-- KUKA KR6 R700 Gazebo Simulation (ROS Noetic) -->
+
+  <!-- Load robot description from xacro -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro $(find kuka_kr6_gazebo)/urdf/kr6_r700.gazebo.xacro" />
+
+  <!-- Launch Gazebo with the refuel world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find kuka_kr6_gazebo)/worlds/refuel_world.world" />
+    <arg name="paused" value="false" />
+    <arg name="gui" value="true" />
+  </include>
+
+  <!-- Spawn robot in Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description -urdf -model kr6_r700"
+        output="screen" />
+
+  <!-- Robot State Publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        output="screen" />
+
+  <!-- Load controller configurations -->
+  <rosparam file="$(find kuka_kr6_gazebo)/config/controllers.yaml" command="load" />
+
+  <!-- Spawn controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        args="joint_state_controller kr6_arm_controller"
+        output="screen" />
+
+</launch>

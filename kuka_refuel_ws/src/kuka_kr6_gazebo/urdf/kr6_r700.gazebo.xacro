@@ -4,39 +4,34 @@
   <!-- Include the raw clean URDF (primitive cylinders/boxes) -->
   <xacro:include filename="$(find kuka_kr6_gazebo)/urdf/kr6_r700_clean.urdf" />
 
-  <!-- ROS 2 Control tag for Gazebo -->
-  <ros2_control name="GazeboSystem" type="system">
-    <hardware>
-      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-    </hardware>
-
-    <xacro:macro name="kuka_joint_control" params="joint_name">
-      <joint name="${joint_name}">
-        <command_interface name="position">
-          <param name="min">-3.14</param>
-          <param name="max">3.14</param>
-        </command_interface>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-    </xacro:macro>
-
-    <xacro:kuka_joint_control joint_name="joint_1"/>
-    <xacro:kuka_joint_control joint_name="joint_2"/>
-    <xacro:kuka_joint_control joint_name="joint_3"/>
-    <xacro:kuka_joint_control joint_name="joint_4"/>
-    <xacro:kuka_joint_control joint_name="joint_5"/>
-    <xacro:kuka_joint_control joint_name="joint_6"/>
-
-  </ros2_control>
-
-  <!-- Gazebo ROS 2 Control Plugin -->
+  <!-- Gazebo ROS Control Plugin (Noetic) -->
   <gazebo>
-    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-      <parameters>$(find kuka_kr6_gazebo)/config/ros2_controllers.yaml</parameters>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
   </gazebo>
+
+  <!-- Transmission for each joint (required for gazebo_ros_control) -->
+  <xacro:macro name="kuka_transmission" params="joint_name">
+    <transmission name="${joint_name}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${joint_name}">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${joint_name}_actuator">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+  <xacro:kuka_transmission joint_name="joint_1"/>
+  <xacro:kuka_transmission joint_name="joint_2"/>
+  <xacro:kuka_transmission joint_name="joint_3"/>
+  <xacro:kuka_transmission joint_name="joint_4"/>
+  <xacro:kuka_transmission joint_name="joint_5"/>
+  <xacro:kuka_transmission joint_name="joint_6"/>
 
   <!-- Physics materials -->
   <gazebo reference="base_link">
