@@ -1,10 +1,10 @@
 TITLE: SAFE DEVELOPMENT RULEBOOK — ROS2 HUMBLE — SHARED LAB MACHINE
 
 CONTEXT:
-Working on shared Ubuntu research machine.
-ROS version: ROS2 Humble
+Working on shared Ubuntu research machines.
+ROS version: ROS2 Humble / ROS1 Noetic
 Workspace:
-`/home/admin/Desktop/anurag_ws`
+`~/kuka_ws` (or your chosen path)
 PhD students have existing work on this system.
 Goal: Zero interference with system, ROS installation, CUDA, GPU jobs, or other research.
 
@@ -12,15 +12,13 @@ Goal: Zero interference with system, ROS installation, CUDA, GPU jobs, or other 
 
 1) STRICT WORKSPACE ISOLATION
 
-All work must remain inside:
-`/home/admin/Desktop/anurag_ws`
+All work must remain inside your designated workspace:
+`~/kuka_ws`
 
 Before running any delete/move command:
 `pwd`
 
-If output is NOT:
-`/home/admin/Desktop/anurag_ws`
-Abort immediately.
+If output does NOT match your designated isolated workspace, Abort immediately.
 
 Never run:
 `rm -rf *`
@@ -49,14 +47,14 @@ Do NOT reinstall ROS2 Humble.
 
 ------------------------------------------------------------
 
-3) SAFE ROS2 WORKSPACE STRUCTURE
+3) SAFE ROS WORKSPACE STRUCTURE
 
-Inside:
-`/home/admin/Desktop/anurag_ws`
+Inside your isolated workspace:
+`~/kuka_ws`
 
-Structure must be:
+Structure must be (ROS 2 example):
 
-`anurag_ws/`
+`kuka_ws/`
   `src/`
   `build/`
   `install/`
@@ -64,8 +62,8 @@ Structure must be:
 
 Create workspace:
 
-`cd /home/admin/Desktop/anurag_ws`
-`mkdir -p src`
+`mkdir -p ~/kuka_ws/src`
+`cd ~/kuka_ws`
 
 Build only inside workspace:
 
@@ -83,9 +81,9 @@ or any other user directory.
 
 4) PYTHON ISOLATION (MANDATORY)
 
-Create virtual environment inside workspace:
+Create virtual environment inside your workspace:
 
-`cd /home/admin/Desktop/anurag_ws`
+`cd ~/kuka_ws`
 `python3 -m venv venv`
 `source venv/bin/activate`
 
@@ -93,8 +91,7 @@ Verify isolation:
 
 `which python`
 
-Must return:
-`/home/admin/Desktop/anurag_ws/venv/bin/python`
+Must return the path to your internal `venv/bin/python`.
 
 Install packages only after activation:
 
@@ -128,10 +125,10 @@ Only terminate your own processes.
 
 6) SAFE ENVIRONMENT SOURCING ORDER
 
-Correct order:
+Correct order (ROS 2 example):
 
 `source /opt/ros/humble/setup.bash`
-`cd /home/admin/Desktop/anurag_ws`
+`cd ~/kuka_ws`
 `source install/setup.bash`
 `source venv/bin/activate`
 
@@ -161,9 +158,9 @@ Upgrade kernel
 
 Do not delete unknown folders.
 Do not modify other researchers’ datasets.
-Store all outputs inside:
+Store all outputs inside your designated workspace bounds:
 
-`/home/admin/Desktop/anurag_ws`
+`~/kuka_ws`
 
 ------------------------------------------------------------
 

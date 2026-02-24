@@ -21,9 +21,8 @@ If GPU is heavily used by others, **do not proceed** with Gazebo.
 ## Step 2: Create Workspace
 
 ```bash
-cd /home/armslab-exp4/Desktop
-mkdir -p anurag_ws/src
-cd anurag_ws/src
+mkdir -p ~/kuka_ws/src
+cd ~/kuka_ws/src
 ```
 
 ---
@@ -39,7 +38,7 @@ git clone https://github.com/orionop/refuel-arm.git
 ## Step 4: Python Virtual Environment (SAFE_DEV_RULES Rule 4)
 
 ```bash
-cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
+cd ~/kuka_ws/src/refuel-arm
 python3 -m venv venv
 source venv/bin/activate
 pip install numpy linearsubproblemsltns
@@ -47,7 +46,7 @@ pip install numpy linearsubproblemsltns
 
 Verify isolation:
 ```bash
-pwd        # Must show: /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
+pwd        # Must show: .../kuka_ws/src/refuel-arm
 which python  # Must show: .../venv/bin/python
 ```
 
@@ -56,7 +55,7 @@ which python  # Must show: .../venv/bin/python
 ## Step 5: Test Pipeline Locally (No ROS Needed)
 
 ```bash
-cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
+cd ~/kuka_ws/src/refuel-arm
 python3 test_full_pipeline.py
 ```
 
@@ -73,7 +72,7 @@ Expected output:
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws
+cd ~/kuka_ws/src/refuel-arm/kuka_refuel_ws
 catkin_make
 source devel/setup.bash
 ```
@@ -84,7 +83,7 @@ source devel/setup.bash
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws
+cd ~/kuka_ws/src/refuel-arm/kuka_refuel_ws
 source devel/setup.bash
 roslaunch kuka_kr6_gazebo gazebo.launch
 ```
@@ -93,18 +92,34 @@ roslaunch kuka_kr6_gazebo gazebo.launch
 
 ---
 
-## Step 8: Run Pipeline with ROS (Terminal 2)
+## Step 8: Run Refueling Mission (Terminal 2)
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws
+cd ~/kuka_ws/src/refuel-arm/kuka_refuel_ws
 source devel/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
+cd ~/kuka_ws/src/refuel-arm
 # NOTE: Do NOT use the venv when running ROS commands here
 python3 test_full_pipeline.py --ros
 
 # Or, if running RViz instead of Gazebo:
 # python3 test_full_pipeline.py --rviz
+```
+
+---
+
+## Step 9: Run IK-Geo Line Tracking (Optional Scenario B)
+
+Demonstrate exact mathematical 60-waypoint Cartesian line tracking dynamically.
+
+```bash
+cd ~/kuka_ws/src/refuel-arm
+
+# Draw default line
+python3 test_ik_line.py --ros
+
+# Draw custom length line dynamically
+python3 test_ik_line.py --ros --start 0.3 0.4 0.5 --end 0.65 -0.25 0.45
 ```
 
 ---
