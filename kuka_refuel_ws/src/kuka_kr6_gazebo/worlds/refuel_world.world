@@ -33,9 +33,9 @@
     </model>
 
     <!-- RED DOT: Refueling Inlet Target -->
-    <!-- Real-world realistic center-front position [0.45, 0.0, 0.3] -->
+    <!-- Real-world realistic far-left position [0.55, 0.3, 0.3] -->
     <model name="car_refuel_inlet">
-      <pose>0.45 0.0 0.3 0 0 0</pose>
+      <pose>0.55 0.3 0.3 0 0 0</pose>
       <static>true</static>
       <link name="inlet">
         <visual name="visual">
