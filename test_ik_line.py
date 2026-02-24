@@ -168,33 +168,41 @@ def execute_ros(trajectory, cartesian_points, mode="ros"):
     line.color.a = 1.0
     line.pose.orientation.w = 1.0
     
-    dots = Marker()
-    dots.header.frame_id = "world"
-    dots.ns = "ik_path_dots"
-    dots.id = 1
-    dots.type = Marker.SPHERE_LIST
-    dots.action = Marker.ADD
-    dots.scale.x = 0.02 # Dot diameter
-    dots.scale.y = 0.02
-    dots.scale.z = 0.02
+    # Gazebo doesn't natively support MarkerArrays well without an external plugin. 
+    # But it does support single markers over standard topic `visualization_marker`.
+    # Let's publish individual sphere markers in a loop specifically so Gazebo natively renders them.
+    marker_pub_single = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
     
-    # White Dots
-    dots.color.r = 1.0
-    dots.color.g = 1.0
-    dots.color.b = 1.0
-    dots.color.a = 1.0
-    dots.pose.orientation.w = 1.0
+    # Send the main strip first
+    marker_pub_single.publish(line)
     
-    from geometry_msgs.msg import Point
-    for p in cartesian_points:
-        pt = Point()
-        pt.x, pt.y, pt.z = p
-        line.points.append(pt)
-        dots.points.append(pt)
+    # Send individual spheres instead of SPHERE_LIST for better Gazebo compatibility
+    for idx, p in enumerate(cartesian_points):
+        dot = Marker()
+        dot.header.frame_id = "world"
+        dot.ns = "ik_path_dots"
+        dot.id = idx + 10  # Offset ID so they don't overwrite each other
+        dot.type = Marker.SPHERE
+        dot.action = Marker.ADD
+        dot.scale.x = 0.02
+        dot.scale.y = 0.02
+        dot.scale.z = 0.02
+        dot.color.r = 1.0
+        dot.color.g = 1.0
+        dot.color.b = 1.0
+        dot.color.a = 1.0
+        dot.pose.position.x = p[0]
+        dot.pose.position.y = p[1]
+        dot.pose.position.z = p[2]
+        dot.pose.orientation.w = 1.0
         
-    ma.markers.append(line)
-    ma.markers.append(dots)
+        # Publish to single topic
+        marker_pub_single.publish(dot)
+        
+        # Also append to array for RViz
+        ma.markers.append(dot)
     
+    ma.markers.append(line)
     marker_pub.publish(ma)
     print("\n[Visuals] Published blue Cartesian path line with white waypoint dots to RViz/Gazebo")
 
@@ -207,12 +215,22 @@ def execute_ros(trajectory, cartesian_points, mode="ros"):
         msg.joint_names = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
         
         time_from_start = 0.0
-        for q in trajectory:
-            time_from_start += DT
+        prev_q = Q_HOME
+        for i, q in enumerate(trajectory):
+            # Calculate dynamic time based on joint distance
+            # If it's a huge jump (like returning HOME), give it more time!
+            dist = np.linalg.norm(q - prev_q)
+            
+            # Base dt is 0.2s for tiny micro-movements, but add 2.5 seconds per radian for big jumps
+            dt = max(0.20, dist * 2.5)
+            time_from_start += dt
+            
             pt = JointTrajectoryPoint()
             pt.positions = q.tolist()
             pt.time_from_start = rospy.Duration.from_sec(time_from_start)
             msg.points.append(pt)
+            
+            prev_q = q
             
         print(f"[Execute] Sending {len(trajectory)} waypoints to ROS Gazebo JointTrajectoryController...")
         pub.publish(msg)
