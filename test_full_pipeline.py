@@ -35,10 +35,10 @@ JOINT_LIMITS = np.array([
 
 # ── Mission Waypoints ────────────────────────────────────────────
 Q_HOME = np.zeros(6)                                         # REST position
-Q_NOZZLE = np.array([0.5, -0.4, 0.6, 0.0, -0.3, 0.0])     # YELLOW dot (hardcoded FK)
-REFUEL_TARGET_XYZ = np.array([0.3, 0.4, 0.25])              # RED dot (IK-Geo solved)
+Q_NOZZLE = np.array([-0.785, 0.5, 1.0, 0.0, 0.5, 0.0])     # YELLOW dot (realistic dock to the right)
+REFUEL_TARGET_XYZ = np.array([0.45, 0.0, 0.3])              # RED dot (front, slightly lower)
 REFUEL_TARGET_R = np.eye(3)                                  # Tool orientation
-DWELL_TIME = 5.0                                             # Seconds to hold at refuel position
+DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
 
 def within_joint_limits(q):
@@ -220,13 +220,13 @@ def main():
     seg6 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)", n_wp)
 
     all_segments = [
-        ("REST → YELLOW (pick up nozzle)", seg1, None),
-        ("YELLOW → REST (nozzle acquired)", seg2, None),
-        ("REST → RED (approach refuel)", seg3, None),
-        ("🔴 REFUELING — holding position", None, DWELL_TIME),
-        ("RED → REST (refueling done)", seg4, None),
-        ("REST → YELLOW (return nozzle)", seg5, None),
-        ("YELLOW → REST (mission complete)", seg6, None),
+        ("REST → YELLOW (pick up nozzle)", seg1, None, 0.12),
+        ("YELLOW → REST (nozzle acquired)", seg2, None, 0.20),
+        ("REST → RED (approach refuel)", seg3, None, 0.25),
+        ("🔴 REFUELING — holding position", None, DWELL_TIME, None),
+        ("RED → REST (refueling done)", seg4, None, 0.15),
+        ("REST → YELLOW (return nozzle)", seg5, None, 0.12),
+        ("YELLOW → REST (mission complete)", seg6, None, 0.10),
     ]
 
     # ── Execute ──────────────────────────────────────────────────
@@ -285,7 +285,7 @@ def main():
 
                 marker_pub.publish(ma)
 
-            for i, (name, traj, dwell) in enumerate(all_segments, 1):
+            for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
                 print(f"\n  Step {i}/7: {name}")
                 if dwell is not None:
                     print(f"     ⏱️  Holding for {dwell:.0f} seconds...")
@@ -293,9 +293,9 @@ def main():
                     print(f"     ✅ Dwell complete")
                 else:
                     if args.ros:
-                        result = send_trajectory_ros(traj)
+                        result = send_trajectory_ros(traj, dt=dt)
                     else:
-                        result = send_trajectory_rviz(traj)
+                        result = send_trajectory_rviz(traj, dt=dt)
 
                     if result:
                         print(f"     ✅ Segment executed")
@@ -308,7 +308,7 @@ def main():
     else:
         print(f"\n[Preview] Mission trajectory summary")
         total_waypoints = 0
-        for i, (name, traj, dwell) in enumerate(all_segments, 1):
+        for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
             if dwell is not None:
                 print(f"  Step {i}/7: {name} ({dwell:.0f}s dwell)")
             else:
