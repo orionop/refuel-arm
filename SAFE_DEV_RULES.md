@@ -1,8 +1,8 @@
-TITLE: SAFE DEVELOPMENT RULEBOOK — ROS2 HUMBLE — SHARED LAB MACHINE
+TITLE: SAFE DEVELOPMENT RULEBOOK — ROS1 NOETIC — SHARED LAB MACHINE
 
 CONTEXT:
 Working on shared Ubuntu research machines.
-ROS version: ROS2 Humble / ROS1 Noetic
+ROS version: ROS1 Noetic / ROS1 Noetic
 Workspace:
 `~/kuka_ws` (or your chosen path)
 PhD students have existing work on this system.
@@ -27,10 +27,10 @@ without confirming location using:
 
 ------------------------------------------------------------
 
-2) ROS2 HUMBLE SAFETY RULES
+2) ROS1 NOETIC SAFETY RULES
 
 Never modify global ROS installation:
-`/opt/ros/humble`
+`/opt/ros/noetic`
 
 Never run:
 `sudo apt remove ros-*`
@@ -38,12 +38,12 @@ Never run:
 `sudo apt install ros-*`
 
 Never edit:
-`/opt/ros/humble/setup.bash`
+`/opt/ros/noetic/setup.bash`
 
 Only source globally installed ROS:
-`source /opt/ros/humble/setup.bash`
+`source /opt/ros/noetic/setup.bash`
 
-Do NOT reinstall ROS2 Humble.
+Do NOT reinstall ROS1 Noetic.
 
 ------------------------------------------------------------
 
@@ -67,11 +67,11 @@ Create workspace:
 
 Build only inside workspace:
 
-`colcon build`
+`catkin_make`
 
 After build:
 
-`source install/setup.bash`
+`source devel/setup.bash`
 
 Never build inside:
 `/opt/ros/`
@@ -127,9 +127,9 @@ Only terminate your own processes.
 
 Correct order (ROS 2 example):
 
-`source /opt/ros/humble/setup.bash`
+`source /opt/ros/noetic/setup.bash`
 `cd ~/kuka_ws`
-`source install/setup.bash`
+`source devel/setup.bash`
 `source venv/bin/activate`
 
 Never modify:
