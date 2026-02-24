@@ -12,9 +12,9 @@
     <arg name="gui" value="true" />
   </include>
 
-  <!-- Spawn robot in Gazebo -->
+  <!-- Spawn robot in Gazebo slightly above ground to prevent clipping -->
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
-        args="-param robot_description -urdf -model kr6_r700"
+        args="-param robot_description -urdf -model kr6_r700 -z 0.05"
         output="screen" />
 
   <!-- Robot State Publisher -->
