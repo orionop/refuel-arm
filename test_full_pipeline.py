@@ -34,7 +34,7 @@ JOINT_LIMITS = np.array([
 ])
 
 # ── Mission Waypoints ────────────────────────────────────────────
-Q_HOME = np.zeros(6)                                         # REST position
+Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])       # REST position (Straight Up)
 Q_NOZZLE = np.array([0.785, -0.5, 0.89, 0.0, 0.0, 0.0])     # YELLOW dot (Z=0.37m on right)
 REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.3])              # RED dot (farther straight, left side)
 REFUEL_TARGET_R = np.eye(3)                                  # Tool orientation
@@ -208,25 +208,21 @@ def main():
     print(f"     Selected: {np.round(q_refuel, 4)}")
     print(f"     FK error: {fk_err:.2e} m")
 
-    # ── Plan all 6 trajectory segments ───────────────────────────
-    print(f"\n[Planning] STOMP trajectory optimization for 6 mission segments")
+    # ── Plan all 4 trajectory segments ───────────────────────────
+    print(f"\n[Planning] STOMP trajectory optimization for 4 motion segments")
     n_wp = args.waypoints
 
     seg1 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (pick up nozzle)",  n_wp)
-    seg2 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (nozzle acquired)", n_wp)
-    seg3 = plan_segment(Q_HOME,    q_refuel, "REST → RED (approach refuel)",     n_wp)
-    seg4 = plan_segment(q_refuel,  Q_HOME,   "RED → REST (refueling done)",     n_wp)
-    seg5 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (return nozzle)",   n_wp)
-    seg6 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)", n_wp)
+    seg2 = plan_segment(Q_NOZZLE,  q_refuel, "YELLOW → RED (approach refuel)",  n_wp)
+    seg3 = plan_segment(q_refuel,  Q_NOZZLE, "RED → YELLOW (return nozzle)",    n_wp)
+    seg4 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)",n_wp)
 
     all_segments = [
         ("REST → YELLOW (pick up nozzle)", seg1, None, 0.12),
-        ("YELLOW → REST (nozzle acquired)", seg2, None, 0.20),
-        ("REST → RED (approach refuel)", seg3, None, 0.25),
+        ("YELLOW → RED (approach refuel)", seg2, None, 0.25),
         ("🔴 REFUELING — holding position", None, DWELL_TIME, None),
-        ("RED → REST (refueling done)", seg4, None, 0.15),
-        ("REST → YELLOW (return nozzle)", seg5, None, 0.12),
-        ("YELLOW → REST (mission complete)", seg6, None, 0.10),
+        ("RED → YELLOW (return nozzle)", seg3, None, 0.15),
+        ("YELLOW → REST (mission complete)", seg4, None, 0.10),
     ]
 
     # ── Execute ──────────────────────────────────────────────────
@@ -286,7 +282,7 @@ def main():
                 marker_pub.publish(ma)
 
             for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
-                print(f"\n  Step {i}/7: {name}")
+                print(f"\n  Step {i}/5: {name}")
                 if dwell is not None:
                     print(f"     ⏱️  Holding for {dwell:.0f} seconds...")
                     rospy.sleep(dwell)
@@ -310,12 +306,12 @@ def main():
         total_waypoints = 0
         for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
             if dwell is not None:
-                print(f"  Step {i}/7: {name} ({dwell:.0f}s dwell)")
+                print(f"  Step {i}/5: {name} ({dwell:.0f}s dwell)")
             else:
                 total_waypoints += len(traj)
                 start = np.round(traj[0], 3)
                 end = np.round(traj[-1], 3)
-                print(f"  Step {i}/7: {name}")
+                print(f"  Step {i}/5: {name}")
                 print(f"           start={start}")
                 print(f"           end  ={end}")
         print(f"\n  Total waypoints: {total_waypoints}")
