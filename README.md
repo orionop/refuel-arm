@@ -9,14 +9,14 @@
 
 ## Overview
 
-This repository implements an end-to-end simulation pipeline for autonomous car refueling using a **KUKA KR6 R700** 6-DOF industrial manipulator. The robot executes a precision refueling sequence: departing from a rest configuration (`HOME`), navigating to a vehicle's refueling inlet (`TARGET` at `[0.3, 0.4, 0.25]` m), holding for 5–7 seconds, and returning to rest — all within a physically accurate **ROS 2 Humble / Gazebo** environment.
+This repository implements an end-to-end simulation pipeline for autonomous car refueling using a **KUKA KR6 R700** 6-DOF industrial manipulator. The robot executes a precision autonomous sequence: `HOME` (Straight Up) → `YELLOW` (Grab Nozzle) → `RED` (Refuel 10s) → `YELLOW` (Return Nozzle) → `HOME`. The mission is executed within a physically accurate **ROS Noetic / Gazebo** environment.
 
-The core innovation combines two complementary inverse kinematics strategies:
+The core trajectory generation combines two complementary kinematics strategies:
 
 | Component | Role | Precision |
 |-----------|------|-----------|
-| **IK-Geo** | Exact algebraic closed-form IK for terminal pose | ~10⁻¹⁶ rad |
-| **IKFlow** | Neural network trajectory generation via Normalizing Flows | Collision-free paths |
+| **IK-Geo** | Exact algebraic closed-form IK for terminal target poses | ~10⁻¹⁶ rad |
+| **STOMP** | Stochastic Trajectory Optimization for smooth motion generation | Collision-free paths |
 
 ---
 
@@ -24,46 +24,39 @@ The core innovation combines two complementary inverse kinematics strategies:
 
 ### Terminal Pose — IK-Geo (Exact Algebraic Solver)
 
-The KR6 R700 belongs to the `IK_spherical_2_parallel` kinematic family. IK-Geo decomposes the 6-DOF inverse kinematics into a sequence of canonical subproblems (Paden–Kahan), yielding **up to 8 closed-form solutions** per pose — no iterative methods, no local minima, no convergence failures.
+The KR6 R700 belongs to the `IK_spherical_2_parallel` kinematic family. IK-Geo decomposes the 6-DOF inverse kinematics into a sequence of canonical subproblems (Paden–Kahan), yielding **up to 8 closed-form solutions** per pose — no iterative methods, no local minima, no convergence failures. It successfully finds exact configurations for the tall Yellow Nozzle dock and the realistic Red car inlet target.
 
-### Trajectory Planning — IKFlow (Neural Network)
+### Trajectory Planning — STOMP Optimizer
 
-[IKFlow](https://github.com/jstmn/ikflow) is a Normalizing Flow network trained on 25M valid joint configurations. It generates diverse, collision-free waypoints along the Cartesian path from `HOME` to the IK-Geo terminal solution, providing smooth seed states for the `JointTrajectoryController`.
+STOMP (Stochastic Trajectory Optimization for Motion Planning) is used to generate smooth, collision-free waypoints along the Cartesian paths between the 5 mission stages. Instead of instantly jumping between algebraic IK solutions, STOMP optimizes 30 smooth intermediate waypoints per segment, ensuring acceleration limits and joint limits are respected before execution via ROS's `JointTrajectoryController`.
 
 ---
 
 ## Quick Start
 
-> **Prerequisites:** Ubuntu 22.04 with ROS 2 Humble, Gazebo, and an NVIDIA GPU.
+> **Prerequisites:** Ubuntu 20.04 with ROS Noetic, Gazebo, and an NVIDIA GPU.
 
 ```bash
 # 1. Clone
-cd /home/admin/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws/src
 git clone https://github.com/orionop/refuel-arm.git
 cd refuel-arm
 
-# 2. Python virtual environment
-python3 -m venv venv
-source venv/bin/activate
-pip install linearSubproblemSltns
-
-# 3. Train IKFlow (check GPU availability first: nvidia-smi)
-cd ikflow
-pip install -e .
-python scripts/build_dataset.py --robot_name=kr6_r700 \
-    --training_set_size=25000000 --only_non_self_colliding
-python scripts/train.py --robot_name=kr6_r700 \
-    --nb_nodes=12 --batch_size=128 --learning_rate=0.0005
+# 2. Build ROS Noetic workspace
+source /opt/ros/noetic/setup.bash
+cd kuka_refuel_ws
+catkin_make
+source devel/setup.bash
 cd ..
 
-# 4. Build ROS 2 workspace
-source /opt/ros/humble/setup.bash
-cd kuka_refuel_ws
-colcon build
-source install/setup.bash
+# 3. Launch purely in RViz (No Physics)
+python3 test_full_pipeline.py --rviz
 
-# 5. Launch simulation
-ros2 launch kuka_kr6_gazebo refuel_sim.launch.py
+# OR: Launch in Gazebo (Full Physics)
+# Terminal 1:
+roslaunch kuka_kr6_gazebo gazebo.launch
+# Terminal 2:
+python3 test_full_pipeline.py --ros
 ```
 
 ---
@@ -72,32 +65,20 @@ ros2 launch kuka_kr6_gazebo refuel_sim.launch.py
 
 ```
 refuel-arm/
-├── matlab/                          # MATLAB IK-Geo verification scripts
-│   ├── +hardcoded_IK/KR6_R700.m    #   Hardcoded IK solver
-│   ├── robot_examples/KR6_R700.m   #   URDF-to-POE conversion & 3D visualizer
-│   ├── kr6_r700_2_clean.urdf       #   Clean URDF (no mesh dependencies)
-│   └── solve_specific_pose.m       #   IK validation for user-defined poses
-│
+├── test_full_pipeline.py            # Main mission execution logic
+├── stomp_planner.py                 # Core STOMP trajectory optimizer
 ├── ik-geo/                          # Algebraic IK library (MATLAB/Python/C++/Rust)
-│   ├── python/                      #   Python canonical subproblems (sp1–sp6)
-│   └── matlab/+IK/                  #   IK_spherical_2_parallel solver
 │
-├── ikflow/                          # IKFlow neural network training pipeline
-│   ├── scripts/train.py             #   Training entry point
-│   ├── scripts/build_dataset.py     #   Dataset generator
-│   └── ikflow/model.py              #   Normalizing Flow architecture
+├── deprecated/                      # Previous ML approaches (IKFlow, Kaggle, JRL)
 │
-├── kuka_refuel_ws/                  # ROS 2 Humble colcon workspace
+├── kuka_refuel_ws/                  # ROS Noetic catkin workspace
 │   └── src/kuka_kr6_gazebo/
-│       ├── urdf/                    #   URDF + ros2_control Xacro
-│       ├── config/                  #   ros2_controllers.yaml
-│       ├── launch/                  #   refuel_sim.launch.py
-│       ├── worlds/                  #   Gazebo world with target inlet
+│       ├── urdf/                    #   URDF with accurate physical inertials
+│       ├── config/                  #   gazebo_ros_controllers & RViz config
+│       ├── launch/                  #   gazebo.launch and rviz.launch
+│       ├── worlds/                  #   Gazebo world with Yellow & Red markers
 │       └── scripts/
 │           ├── ik_geometric.py      #   Python port of IK_spherical_2_parallel
-│           └── refuel_mission_commander.py  # ROS 2 action client node
-│
-├── kuka_robot_descriptions/         # Official KUKA URDF + meshes (KR6 R700 only)
 │
 ├── SAFE_DEV_RULES.md                # Shared lab machine safety protocol
 └── README.md
@@ -119,5 +100,5 @@ This project runs on a shared research machine. See [`SAFE_DEV_RULES.md`](SAFE_D
 ## License
 
 IK-Geo: MIT License (RPI Robotics)  
-IKFlow: MIT License  
+STOMP: Derived from Kalakrishnan et al. (2011)  
 KUKA Robot Descriptions: Apache 2.0 (KUKA)

@@ -39,7 +39,7 @@ git clone https://github.com/orionop/refuel-arm.git
 ## Step 4: Python Virtual Environment (SAFE_DEV_RULES Rule 4)
 
 ```bash
-cd /home/armslab-exp4/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
 python3 -m venv venv
 source venv/bin/activate
 pip install numpy linearsubproblemsltns
@@ -47,8 +47,8 @@ pip install numpy linearsubproblemsltns
 
 Verify isolation:
 ```bash
-pwd        # Must show: /home/armslab-exp4/Desktop/anurag_ws
-which python  # Must show: /home/armslab-exp4/Desktop/anurag_ws/venv/bin/python
+pwd        # Must show: /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
+which python  # Must show: .../venv/bin/python
 ```
 
 ---
@@ -62,9 +62,9 @@ python3 test_full_pipeline.py
 
 Expected output:
 ```
-[Phase 1] IK-Geo → 8 solutions, 1 valid, FK error: 1.24e-16 m ✅
-[Phase 2] STOMP → 30 waypoints, max jump 3.8°, all within limits ✅
-[Phase 3] Local mode — trajectory preview ✅
+[Setup] Verifying mission waypoints...
+[Planning] STOMP trajectory optimization for 4 motion segments
+[Preview] Mission trajectory summary...
 ```
 
 ---
@@ -73,7 +73,7 @@ Expected output:
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws
 catkin_make
 source devel/setup.bash
 ```
@@ -84,10 +84,12 @@ source devel/setup.bash
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws
 source devel/setup.bash
 roslaunch kuka_kr6_gazebo gazebo.launch
 ```
+
+*(You can also use `roslaunch kuka_kr6_gazebo rviz.launch` to visualize purely in RViz.)*
 
 ---
 
@@ -95,11 +97,14 @@ roslaunch kuka_kr6_gazebo gazebo.launch
 
 ```bash
 source /opt/ros/noetic/setup.bash
-cd /home/armslab-exp4/Desktop/anurag_ws
+cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws
 source devel/setup.bash
-source venv/bin/activate
-cd src/refuel-arm
+cd /home/armslab-exp4/Desktop/anurag_ws/src/refuel-arm
+# NOTE: Do NOT use the venv when running ROS commands here
 python3 test_full_pipeline.py --ros
+
+# Or, if running RViz instead of Gazebo:
+# python3 test_full_pipeline.py --rviz
 ```
 
 ---
@@ -108,9 +113,9 @@ python3 test_full_pipeline.py --ros
 
 | Phase | Component | What It Does |
 |-------|-----------|--------------|
-| 1 | **IK-Geo** | Computes exact joint angles for target pose (8 solutions, filters by limits) |
-| 2 | **STOMP** | Optimises 30-waypoint trajectory (smooth, within joint limits) |
-| 3 | **ROS** | Sends trajectory to Gazebo `JointTrajectoryController` |
+| 1 | **IK-Geo** | Algebraic IK solver to precisely determine valid joint poses for Real-world Refuel Inlet and Nozzle Station. |
+| 2 | **STOMP** | Optimises 30-waypoint trajectory across the 5 stage continuous sequence (REST → YELLOW → RED (10s refuel) → YELLOW → REST). |
+| 3 | **ROS & RViz** | Broadcasts directly to ROS via `/joint_states` (`--rviz`) or `JointTrajectoryController` (`--ros`). |
 
 ## References
 
