@@ -12,16 +12,16 @@
 
     <!-- YELLOW DOT: Fuel Nozzle Station -->
     <!-- Robot picks up / returns the nozzle here -->
-    <!-- Exact FK of joint config [0.785, -0.5, 0.89, 0.0, 0.0, 0.0] -->
+    <!-- Exact FK of joint config [0.785, -0.94, 0.94, 0.0, 0.0, 0.0] -->
     <model name="nozzle_station">
-      <pose>0.53 -0.53 0.205 0 0 0</pose> <!-- Half z-height for cylinder origin -->
+      <pose>0.478 -0.478 0.348 0 0 0</pose> <!-- Half z-height for cylinder origin -->
       <static>true</static>
       <link name="marker">
         <visual name="visual">
           <geometry>
             <cylinder>
               <radius>0.05</radius>
-              <length>0.41</length>
+              <length>0.696</length>
             </cylinder>
           </geometry>
           <material>
@@ -33,9 +33,9 @@
     </model>
 
     <!-- RED DOT: Refueling Inlet Target -->
-    <!-- Real-world realistic far-left position [0.55, 0.3, 0.3] -->
+    <!-- Real-world realistic far-left taller position [0.55, 0.3, 0.5] -->
     <model name="car_refuel_inlet">
-      <pose>0.55 0.3 0.3 0 0 0</pose>
+      <pose>0.55 0.3 0.5 0 0 0</pose>
       <static>true</static>
       <link name="inlet">
         <visual name="visual">

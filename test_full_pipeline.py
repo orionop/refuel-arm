@@ -35,8 +35,8 @@ JOINT_LIMITS = np.array([
 
 # ── Mission Waypoints ────────────────────────────────────────────
 Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])       # REST position (Straight Up)
-Q_NOZZLE = np.array([0.785, -0.5, 0.89, 0.0, 0.0, 0.0])     # YELLOW dot (Z=0.37m on right)
-REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.3])              # RED dot (farther straight, left side)
+Q_NOZZLE = np.array([0.785, -0.94, 0.94, 0.0, 0.0, 0.0])     # YELLOW dot (Tall, Z=0.696m on right)
+REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-left, height=0.5m)
 REFUEL_TARGET_R = np.eye(3)                                  # Tool orientation
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
