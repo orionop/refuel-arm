@@ -20,9 +20,9 @@ import ik_geometric as ik
 
 # ── Configuration ───────────────────────────────────────────
 LINE_START = np.array([0.3,  0.4, 0.5])  # Left side
-LINE_END   = np.array([0.6, -0.2, 0.5])  # Right side, further out
-NUM_WAYPOINTS = 30
-DT = 0.20  # Time per waypoint for execution (seconds)
+LINE_END   = np.array([0.65, -0.25, 0.45])  # Furthest reachable right
+NUM_WAYPOINTS = 60
+DT = 0.15  # Time per waypoint for execution (seconds)
 
 # Keep orientation pointing constant (forward, looking slightly down)
 TARGET_R = np.array([
