@@ -237,7 +237,9 @@ print("🔍 Validating trained model...")
 solver.nn_model.eval()
 solver._model_weights_loaded = True  # We trained it ourselves, not loaded from file
 
-test_q = torch.rand(1000, 6, device="cpu") * (hi - lo) + lo
+limits_cpu = torch.tensor(robot.actuated_joints_limits)
+lo_v, hi_v = limits_cpu[:, 0], limits_cpu[:, 1]
+test_q = torch.rand(1000, 6) * (hi_v - lo_v) + lo_v
 test_poses = robot.forward_kinematics(test_q)
 
 with torch.no_grad():
