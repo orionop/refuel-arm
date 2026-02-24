@@ -252,22 +252,24 @@ def main():
 
     # ── Phase 3: Execute ─────────────────────────────────────────
     if args.ros:
-        print(f"\n[Phase 3] Sending trajectory to ROS 2 JointTrajectoryController...")
+        print(f"\n[Phase 3] Sending trajectory to ROS Noetic JointTrajectoryController...")
         try:
-            import rclpy
-            from rclpy.node import Node
-            from rclpy.action import ActionClient
-            from control_msgs.action import FollowJointTrajectory
+            import rospy
+            import actionlib
+            from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
             from trajectory_msgs.msg import JointTrajectoryPoint
-            from builtin_interfaces.msg import Duration
+            from std_msgs.msg import Duration
 
-            rclpy.init()
-            node = rclpy.create_node('refuel_pipeline')
-            client = ActionClient(node, FollowJointTrajectory,
-                                  '/kr6_arm_controller/follow_joint_trajectory')
-            client.wait_for_server()
+            rospy.init_node('refuel_pipeline', anonymous=True)
+            client = actionlib.SimpleActionClient(
+                '/kr6_arm_controller/follow_joint_trajectory',
+                FollowJointTrajectoryAction
+            )
+            print("  Waiting for JointTrajectoryController action server...")
+            client.wait_for_server(timeout=rospy.Duration(10.0))
+            print("  ✅ Connected to action server")
 
-            goal = FollowJointTrajectory.Goal()
+            goal = FollowJointTrajectoryGoal()
             goal.trajectory.joint_names = [
                 'joint_1', 'joint_2', 'joint_3',
                 'joint_4', 'joint_5', 'joint_6'
@@ -277,16 +279,23 @@ def main():
             for i, q in enumerate(trajectory):
                 pt = JointTrajectoryPoint()
                 pt.positions = q.tolist()
+                pt.velocities = [0.0] * 6
                 t = i * dt
-                pt.time_from_start = Duration(sec=int(t), nanosec=int((t % 1) * 1e9))
+                pt.time_from_start = rospy.Duration.from_sec(t)
                 goal.trajectory.points.append(pt)
 
-            future = client.send_goal_async(goal)
-            rclpy.spin_until_future_complete(node, future)
-            print("  ✅ Trajectory sent to Gazebo!")
-            rclpy.shutdown()
+            print(f"  Sending {len(trajectory)} waypoints ({len(trajectory)*dt:.1f}s trajectory)...")
+            client.send_goal(goal)
+            client.wait_for_result(timeout=rospy.Duration(30.0))
+
+            result = client.get_result()
+            if result:
+                print("  ✅ Trajectory executed in Gazebo!")
+            else:
+                print("  ⚠️  Trajectory execution timed out")
+
         except ImportError:
-            print("  ⚠️  ROS 2 not available. Run on the Ubuntu PC with --ros flag.")
+            print("  ⚠️  ROS Noetic not available. Source /opt/ros/noetic/setup.bash first.")
     else:
         print(f"\n[Phase 3] Local mode — trajectory preview")
         print(f"  Joint trajectory (every 5th waypoint):")
