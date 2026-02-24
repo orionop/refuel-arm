@@ -142,9 +142,39 @@ def send_trajectory_ros(trajectory, dt=0.15):
     return client.get_result()
 
 
+def send_trajectory_rviz(trajectory, dt=0.05):
+    """Publish a trajectory directly to RViz via /joint_states."""
+    # Auto-add ROS Noetic Python path
+    import os
+    import sys
+    ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
+    if ros_python not in sys.path and os.path.isdir(ros_python):
+        sys.path.insert(0, ros_python)
+
+    import rospy
+    from sensor_msgs.msg import JointState
+
+    # Create publisher if it doesn't exist yet
+    if not hasattr(send_trajectory_rviz, "pub"):
+        send_trajectory_rviz.pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
+        rospy.sleep(0.5)  # Wait for publisher connection
+
+    msg = JointState()
+    msg.name = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
+
+    rate = rospy.Rate(1.0 / dt)
+    for q in trajectory:
+        msg.header.stamp = rospy.Time.now()
+        msg.position = q.tolist()
+        send_trajectory_rviz.pub.publish(msg)
+        rate.sleep()
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description="KUKA KR6 R700 Refueling Mission")
     parser.add_argument("--ros", action="store_true", help="Execute on ROS Noetic + Gazebo")
+    parser.add_argument("--rviz", action="store_true", help="Visualize trajectory purely in RViz (no Gazebo physics)")
     parser.add_argument("--waypoints", type=int, default=30, help="Waypoints per segment")
     args = parser.parse_args()
 
@@ -200,8 +230,9 @@ def main():
     ]
 
     # ── Execute ──────────────────────────────────────────────────
-    if args.ros:
-        print(f"\n[Execute] Running mission on ROS Noetic + Gazebo")
+    if args.ros or args.rviz:
+        mode_str = "Gazebo" if args.ros else "RViz"
+        print(f"\n[Execute] Running mission visualization in {mode_str}")
         try:
             import os
             ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
@@ -217,11 +248,15 @@ def main():
                     rospy.sleep(dwell)
                     print(f"     ✅ Dwell complete")
                 else:
-                    result = send_trajectory_ros(traj)
+                    if args.ros:
+                        result = send_trajectory_ros(traj)
+                    else:
+                        result = send_trajectory_rviz(traj)
+
                     if result:
                         print(f"     ✅ Segment executed")
                     else:
-                        print(f"     ⚠️  Segment timed out")
+                        print(f"     ⚠️  Segment failed/timed out")
 
             print(f"\n  🎉 Mission complete!")
         except ImportError:
