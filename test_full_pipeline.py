@@ -142,7 +142,7 @@ def send_trajectory_ros(trajectory, dt=0.15):
     return client.get_result()
 
 
-def send_trajectory_rviz(trajectory, dt=0.05):
+def send_trajectory_rviz(trajectory, dt=0.15):
     """Publish a trajectory directly to RViz via /joint_states."""
     # Auto-add ROS Noetic Python path
     import os
@@ -239,7 +239,51 @@ def main():
             if ros_python not in sys.path and os.path.isdir(ros_python):
                 sys.path.insert(0, ros_python)
             import rospy
+            from visualization_msgs.msg import Marker, MarkerArray
             rospy.init_node('refuel_mission', anonymous=True)
+
+            if args.rviz:
+                # Publish static markers for RViz
+                marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
+                rospy.sleep(0.5)  # wait for connection
+                
+                ma = MarkerArray()
+                
+                # Yellow Nozzle Station (tall thin cylinder)
+                m_y = Marker()
+                m_y.header.frame_id = "world"  # same as robot base anchor
+                m_y.ns = "stations"
+                m_y.id = 0
+                m_y.type = Marker.CYLINDER
+                m_y.action = Marker.ADD
+                m_y.pose.position.x = p_nozzle[0]
+                m_y.pose.position.y = p_nozzle[1]
+                m_y.pose.position.z = p_nozzle[2] / 2.0  # rest on ground
+                m_y.pose.orientation.w = 1.0
+                m_y.scale.x = 0.05
+                m_y.scale.y = 0.05
+                m_y.scale.z = p_nozzle[2]
+                m_y.color.r = 1.0; m_y.color.g = 1.0; m_y.color.b = 0.0; m_y.color.a = 0.8
+                ma.markers.append(m_y)
+
+                # Red Refuel Inlet (sphere)
+                m_r = Marker()
+                m_r.header.frame_id = "world"
+                m_r.ns = "stations"
+                m_r.id = 1
+                m_r.type = Marker.SPHERE
+                m_r.action = Marker.ADD
+                m_r.pose.position.x = REFUEL_TARGET_XYZ[0]
+                m_r.pose.position.y = REFUEL_TARGET_XYZ[1]
+                m_r.pose.position.z = REFUEL_TARGET_XYZ[2]
+                m_r.pose.orientation.w = 1.0
+                m_r.scale.x = 0.1
+                m_r.scale.y = 0.1
+                m_r.scale.z = 0.1
+                m_r.color.r = 1.0; m_r.color.g = 0.0; m_r.color.b = 0.0; m_r.color.a = 0.8
+                ma.markers.append(m_r)
+
+                marker_pub.publish(ma)
 
             for i, (name, traj, dwell) in enumerate(all_segments, 1):
                 print(f"\n  Step {i}/7: {name}")

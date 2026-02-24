@@ -44,6 +44,14 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /visualization_marker_array
+      Name: MarkerArray
+      Namespaces:
+        stations: true
+      Queue Size: 10
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
