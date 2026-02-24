@@ -206,25 +206,30 @@ def main():
         margin = min(margin_lo, margin_hi)
         print(f"    J{j+1}: {q_terminal[j]:+.3f} rad  (margin: {np.degrees(margin):.1f}°)")
 
-    # ── Phase 2: Joint-space trajectory planning ──────────────────
+    # ── Phase 2: STOMP trajectory optimization ─────────────────────
     n_wp = args.waypoints
-    print(f"\n[Phase 2] Joint-Space Trajectory: HOME → TARGET ({n_wp} waypoints)")
+    print(f"\n[Phase 2] STOMP Trajectory Optimization: HOME → TARGET ({n_wp} waypoints)")
+    print(f"  Reference: Kalakrishnan et al., ICRA 2011")
 
-    # Joint-space linear interpolation guarantees:
-    #  ✅ No elbow flips (monotonic joint motion)
-    #  ✅ No topology jumps (no IK branch switching)
-    #  ✅ Bounded joint velocities
-    #  ✅ All waypoints within limits (if start & end are)
-    trajectory = np.zeros((n_wp, 6))
-    for i in range(n_wp):
-        alpha = i / (n_wp - 1)
-        trajectory[i] = (1 - alpha) * q_home + alpha * q_terminal
+    from stomp_planner import stomp_optimize
+
+    trajectory = stomp_optimize(
+        q_start=q_home,
+        q_goal=q_terminal,
+        joint_limits=JOINT_LIMITS,
+        n_waypoints=n_wp,
+        n_iterations=80,
+        n_rollouts=10,
+        noise_stddev=0.08,
+        verbose=True,
+    )
 
     # Verify each waypoint FK for Cartesian tracking error
     cart_errors = []
+    p_home = fwd_kinematics(q_home)[1]
     for i in range(n_wp):
         alpha = i / (n_wp - 1)
-        p_desired = (1 - alpha) * fwd_kinematics(q_home)[1] + alpha * target_xyz
+        p_desired = (1 - alpha) * p_home + alpha * target_xyz
         _, p_actual = fwd_kinematics(trajectory[i])
         cart_errors.append(np.linalg.norm(p_actual - p_desired))
 
@@ -243,7 +248,7 @@ def main():
     # Verify all waypoints are within limits
     all_valid = all(within_joint_limits(trajectory[i]) for i in range(len(trajectory)))
     print(f"    All within limits: {'✅' if all_valid else '❌'}")
-    print(f"    ✅ Trajectory is Gazebo-safe! (joint-space interpolation = no flips)")
+    print(f"    ✅ STOMP-optimized trajectory is Gazebo-safe!")
 
     # ── Phase 3: Execute ─────────────────────────────────────────
     if args.ros:
