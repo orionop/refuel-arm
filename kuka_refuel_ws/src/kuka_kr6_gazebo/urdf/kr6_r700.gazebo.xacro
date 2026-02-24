@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kr6_r700_gazebo">
 
   <!-- Include the raw clean URDF (primitive cylinders/boxes) -->
-  <xacro:include filename="$(find kuka_kr6_gazebo)/urdf/kr6_r700_clean.urdf" />
+  <xacro:include filename="$(find kuka_kr6_gazebo)/urdf/kr6_r700_2_clean.urdf" />
 
   <!-- Gazebo ROS Control Plugin (Noetic) -->
   <gazebo>
