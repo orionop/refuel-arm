@@ -107,6 +107,12 @@ def plan_segment(q_start, q_goal, name, n_waypoints=30):
 
 def send_trajectory_ros(trajectory, dt=0.15):
     """Send a single trajectory segment to the ROS controller."""
+    # Auto-add ROS Noetic Python path (needed when running inside a venv)
+    import os
+    ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
+    if ros_python not in sys.path and os.path.isdir(ros_python):
+        sys.path.insert(0, ros_python)
+
     import rospy
     import actionlib
     from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
@@ -197,6 +203,10 @@ def main():
     if args.ros:
         print(f"\n[Execute] Running mission on ROS Noetic + Gazebo")
         try:
+            import os
+            ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
+            if ros_python not in sys.path and os.path.isdir(ros_python):
+                sys.path.insert(0, ros_python)
             import rospy
             rospy.init_node('refuel_mission', anonymous=True)
 
