@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""
+KUKA KR6 R700 — Pure IK-Geo Cartesian Line Tracking
+===================================================
+
+Demonstrates plotting a straight 3D line in Cartesian space, decomposing it
+into dense waypoints, and smoothly tracking it using purely algebraic IK-Geo.
+
+No STOMP. No IKFlow. Just math!
+"""
+import sys
+import os
+import time
+import argparse
+import numpy as np
+
+# Import IK-Geo
+sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
+import ik_geometric as ik
+
+# ── Configuration ───────────────────────────────────────────
+LINE_START = np.array([0.3,  0.4, 0.5])  # Left side
+LINE_END   = np.array([0.6, -0.2, 0.5])  # Right side, further out
+NUM_WAYPOINTS = 30
+DT = 0.20  # Time per waypoint for execution (seconds)
+
+# Keep orientation pointing constant (forward, looking slightly down)
+TARGET_R = np.array([
+    [ 0,  0,  1],
+    [ 0,  1,  0],
+    [-1,  0,  0]
+])
+
+# Official Joint Limits
+JOINT_LIMITS = np.array([
+    [-2.967,  2.967],  # joint_1
+    [-3.316,  0.785],  # joint_2
+    [-2.094,  2.722],  # joint_3
+    [-6.108,  6.108],  # joint_4
+    [-2.094,  2.094],  # joint_5
+    [-6.108,  6.108],  # joint_6
+])
+
+# For the very first point, start searching from a straight-up HOME pose
+Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])
+
+
+def is_valid(q):
+    """Check if joint angles within official URDF limits."""
+    for j in range(6):
+        if q[j] < JOINT_LIMITS[j, 0] or q[j] > JOINT_LIMITS[j, 1]:
+            return False
+    return True
+
+
+def solve_closest_ik(target_pos, prev_q):
+    """Solve IK-Geo for a Cartesian point, pick the valid pose closest to prev_q."""
+    Q_all = ik.IK_spherical_2_parallel(TARGET_R, target_pos)
+    
+    if Q_all.size == 0:
+        return None
+
+    best_q = None
+    min_dist = float('inf')
+
+    # Q_all is 6xN matrix of solutions
+    for i in range(Q_all.shape[1]):
+        q = Q_all[:, i]
+        # Normalize between -pi and pi
+        q = (q + np.pi) % (2 * np.pi) - np.pi
+        
+        if is_valid(q):
+            # L2 norm (Euclidean distance in joint space)
+            dist = np.linalg.norm(q - prev_q)
+            if dist < min_dist:
+                min_dist = dist
+                best_q = q
+
+    return best_q
+
+
+def generate_line_trajectory():
+    """Interpolate straight Cartesian line and solve IK tightly for each point."""
+    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} waypoints from {LINE_START} to {LINE_END}...")
+    
+    trajectory = []
+    cartesian_points = []
+    
+    # Generate X, Y, Z coordinates linearly spaced
+    x_vals = np.linspace(LINE_START[0], LINE_END[0], NUM_WAYPOINTS)
+    y_vals = np.linspace(LINE_START[1], LINE_END[1], NUM_WAYPOINTS)
+    z_vals = np.linspace(LINE_START[2], LINE_END[2], NUM_WAYPOINTS)
+
+    current_q = Q_HOME
+
+    for i in range(NUM_WAYPOINTS):
+        wp_pos = np.array([x_vals[i], y_vals[i], z_vals[i]])
+        cartesian_points.append(wp_pos)
+        
+        # 1. Solve IK for this waypoint
+        solved_q = solve_closest_ik(wp_pos, current_q)
+        
+        if solved_q is None:
+            print(f"\n[ERROR] IK-Geo failed to find valid solution for Waypoint {i+1} at XYZ={np.round(wp_pos, 3)}")
+            print("The line might leave the reachable workspace or violate joint limits.")
+            sys.exit(1)
+            
+        # 2. Check joint jump distance to prevent 'flips'
+        jump = np.linalg.norm(solved_q - current_q)
+        if i > 0 and jump > 1.0: # 1 radian jump between millimeters is physically impossible, denotes a flip
+            print(f"\n[WARNING] Massive joint jump detected at Waypoint {i+1}: {jump:.2f} rad")
+            print("IK-Geo had to flip configuration (elbow up/down shifted). Execution will be violent.")
+            
+        # 3. Verify via Forward Kinematics (FK)
+        R_check, p_check = ik.fwd_kinematics(solved_q)
+        err = np.linalg.norm(p_check - wp_pos)
+        
+        if err > 1e-4:
+            print(f"\n[ERROR] FK Verification failed at Waypoint {i+1}!")
+            print(f"Target: {wp_pos}, FK Output: {p_check}")
+            sys.exit(1)
+            
+        print(f"  WP {i+1:2d} -> IK Success | Jump from prev: {jump:.2f} rad | FK Error: {err:.2e} m")
+        
+        trajectory.append(solved_q)
+        current_q = solved_q  # Update reference for next waypoint
+
+    return trajectory, cartesian_points
+
+
+def execute_ros(trajectory, cartesian_points, mode="ros"):
+    """Send joint trajectory to Gazebo / RViz and draw the blue line."""
+    import rospy
+    from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+    from sensor_msgs.msg import JointState
+    from visualization_msgs.msg import Marker
+
+    rospy.init_node('pure_ik_line_tracker', anonymous=True)
+    
+    # ── 1. Draw Blue Line Marker ──
+    marker_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
+    rospy.sleep(0.5)
+    
+    line = Marker()
+    line.header.frame_id = "world"
+    line.ns = "ik_path"
+    line.id = 0
+    line.type = Marker.LINE_STRIP
+    line.action = Marker.ADD
+    line.scale.x = 0.015 # Line width
+    
+    # Neon Blue
+    line.color.r = 0.0
+    line.color.g = 0.5
+    line.color.b = 1.0
+    line.color.a = 1.0
+    line.pose.orientation.w = 1.0
+    
+    from geometry_msgs.msg import Point
+    for p in cartesian_points:
+        pt = Point()
+        pt.x, pt.y, pt.z = p
+        line.points.append(pt)
+        
+    marker_pub.publish(line)
+    print("\n[Visuals] Published blue Cartesian path line to RViz/Gazebo")
+
+    # ── 2. Execute Trajectory ──
+    if mode == "ros":
+        pub = rospy.Publisher('/kr6_arm_controller/command', JointTrajectory, queue_size=10)
+        rospy.sleep(0.5)
+        
+        msg = JointTrajectory()
+        msg.joint_names = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
+        
+        time_from_start = 0.0
+        for q in trajectory:
+            time_from_start += DT
+            pt = JointTrajectoryPoint()
+            pt.positions = q.tolist()
+            pt.time_from_start = rospy.Duration.from_sec(time_from_start)
+            msg.points.append(pt)
+            
+        print(f"[Execute] Sending {len(trajectory)} waypoints to ROS Gazebo JointTrajectoryController...")
+        pub.publish(msg)
+        
+        duration = time_from_start + 1.0
+        print(f"Waiting {duration:.1f}s for trajectory to finish...")
+        rospy.sleep(duration)
+    else:
+        # RViz mode
+        pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
+        rospy.sleep(0.5)
+        
+        msg = JointState()
+        msg.name = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
+        
+        print(f"[Execute] Visualizing {len(trajectory)} waypoints directly in RViz...")
+        for q in trajectory:
+            msg.header.stamp = rospy.Time.now()
+            msg.position = q.tolist()
+            pub.publish(msg)
+            rospy.sleep(DT)
+            
+    print("Done!")
+
+    
+def main():
+    parser = argparse.ArgumentParser(description="Pure IK-Geo Line Tracking")
+    parser.add_argument("--ros", action="store_true", help="Execute in Gazebo via ROS")
+    parser.add_argument("--rviz", action="store_true", help="Execute purely in RViz (no physics)")
+    args = parser.parse_args()
+
+    print("=" * 65)
+    print("  KUKA KR6 R700 — Pure IK-Geo Line Tracking")
+    print("  Mathematical Cartesian path exactly tracked via IK")
+    print("=" * 65)
+
+    # 1. Plan trajectory
+    trajectory, cartesian_points = generate_line_trajectory()
+    
+    # 2. Add HOME block at the front and back for safety
+    print("\nAdding HOME sequence for safe deployment...")
+    safe_traj = [Q_HOME] + trajectory + [Q_HOME]
+    
+    # We need to prepend/append HOME to cartesian points too so the blue line connects down
+    safe_pts = [ik.fwd_kinematics(Q_HOME)[1]] + cartesian_points + [ik.fwd_kinematics(Q_HOME)[1]]
+    
+    # 3. Execute
+    if args.ros or args.rviz:
+        import os
+        ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
+        if ros_python not in sys.path and os.path.isdir(ros_python):
+            sys.path.insert(0, ros_python)
+        
+        mode = "ros" if args.ros else "rviz"
+        execute_ros(safe_traj, safe_pts, mode=mode)
+    else:
+        print("\n[Preview] Trajectory planned successfully. Run with --ros or --rviz to execute.")
+
+
+if __name__ == "__main__":
+    main()
