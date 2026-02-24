@@ -34,11 +34,12 @@ STOMP (Stochastic Trajectory Optimization for Motion Planning) is used to genera
 
 ## Quick Start
 
-> **Prerequisites:** Ubuntu 20.04 with ROS Noetic, Gazebo, and an NVIDIA GPU.
+> **Prerequisites:** Ubuntu 20.04 with ROS Noetic, Gazebo, and an NVIDIA GPU (optional for simulation).
 
 ```bash
-# 1. Clone
-cd /home/armslab-exp4/Desktop/anurag_ws/src
+# 1. Clone into your ROS workspace
+mkdir -p ~/kuka_ws/src
+cd ~/kuka_ws/src
 git clone https://github.com/orionop/refuel-arm.git
 cd refuel-arm
 
@@ -48,8 +49,13 @@ cd kuka_refuel_ws
 catkin_make
 source devel/setup.bash
 cd ..
+```
 
-# 3. Launch purely in RViz (No Physics)
+### Scenario A: Full Refueling Mission (IK + STOMP)
+Executes the complex `HOME → YELLOW → RED → YELLOW → HOME` mission.
+
+```bash
+# Launch purely in RViz (No Physics)
 python3 test_full_pipeline.py --rviz
 
 # OR: Launch in Gazebo (Full Physics)
@@ -59,13 +65,25 @@ roslaunch kuka_kr6_gazebo gazebo.launch
 python3 test_full_pipeline.py --ros
 ```
 
+### Scenario B: Pure IK-Geo Cartesian Line Tracking
+Demonstrates exact mathematical line tracking without a trajectory optimizer (generates 60 dense waypoints dynamically).
+
+```bash
+# Run the default straight line sweep
+python3 test_ik_line.py --ros
+
+# Test specific dynamic coordinates (auto-truncates if unreachable)
+python3 test_ik_line.py --ros --start 0.3 0.4 0.5 --end 0.65 -0.25 0.45
+```
+
 ---
 
 ## Repository Structure
 
 ```
 refuel-arm/
-├── test_full_pipeline.py            # Main mission execution logic
+├── test_full_pipeline.py            # STOMP Refueling mission execution
+├── test_ik_line.py                  # Pure algebraic IK Cartesian line tracker
 ├── stomp_planner.py                 # Core STOMP trajectory optimizer
 ├── ik-geo/                          # Algebraic IK library (MATLAB/Python/C++/Rust)
 │
@@ -88,12 +106,7 @@ refuel-arm/
 
 ## Shared Lab Machine Protocol
 
-This project runs on a shared research machine. See [`SAFE_DEV_RULES.md`](SAFE_DEV_RULES.md) for the complete rulebook. Key rules:
-
-- **No `sudo`** — no global package installations or removals
-- **No modifications** to `/opt/ros/humble`, `~/.bashrc`, or system Python
-- **Workspace isolation** — all work inside `/home/admin/Desktop/anurag_ws`
-- **GPU courtesy** — run `nvidia-smi` before launching training; never kill others' processes
+See [`SAFE_DEV_RULES.md`](SAFE_DEV_RULES.md) for the original lab protocol guidelines used during the development of this repository. Key historical rules included restricted `sudo` access, strict workspace isolation, and NVIDIA GPU sharing courtesy.
 
 ---
 
