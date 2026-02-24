@@ -18,9 +18,11 @@ import numpy as np
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
 import ik_geometric as ik
 
-# ── Configuration ───────────────────────────────────────────
-LINE_START = np.array([0.3,  0.4, 0.5])  # Left side
-LINE_END   = np.array([0.65, -0.25, 0.45])  # Furthest reachable right
+# ── Default Configuration ─────────────────────────────────────
+DEFAULT_START = [0.3, 0.4, 0.5]
+DEFAULT_END   = [0.65, -0.25, 0.45]
+NUM_WAYPOINTS = 60
+DT = 0.15  # Time per waypoint for execution (seconds)
 NUM_WAYPOINTS = 60
 DT = 0.15  # Time per waypoint for execution (seconds)
 
@@ -88,17 +90,17 @@ def solve_closest_ik(target_pos, prev_q):
     return best_q
 
 
-def generate_line_trajectory():
+def generate_line_trajectory(start_pt, end_pt):
     """Interpolate straight Cartesian line and solve IK tightly for each point."""
-    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} waypoints from {LINE_START} to {LINE_END}...")
+    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} waypoints from {start_pt} to {end_pt}...")
     
     trajectory = []
     cartesian_points = []
     
     # Generate X, Y, Z coordinates linearly spaced
-    x_vals = np.linspace(LINE_START[0], LINE_END[0], NUM_WAYPOINTS)
-    y_vals = np.linspace(LINE_START[1], LINE_END[1], NUM_WAYPOINTS)
-    z_vals = np.linspace(LINE_START[2], LINE_END[2], NUM_WAYPOINTS)
+    x_vals = np.linspace(start_pt[0], end_pt[0], NUM_WAYPOINTS)
+    y_vals = np.linspace(start_pt[1], end_pt[1], NUM_WAYPOINTS)
+    z_vals = np.linspace(start_pt[2], end_pt[2], NUM_WAYPOINTS)
 
     current_q = Q_HOME
     prev_wp_pos = None
@@ -120,30 +122,42 @@ def generate_line_trajectory():
         solved_q = solve_closest_ik(wp_pos, current_q)
         
         if solved_q is None:
-            print(f"\n[ERROR] IK-Geo failed to find valid solution for Waypoint {i+1} at XYZ={np.round(wp_pos, 3)}")
-            print("The line might leave the reachable workspace or violate joint limits.")
-            sys.exit(1)
+            print(f"\n[WARNING] IK-Geo failed to find valid solution for Waypoint {i+1} at XYZ={np.round(wp_pos, 3)}")
+            print("[WARNING] The line has left the reachable kinematic workspace or violates joint limits.")
+            print(f"[WARNING] Truncating trajectory to only execute the first {i} safe waypoints.")
+            cartesian_points.pop() # Remove the unreachable point
+            break
             
         # 2. Check joint jump distance to prevent 'flips'
         jump = np.linalg.norm(solved_q - current_q)
         if i > 0 and jump > 1.0: # 1 radian jump between millimeters is physically impossible, denotes a flip
             print(f"\n[WARNING] Massive joint jump detected at Waypoint {i+1}: {jump:.2f} rad")
-            print("IK-Geo had to flip configuration (elbow up/down shifted). Execution will be violent.")
+            print("[WARNING] IK-Geo had to flip configuration (elbow up/down shifted).")
+            print(f"[WARNING] Truncating trajectory to safely execute up to Waypoint {i}.")
+            cartesian_points.pop()
+            break
             
         # 3. Verify via Forward Kinematics (FK)
         R_check, p_check = ik.fwd_kinematics(solved_q)
         err = np.linalg.norm(p_check - wp_pos)
         
         if err > 1e-4:
-            print(f"\n[ERROR] FK Verification failed at Waypoint {i+1}!")
+            print(f"\n[ERROR] FK Verification mathematically failed at Waypoint {i+1}!")
             print(f"Target: {wp_pos}, FK Output: {p_check}")
-            sys.exit(1)
+            print(f"[WARNING] Truncating trajectory to safely execute up to Waypoint {i}.")
+            cartesian_points.pop()
+            break
             
         print(f"  => SELECTED WP {i+1}: {np.round(solved_q, 3)} | FK Error: {err:.2e} m")
         
         trajectory.append(solved_q)
         current_q = solved_q  # Update reference for next waypoint
 
+    if len(trajectory) == 0:
+        print("\n[FATAL] Failed to solve even the first waypoint. Execution cancelled.")
+        sys.exit(1)
+        
+    print(f"\n[Planning Complete] Successfully planned {len(trajectory)} / {NUM_WAYPOINTS} waypoints.")
     return trajectory, cartesian_points
 
 def spawn_gazebo_markers(cartesian_points):
@@ -314,7 +328,12 @@ def main():
     parser = argparse.ArgumentParser(description="Pure IK-Geo Line Tracking")
     parser.add_argument("--ros", action="store_true", help="Execute in Gazebo via ROS")
     parser.add_argument("--rviz", action="store_true", help="Execute purely in RViz (no physics)")
+    parser.add_argument("--start", nargs=3, type=float, default=DEFAULT_START, help="Start XYZ coordinates (m)")
+    parser.add_argument("--end", nargs=3, type=float, default=DEFAULT_END, help="End XYZ coordinates (m)")
     args = parser.parse_args()
+
+    line_start = np.array(args.start)
+    line_end = np.array(args.end)
 
     print("=" * 65)
     print("  KUKA KR6 R700 — Pure IK-Geo Line Tracking")
@@ -322,7 +341,7 @@ def main():
     print("=" * 65)
 
     # 1. Plan trajectory
-    trajectory, cartesian_points = generate_line_trajectory()
+    trajectory, cartesian_points = generate_line_trajectory(line_start, line_end)
     
     # 2. Add HOME block at the front and back for safety
     print("\nAdding HOME sequence for safe deployment...")
