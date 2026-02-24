@@ -53,7 +53,7 @@ def is_valid(q):
     return True
 
 
-def solve_closest_ik(target_pos, prev_q, wp_index):
+def solve_closest_ik(target_pos, prev_q):
     """Solve IK-Geo for a Cartesian point, pick the valid pose closest to prev_q."""
     Q_all = ik.IK_spherical_2_parallel(TARGET_R, target_pos)
     
@@ -62,8 +62,6 @@ def solve_closest_ik(target_pos, prev_q, wp_index):
 
     best_q = None
     min_dist = float('inf')
-    
-    print(f"\n--- WP {wp_index:2d} | Target XYZ: {np.round(target_pos, 3)} ---")
 
     # Q_all is 6xN matrix of solutions
     valid_count = 0
@@ -103,13 +101,23 @@ def generate_line_trajectory():
     z_vals = np.linspace(LINE_START[2], LINE_END[2], NUM_WAYPOINTS)
 
     current_q = Q_HOME
+    prev_wp_pos = None
 
     for i in range(NUM_WAYPOINTS):
         wp_pos = np.array([x_vals[i], y_vals[i], z_vals[i]])
         cartesian_points.append(wp_pos)
         
+        # Calculate Cartesian chunk distance
+        if prev_wp_pos is not None:
+            cart_dist = np.linalg.norm(wp_pos - prev_wp_pos)
+        else:
+            cart_dist = 0.0
+            
+        print(f"\n--- WP {i+1:2d} | Target XYZ: {np.round(wp_pos, 3)} | Dist from WP{i}: {cart_dist:.4f} m ---")
+        prev_wp_pos = wp_pos
+        
         # 1. Solve IK for this waypoint
-        solved_q = solve_closest_ik(wp_pos, current_q, i+1)
+        solved_q = solve_closest_ik(wp_pos, current_q)
         
         if solved_q is None:
             print(f"\n[ERROR] IK-Geo failed to find valid solution for Waypoint {i+1} at XYZ={np.round(wp_pos, 3)}")
@@ -131,12 +139,52 @@ def generate_line_trajectory():
             print(f"Target: {wp_pos}, FK Output: {p_check}")
             sys.exit(1)
             
-        print(f"  => SELECTED: {np.round(solved_q, 3)} | FK Error: {err:.2e} m")
+        print(f"  => SELECTED WP {i+1}: {np.round(solved_q, 3)} | FK Error: {err:.2e} m")
         
         trajectory.append(solved_q)
         current_q = solved_q  # Update reference for next waypoint
 
     return trajectory, cartesian_points
+
+def spawn_gazebo_markers(cartesian_points):
+    """Force-spawns native spherical SDF models into Gazebo to guarantee visibility, skipping the flaky RViz marker plugin."""
+    import rospy
+    from gazebo_msgs.srv import SpawnModel
+    from geometry_msgs.msg import Pose
+    
+    print("\n[Visuals] Spawning 30 native white spheres into Gazebo physics engine...", end="")
+    rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
+    spawn_model_prox = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    
+    # Generic white glowing sphere SDF
+    sdf_xml = """
+    <?xml version="1.0" ?>
+    <sdf version="1.5">
+      <model name="dot_{id}">
+        <static>true</static>
+        <link name="link">
+          <visual name="visual">
+            <geometry><sphere><radius>0.015</radius></sphere></geometry>
+            <material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material>
+          </visual>
+        </link>
+      </model>
+    </sdf>
+    """
+    
+    for idx, p in enumerate(cartesian_points):
+        pose = Pose()
+        pose.position.x = p[0]
+        pose.position.y = p[1]
+        pose.position.z = p[2]
+        pose.orientation.w = 1.0
+        
+        try:
+            spawn_model_prox(f"ik_line_wp_{idx}", sdf_xml.replace("{id}", str(idx)), "ik_path", pose, "world")
+        except Exception as e:
+            pass
+            
+    print(" Done!")
 
 
 def execute_ros(trajectory, cartesian_points, mode="ros"):
@@ -204,10 +252,16 @@ def execute_ros(trajectory, cartesian_points, mode="ros"):
     
     ma.markers.append(line)
     marker_pub.publish(ma)
-    print("\n[Visuals] Published blue Cartesian path line with white waypoint dots to RViz/Gazebo")
+    print("\n[Visuals] Published blue Cartesian path line with white waypoint dots to RViz")
 
     # ── 2. Execute Trajectory ──
     if mode == "ros":
+        # Spawn literal models inside Gazebo so we don't have to rely on buggy plugins
+        try:
+            spawn_gazebo_markers(cartesian_points)
+        except Exception as e:
+            print(f"[Warning] Failed to spawn Gazebo markers natively: {e}")
+            
         pub = rospy.Publisher('/kr6_arm_controller/command', JointTrajectory, queue_size=10)
         rospy.sleep(0.5)
         
