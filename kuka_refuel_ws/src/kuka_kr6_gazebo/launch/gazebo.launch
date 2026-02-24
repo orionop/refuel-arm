@@ -8,13 +8,13 @@
   <!-- Launch Gazebo with the refuel world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find kuka_kr6_gazebo)/worlds/refuel_world.world" />
-    <arg name="paused" value="false" />
+    <arg name="paused" value="true" />
     <arg name="gui" value="true" />
   </include>
 
   <!-- Spawn robot in Gazebo slightly above ground to prevent clipping -->
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
-        args="-param robot_description -urdf -model kr6_r700 -z 0.05"
+        args="-param robot_description -urdf -model kr6_r700 -z 0.05 -J joint_2 -1.570796326 -unpause"
         output="screen" />
 
   <!-- Robot State Publisher -->
