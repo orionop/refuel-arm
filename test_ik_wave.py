@@ -22,7 +22,7 @@ import ik_geometric as ik
 # ── Default Configuration ─────────────────────────────────────
 DEFAULT_START = [0.3, 0.4, 0.5]
 DEFAULT_END   = [0.65, -0.25, 0.45]
-Z_AMPLITUDE   = 0.15  # Peak height of the sine wave in meters
+Z_AMPLITUDE   = 0.10  # Peak height of the sine wave in meters
 NUM_WAYPOINTS = 60
 DT = 0.15  # Time per waypoint for execution (seconds)
 DEFAULT_TWIST_DEG = 45.0  # Default wrist twist in degrees
@@ -134,11 +134,11 @@ def generate_wave_trajectory(start_pt, end_pt, twist_deg=45.0):
     x_vals = np.linspace(start_pt[0], end_pt[0], NUM_WAYPOINTS)
     y_vals = np.linspace(start_pt[1], end_pt[1], NUM_WAYPOINTS)
     
-    # Generate Z coordinates with a single-amplitude sine wave arch over the linear baseline
+    # Generate Z coordinates with a multi-cycle sine wave (audio-like)
     # base_z linearly drops from 0.5 to 0.45.
     base_z = np.linspace(start_pt[2], end_pt[2], NUM_WAYPOINTS)
-    # sin(0) to sin(pi) arches perfectly up and down across the waypoints.
-    wave_z = Z_AMPLITUDE * np.sin(np.linspace(0, np.pi, NUM_WAYPOINTS))
+    # sin(0) to sin(4*pi) creates 2 full wave cycles (up, down, up, down).
+    wave_z = Z_AMPLITUDE * np.sin(np.linspace(0, 4 * np.pi, NUM_WAYPOINTS))
     z_vals = base_z + wave_z
 
     # Compute R_END by applying the twist around the tool X-axis (first column of R_START)
