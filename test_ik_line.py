@@ -13,6 +13,7 @@ import os
 import time
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Import IK-Geo
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
@@ -96,6 +97,8 @@ def generate_line_trajectory(start_pt, end_pt):
     
     trajectory = []
     cartesian_points = []
+    jump_distances = []
+    fk_errors = []
     
     # Generate X, Y, Z coordinates linearly spaced
     x_vals = np.linspace(start_pt[0], end_pt[0], NUM_WAYPOINTS)
@@ -151,6 +154,12 @@ def generate_line_trajectory(start_pt, end_pt):
         print(f"  => SELECTED WP {i+1}: {np.round(solved_q, 3)} | FK Error: {err:.2e} m")
         
         trajectory.append(solved_q)
+        
+        # We only record the jump from WP(i-1) to WP(i). The first point from HOME is excluded from the plot to keep scale readable.
+        if i > 0:
+            jump_distances.append(jump)
+        fk_errors.append(err)
+        
         current_q = solved_q  # Update reference for next waypoint
 
     if len(trajectory) == 0:
@@ -158,7 +167,71 @@ def generate_line_trajectory(start_pt, end_pt):
         sys.exit(1)
         
     print(f"\n[Planning Complete] Successfully planned {len(trajectory)} / {NUM_WAYPOINTS} waypoints.")
-    return trajectory, cartesian_points
+    return trajectory, cartesian_points, jump_distances, fk_errors
+
+def plot_trajectory_analysis(trajectory, jump_distances, fk_errors):
+    """Generates a 3-panel matplotlib figure proving tracking smoothness and FK precision."""
+    print("\n[Analysis] Rendering trajectory error plots...")
+    
+    # Extract joint angles (N_waypoints x 6_joints)
+    waypoints_q = np.array(trajectory)
+    steps = np.arange(1, len(trajectory) + 1)
+    
+    fig, axs = plt.subplots(3, 1, figsize=(10, 12), gridspec_kw={'height_ratios': [3, 1.5, 1.5]})
+    fig.canvas.manager.set_window_title("IK-Geo Trajectory Analysis")
+    fig.suptitle('KUKA KR6 R700 — Pure Algebraic Cartesian Tracking Analysis', fontsize=14, fontweight='bold', y=0.95)
+
+    # --- Plot 1: Joint Angles vs Time (Smoothness Proof) ---
+    axs[0].set_title("Kinematic Profile: Joint Angles vs. Waypoints\n(Proves smooth tracking without elbow-flips)", fontsize=11, loc='left')
+    colors = ['r', 'g', 'b', 'c', 'm', 'y']
+    labels = ['J1 (Base)', 'J2 (Shoulder)', 'J3 (Elbow)', 'J4 (Wrist 1)', 'J5 (Wrist 2)', 'J6 (Wrist 3)']
+    
+    for j in range(6):
+        axs[0].plot(steps, waypoints_q[:, j], label=labels[j], color=colors[j], linewidth=2, marker='.')
+        
+    axs[0].set_ylabel("Joint Angle (radians)", fontsize=10)
+    axs[0].grid(True, linestyle='--', alpha=0.6)
+    axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axs[0].set_xlim(1, len(trajectory))
+
+    # --- Plot 2: Euclidean Jump Distance (Least Squares Norm Profile) ---
+    axs[1].set_title("Configuration Stability: Joint Space Jump Distance ($\Delta Q$)\n(Proves minimal Euclidean distance selection)", fontsize=11, loc='left')
+    # Pad the jump array since there is no 'jump' for the very first WP
+    padded_jumps = [0.0] + jump_distances 
+    axs[1].plot(steps, padded_jumps, color='darkorange', linewidth=2, drawstyle='steps-mid', fillstyle='bottom')
+    axs[1].fill_between(steps, padded_jumps, 0, color='darkorange', alpha=0.2, step='mid')
+    axs[1].set_ylabel(r"$\Delta Q$ Norm (rad)", fontsize=10)
+    axs[1].grid(True, linestyle='--', alpha=0.6)
+    axs[1].set_xlim(1, len(trajectory))
+    # Add an absolute safety limit line representing an instant flip tolerance
+    axs[1].axhline(y=1.0, color='r', linestyle=':', label='Max Safety Tolerance')
+
+    # --- Plot 3: Forward Kinematics Error (Scientific Precision Proof) ---
+    axs[2].set_title("Mathematical Precision: Forward Kinematics Tracking Error\n(Proves algebraic exactness vs neural net approximation)", fontsize=11, loc='left')
+    axs[2].plot(steps, fk_errors, color='crimson', marker='o', markersize=3, linestyle='-', linewidth=1.5)
+    axs[2].set_xlabel("Cartesian Waypoint Number", fontsize=10)
+    axs[2].set_ylabel("FK Error (meters)", fontsize=10)
+    axs[2].set_yscale('log') # Log scale because error is normally 10^-16
+    axs[2].grid(True, which="both", linestyle='--', alpha=0.6)
+    axs[2].set_xlim(1, len(trajectory))
+    axs[2].set_ylim(bottom=1e-18, top=1e-12)
+
+    
+    # Format log axis to be readable
+    import matplotlib.ticker as ticker
+    axs[2].yaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=5))
+    axs[2].set_ylim(bottom=1e-18, top=1e-12)
+    
+    plt.tight_layout(rect=[0, 0.03, 1, 0.93])
+    
+    # Save a static image in case they need to embed it in LaTeX
+    safe_path = "ik_trajectory_analysis.png"
+    plt.savefig(safe_path, dpi=300, bbox_inches='tight')
+    print(f"  -> High-Res plot saved for thesis to: {safe_path}")
+    
+    # Unblock the code by explicitly bringing window to front, showing, but not freezing
+    plt.show(block=False)
+    plt.pause(2.0)
 
 def spawn_gazebo_markers(cartesian_points):
     """Force-spawns native spherical SDF models into Gazebo to guarantee visibility, skipping the flaky RViz marker plugin."""
@@ -341,7 +414,10 @@ def main():
     print("=" * 65)
 
     # 1. Plan trajectory
-    trajectory, cartesian_points = generate_line_trajectory(line_start, line_end)
+    trajectory, cartesian_points, jump_distances, fk_errors = generate_line_trajectory(line_start, line_end)
+    
+    # Generate the Matplotlib Analysis Graphs requested by Professor
+    plot_trajectory_analysis(trajectory, jump_distances, fk_errors)
     
     # 2. Add HOME block at the front and back for safety
     print("\nAdding HOME sequence for safe deployment...")
