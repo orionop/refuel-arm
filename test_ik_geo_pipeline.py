@@ -352,6 +352,104 @@ def send_shadow_trajectory_ros(trajectory, coords, node_indices, dt=0.15):
     print("[Gazebo] ✅ Refueling Mission Complete!")
     return True
 
+# ── RViz-Only Execution ────────────────────────────────────────
+def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
+    """
+    Visualize the trajectory purely in RViz (no Gazebo physics).
+    Uses JointState publishing + MarkerArray for path visualization.
+    """
+    ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
+    if ros_python not in sys.path and os.path.isdir(ros_python):
+        sys.path.insert(0, ros_python)
+
+    import rospy
+    from sensor_msgs.msg import JointState
+    from visualization_msgs.msg import Marker, MarkerArray
+    from geometry_msgs.msg import Point
+
+    rospy.init_node('ik_geo_rviz_pipeline', anonymous=True)
+
+    # Publishers
+    js_pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
+    marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
+    marker_single_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
+    rospy.sleep(0.5)
+
+    # ── 1. Publish path line + waypoint dots ──
+    ma = MarkerArray()
+
+    # Line strip connecting all waypoints
+    line = Marker()
+    line.header.frame_id = "world"
+    line.ns = "refuel_path_line"
+    line.id = 0
+    line.type = Marker.LINE_STRIP
+    line.action = Marker.ADD
+    line.scale.x = 0.006
+    line.color.r = 1.0
+    line.color.g = 1.0
+    line.color.b = 1.0
+    line.color.a = 0.8
+    line.pose.orientation.w = 1.0
+    for p in coords:
+        pt = Point()
+        pt.x, pt.y, pt.z = p[0], p[1], p[2]
+        line.points.append(pt)
+    ma.markers.append(line)
+    marker_single_pub.publish(line)
+
+    # Individual dot spheres
+    for idx, p in enumerate(coords):
+        dot = Marker()
+        dot.header.frame_id = "world"
+        dot.ns = "refuel_path_dots"
+        dot.id = idx + 10
+        dot.type = Marker.SPHERE
+        dot.action = Marker.ADD
+        dot.scale.x = dot.scale.y = dot.scale.z = 0.015
+        # Color: Yellow at YELLOW nodes, Red at RED, White otherwise
+        if idx == node_indices.get('yellow_1') or idx == node_indices.get('yellow_2'):
+            dot.color.r, dot.color.g, dot.color.b = 1.0, 1.0, 0.0
+        elif idx == node_indices.get('red'):
+            dot.color.r, dot.color.g, dot.color.b = 1.0, 0.0, 0.0
+        else:
+            dot.color.r, dot.color.g, dot.color.b = 1.0, 1.0, 1.0
+        dot.color.a = 1.0
+        dot.pose.position.x = p[0]
+        dot.pose.position.y = p[1]
+        dot.pose.position.z = p[2]
+        dot.pose.orientation.w = 1.0
+        ma.markers.append(dot)
+        marker_single_pub.publish(dot)
+
+    marker_pub.publish(ma)
+    print("[RViz] Published white path line with colored waypoint dots")
+
+    # ── 2. Animate via JointState ──
+    msg = JointState()
+    msg.name = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
+
+    print(f"[RViz] Visualizing {len(trajectory)} waypoints...")
+    for i, q in enumerate(trajectory):
+        msg.header.stamp = rospy.Time.now()
+        msg.position = q.tolist()
+        js_pub.publish(msg)
+        rospy.sleep(dt)
+
+        # Dwell pauses at mission nodes
+        if i == node_indices.get('yellow_1'):
+            print(f"  🟡 Dwelling at YELLOW for 3.0s (WP {i})")
+            rospy.sleep(3.0)
+        elif i == node_indices.get('red'):
+            print(f"  🔴 Dwelling at RED for 7.0s (WP {i})")
+            rospy.sleep(7.0)
+        elif i == node_indices.get('yellow_2'):
+            print(f"  🟡 Dwelling at Return YELLOW for 3.0s (WP {i})")
+            rospy.sleep(3.0)
+
+    print("[RViz] ✅ Refueling Mission Visualization Complete!")
+    return True
+
 # ── Visualization ─────────────────────────────────────────────
 def plot_pipeline_analysis(joints, jump_dists, pos_errs, ori_errs, nodes_idx):
     # To fix matplotlib warning about gui thread
@@ -415,6 +513,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--twist", type=float, default=0.0, help="Total wrist twist overlay (deg)")
     parser.add_argument("--ros", action="store_true", help="Execute in Gazebo with shadow markers")
+    parser.add_argument("--rviz", action="store_true", help="Visualize trajectory purely in RViz (no Gazebo physics)")
     args = parser.parse_args()
     
     print("=================================================================")
@@ -434,5 +533,7 @@ if __name__ == "__main__":
         
         if args.ros:
             send_shadow_trajectory_ros(joints, coords, nodes, dt=DT)
+        elif args.rviz:
+            send_trajectory_rviz(joints, coords, nodes, dt=DT)
         else:
-            print("\n[Skip] Pass --ros to execute in Gazebo and spawn shadow markers.")
+            print("\n[Skip] Pass --ros to execute in Gazebo or --rviz to visualize in RViz.")
