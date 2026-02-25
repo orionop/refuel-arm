@@ -305,8 +305,12 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
-    # Save with trajectory-type naming convention
-    safe_path = f"analysis_{shape_name}_full.png"
+    # Save with trajectory-type naming convention in a dedicated output folder
+    save_dir = "output_graphs"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+        
+    safe_path = os.path.join(save_dir, f"analysis_{shape_name}_full.png")
     plt.savefig(safe_path, dpi=300, bbox_inches='tight')
     print(f"  -> High-Res plot saved to: {safe_path}")
     
