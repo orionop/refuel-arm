@@ -265,7 +265,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     # --- Plot 4: Orientation FK Error ---
     axs[3].set_title("Orientation Precision: Forward Kinematics Rotational Error\n(Geodesic angular distance between target and actual rotation)", fontsize=11, loc='left')
     
-    printable_orient_errors = np.maximum(orient_errors, 1e-16)
+    printable_orient_errors = np.maximum(orient_errors, 1e-9)
     
     axs[3].plot(steps, printable_orient_errors, color='dodgerblue', marker='s', markersize=3, linestyle='-', linewidth=1.5)
     axs[3].set_xlabel("Cartesian Waypoint Number", fontsize=10)
@@ -274,7 +274,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     axs[3].grid(True, which="both", linestyle='--', alpha=0.6)
     axs[3].set_xlim(1, len(trajectory))
     axs[3].yaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=5))
-    axs[3].set_ylim(bottom=1e-17, top=1e-6)
+    axs[3].set_ylim(bottom=1e-10, top=1e-6)
     
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
