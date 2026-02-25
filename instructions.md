@@ -41,7 +41,7 @@ git clone https://github.com/orionop/refuel-arm.git
 cd ~/kuka_ws/src/refuel-arm
 python3 -m venv venv
 source venv/bin/activate
-pip install numpy linearsubproblemsltns
+pip install numpy linearsubproblemsltns matplotlib
 ```
 
 Verify isolation:
