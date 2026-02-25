@@ -24,11 +24,10 @@ DEFAULT_START = [0.3, 0.4, 0.5]
 DEFAULT_END   = [0.65, -0.25, 0.45]
 NUM_WAYPOINTS = 60
 DT = 0.15  # Time per waypoint for execution (seconds)
-NUM_WAYPOINTS = 60
-DT = 0.15  # Time per waypoint for execution (seconds)
+DEFAULT_TWIST_DEG = 45.0  # Default wrist twist in degrees
 
-# Keep orientation pointing constant (forward, looking slightly down)
-TARGET_R = np.array([
+# Base orientation: EE pointing forward, looking slightly down
+R_START = np.array([
     [ 0,  0,  1],
     [ 0,  1,  0],
     [-1,  0,  0]
@@ -56,9 +55,37 @@ def is_valid(q):
     return True
 
 
-def solve_closest_ik(target_pos, prev_q):
-    """Solve IK-Geo for a Cartesian point, pick the valid pose closest to prev_q."""
-    Q_all = ik.IK_spherical_2_parallel(TARGET_R, target_pos)
+def orientation_error(R_target, R_actual):
+    """Geodesic distance between two rotation matrices (radians)."""
+    R_err = R_target.T @ R_actual
+    cos_angle = (np.trace(R_err) - 1.0) / 2.0
+    cos_angle = np.clip(cos_angle, -1.0, 1.0)  # Numerical safety
+    return np.abs(np.arccos(cos_angle))
+
+
+def axis_angle_from_rotation(R):
+    """Extract (axis, angle) from a rotation matrix via the logarithmic map."""
+    angle = np.arccos(np.clip((np.trace(R) - 1.0) / 2.0, -1.0, 1.0))
+    if angle < 1e-10:
+        return np.array([1.0, 0.0, 0.0]), 0.0  # Identity rotation
+    axis = np.array([
+        R[2, 1] - R[1, 2],
+        R[0, 2] - R[2, 0],
+        R[1, 0] - R[0, 1]
+    ]) / (2.0 * np.sin(angle))
+    return axis / np.linalg.norm(axis), angle
+
+
+def interpolate_orientation(R_start, R_end, t):
+    """Axis-angle SLERP: interpolate between two rotation matrices at parameter t ∈ [0, 1]."""
+    R_rel = R_start.T @ R_end
+    axis, angle = axis_angle_from_rotation(R_rel)
+    return R_start @ ik.rot(axis, t * angle)
+
+
+def solve_closest_ik(target_pos, target_R, prev_q):
+    """Solve IK-Geo for a Cartesian point + orientation, pick the valid pose closest to prev_q."""
+    Q_all = ik.IK_spherical_2_parallel(target_R, target_pos)
     
     if Q_all.size == 0:
         return None
@@ -91,19 +118,26 @@ def solve_closest_ik(target_pos, prev_q):
     return best_q
 
 
-def generate_line_trajectory(start_pt, end_pt):
-    """Interpolate straight Cartesian line and solve IK tightly for each point."""
+def generate_line_trajectory(start_pt, end_pt, twist_deg=45.0):
+    """Interpolate straight Cartesian line with SLERP orientation and solve IK for each point."""
     print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} waypoints from {start_pt} to {end_pt}...")
+    print(f"[Planning] End-effector twist: {twist_deg}° over trajectory")
     
     trajectory = []
     cartesian_points = []
     jump_distances = []
     fk_errors = []
+    orient_errors = []
     
     # Generate X, Y, Z coordinates linearly spaced
     x_vals = np.linspace(start_pt[0], end_pt[0], NUM_WAYPOINTS)
     y_vals = np.linspace(start_pt[1], end_pt[1], NUM_WAYPOINTS)
     z_vals = np.linspace(start_pt[2], end_pt[2], NUM_WAYPOINTS)
+
+    # Compute R_END by applying the twist around the tool X-axis (first column of R_START)
+    twist_rad = np.radians(twist_deg)
+    tool_x_axis = R_START[:, 0]  # The approach direction of the end-effector
+    R_END = R_START @ ik.rot(np.array([1.0, 0.0, 0.0]), twist_rad)
 
     current_q = Q_HOME
     prev_wp_pos = None
@@ -112,17 +146,21 @@ def generate_line_trajectory(start_pt, end_pt):
         wp_pos = np.array([x_vals[i], y_vals[i], z_vals[i]])
         cartesian_points.append(wp_pos)
         
+        # Interpolate orientation via axis-angle SLERP
+        t = i / max(NUM_WAYPOINTS - 1, 1)
+        R_target = interpolate_orientation(R_START, R_END, t)
+        
         # Calculate Cartesian chunk distance
         if prev_wp_pos is not None:
             cart_dist = np.linalg.norm(wp_pos - prev_wp_pos)
         else:
             cart_dist = 0.0
             
-        print(f"\n--- WP {i+1:2d} | Target XYZ: {np.round(wp_pos, 3)} | Dist from WP{i}: {cart_dist:.4f} m ---")
+        print(f"\n--- WP {i+1:2d} | Target XYZ: {np.round(wp_pos, 3)} | Twist: {t*twist_deg:.1f}° | Dist from WP{i}: {cart_dist:.4f} m ---")
         prev_wp_pos = wp_pos
         
-        # 1. Solve IK for this waypoint
-        solved_q = solve_closest_ik(wp_pos, current_q)
+        # 1. Solve IK for this waypoint (with per-waypoint orientation)
+        solved_q = solve_closest_ik(wp_pos, R_target, current_q)
         
         if solved_q is None:
             print(f"\n[WARNING] IK-Geo failed to find valid solution for Waypoint {i+1} at XYZ={np.round(wp_pos, 3)}")
@@ -142,23 +180,25 @@ def generate_line_trajectory(start_pt, end_pt):
             
         # 3. Verify via Forward Kinematics (FK)
         R_check, p_check = ik.fwd_kinematics(solved_q)
-        err = np.linalg.norm(p_check - wp_pos)
+        pos_err = np.linalg.norm(p_check - wp_pos)
+        rot_err = orientation_error(R_target, R_check)
         
-        if err > 1e-4:
+        if pos_err > 1e-4:
             print(f"\n[ERROR] FK Verification mathematically failed at Waypoint {i+1}!")
             print(f"Target: {wp_pos}, FK Output: {p_check}")
             print(f"[WARNING] Truncating trajectory to safely execute up to Waypoint {i}.")
             cartesian_points.pop()
             break
             
-        print(f"  => SELECTED WP {i+1}: {np.round(solved_q, 3)} | FK Error: {err:.2e} m")
+        print(f"  => SELECTED WP {i+1}: {np.round(solved_q, 3)} | FK Pos Err: {pos_err:.2e} m | Rot Err: {rot_err:.2e} rad")
         
         trajectory.append(solved_q)
         
         # We only record the jump from WP(i-1) to WP(i). The first point from HOME is excluded from the plot to keep scale readable.
         if i > 0:
             jump_distances.append(jump)
-        fk_errors.append(err)
+        fk_errors.append(pos_err)
+        orient_errors.append(rot_err)
         
         current_q = solved_q  # Update reference for next waypoint
 
@@ -167,19 +207,19 @@ def generate_line_trajectory(start_pt, end_pt):
         sys.exit(1)
         
     print(f"\n[Planning Complete] Successfully planned {len(trajectory)} / {NUM_WAYPOINTS} waypoints.")
-    return trajectory, cartesian_points, jump_distances, fk_errors
+    return trajectory, cartesian_points, jump_distances, fk_errors, orient_errors
 
-def plot_trajectory_analysis(trajectory, jump_distances, fk_errors):
-    """Generates a 3-panel matplotlib figure proving tracking smoothness and FK precision."""
-    print("\n[Analysis] Rendering trajectory error plots...")
+def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_errors, shape_name="line"):
+    """Generates a 4-panel matplotlib figure proving tracking smoothness and FK precision."""
+    print(f"\n[Analysis] Rendering {shape_name} trajectory error plots...")
     
     # Extract joint angles (N_waypoints x 6_joints)
     waypoints_q = np.array(trajectory)
     steps = np.arange(1, len(trajectory) + 1)
     
-    fig, axs = plt.subplots(3, 1, figsize=(10, 12), gridspec_kw={'height_ratios': [3, 1.5, 1.5]})
-    fig.canvas.manager.set_window_title("IK-Geo Trajectory Analysis")
-    fig.suptitle('KUKA KR6 R700 — Pure Algebraic Cartesian Tracking Analysis', fontsize=14, fontweight='bold', y=0.95)
+    fig, axs = plt.subplots(4, 1, figsize=(10, 16), gridspec_kw={'height_ratios': [3, 1.5, 1.5, 1.5]})
+    fig.canvas.manager.set_window_title(f"IK-Geo {shape_name.title()} Trajectory Analysis")
+    fig.suptitle(f'KUKA KR6 R700 — {shape_name.title()} Trajectory: 6-DOF Cartesian Tracking Analysis', fontsize=14, fontweight='bold', y=0.96)
 
     # --- Plot 1: Joint Angles vs Time (Smoothness Proof) ---
     axs[0].set_title("Kinematic Profile: Joint Angles vs. Waypoints\n(Proves smooth tracking without elbow-flips)", fontsize=11, loc='left')
@@ -206,31 +246,42 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors):
     # Add an absolute safety limit line representing an instant flip tolerance
     axs[1].axhline(y=1.0, color='r', linestyle=':', label='Max Safety Tolerance')
 
-    # --- Plot 3: Forward Kinematics Error (Scientific Precision Proof) ---
-    axs[2].set_title("Mathematical Precision: Forward Kinematics Tracking Error\n(Proves algebraic exactness vs neural net approximation)", fontsize=11, loc='left')
+    # --- Plot 3: Position FK Error ---
+    axs[2].set_title("Position Precision: Forward Kinematics Translational Error\n(Algebraic exactness: error bounded by IEEE 754 FP64 noise)", fontsize=11, loc='left')
     
-    # Mathematical 0.0 on a log scale plunges to negative infinity. 
     # Clamp the values to the precision floor (1e-16) to keep the graph visually flat.
-    printable_errors = np.maximum(fk_errors, 1e-16)
+    printable_pos_errors = np.maximum(fk_errors, 1e-16)
     
-    axs[2].plot(steps, printable_errors, color='crimson', marker='o', markersize=3, linestyle='-', linewidth=1.5)
-    axs[2].set_xlabel("Cartesian Waypoint Number", fontsize=10)
-    axs[2].set_ylabel("FK Error (meters)", fontsize=10)
-    axs[2].set_yscale('log') # Log scale because error is normally 10^-16
+    axs[2].plot(steps, printable_pos_errors, color='crimson', marker='o', markersize=3, linestyle='-', linewidth=1.5)
+    axs[2].set_ylabel("Position Error (m)", fontsize=10)
+    axs[2].set_yscale('log')
     axs[2].grid(True, which="both", linestyle='--', alpha=0.6)
     axs[2].set_xlim(1, len(trajectory))
     
-    # Format log axis to be readable
     import matplotlib.ticker as ticker
     axs[2].yaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=5))
     axs[2].set_ylim(bottom=1e-17, top=1e-13)
+
+    # --- Plot 4: Orientation FK Error ---
+    axs[3].set_title("Orientation Precision: Forward Kinematics Rotational Error\n(Geodesic angular distance between target and actual rotation)", fontsize=11, loc='left')
     
-    plt.tight_layout(rect=[0, 0.03, 1, 0.93])
+    printable_orient_errors = np.maximum(orient_errors, 1e-16)
     
-    # Save a static image in case they need to embed it in LaTeX
-    safe_path = "ik_trajectory_analysis.png"
+    axs[3].plot(steps, printable_orient_errors, color='dodgerblue', marker='s', markersize=3, linestyle='-', linewidth=1.5)
+    axs[3].set_xlabel("Cartesian Waypoint Number", fontsize=10)
+    axs[3].set_ylabel("Orientation Error (rad)", fontsize=10)
+    axs[3].set_yscale('log')
+    axs[3].grid(True, which="both", linestyle='--', alpha=0.6)
+    axs[3].set_xlim(1, len(trajectory))
+    axs[3].yaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=5))
+    axs[3].set_ylim(bottom=1e-17, top=1e-13)
+    
+    plt.tight_layout(rect=[0, 0.02, 1, 0.94])
+    
+    # Save with trajectory-type naming convention
+    safe_path = f"analysis_{shape_name}_full.png"
     plt.savefig(safe_path, dpi=300, bbox_inches='tight')
-    print(f"  -> High-Res plot saved for thesis to: {safe_path}")
+    print(f"  -> High-Res plot saved to: {safe_path}")
     
     # Unblock the code by explicitly bringing window to front, showing, but not freezing
     plt.show(block=False)
@@ -406,21 +457,22 @@ def main():
     parser.add_argument("--rviz", action="store_true", help="Execute purely in RViz (no physics)")
     parser.add_argument("--start", nargs=3, type=float, default=DEFAULT_START, help="Start XYZ coordinates (m)")
     parser.add_argument("--end", nargs=3, type=float, default=DEFAULT_END, help="End XYZ coordinates (m)")
+    parser.add_argument("--twist", type=float, default=DEFAULT_TWIST_DEG, help="End-effector twist angle in degrees (default: 45°)")
     args = parser.parse_args()
 
     line_start = np.array(args.start)
     line_end = np.array(args.end)
 
     print("=" * 65)
-    print("  KUKA KR6 R700 — Pure IK-Geo Line Tracking")
-    print("  Mathematical Cartesian path exactly tracked via IK")
+    print("  KUKA KR6 R700 — Pure IK-Geo 6-DOF Line Tracking")
+    print(f"  Cartesian line + {args.twist}° wrist twist tracked via IK")
     print("=" * 65)
 
-    # 1. Plan trajectory
-    trajectory, cartesian_points, jump_distances, fk_errors = generate_line_trajectory(line_start, line_end)
+    # 1. Plan trajectory with orientation
+    trajectory, cartesian_points, jump_distances, fk_errors, orient_errors = generate_line_trajectory(line_start, line_end, twist_deg=args.twist)
     
-    # Generate the Matplotlib Analysis Graphs requested by Professor
-    plot_trajectory_analysis(trajectory, jump_distances, fk_errors)
+    # Generate the Matplotlib Analysis Graphs
+    plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_errors, shape_name="line")
     
     # 2. Add HOME block at the front and back for safety
     print("\nAdding HOME sequence for safe deployment...")
