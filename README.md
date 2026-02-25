@@ -1,4 +1,4 @@
-# KUKA KR6 R700 — Autonomous Refueling Simulation
+# Design of Robotic Arm for Autonomous Refueling Applications
 
 <p align="center">
   <b>Systems and Control Engineering (SysCon), IIT Bombay</b><br>
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This repository implements an end-to-end simulation pipeline for autonomous car refueling using a **KUKA KR6 R700** 6-DOF industrial manipulator. The robot executes a precision autonomous sequence: `HOME` (Straight Up) → `YELLOW` (Grab Nozzle) → `RED` (Refuel 10s) → `YELLOW` (Return Nozzle) → `HOME`. The mission is executed within a physically accurate **ROS Noetic / Gazebo** environment.
+This repository implements an end-to-end simulation pipeline for autonomous car refueling using a **KUKA KR6 R700** 6-DOF industrial manipulator *(Expansion to UR5 architecture coming soon!)*. The robot executes a precision autonomous sequence: `HOME` (Straight Up) → `YELLOW` (Grab Nozzle) → `RED` (Refuel 10s) → `YELLOW` (Return Nozzle) → `HOME`. The mission is executed within a physically accurate **ROS Noetic / Gazebo** environment.
 
 The core trajectory generation combines two complementary kinematics strategies:
 
