@@ -65,15 +65,15 @@ roslaunch kuka_kr6_gazebo gazebo.launch
 python3 test_full_pipeline.py --ros
 ```
 
-### Scenario B: Pure IK-Geo Cartesian Line Tracking
-Demonstrates exact mathematical line tracking without a trajectory optimizer (generates 60 dense waypoints dynamically).
+### Scenario B: Pure IK-Geo 6-DOF Cartesian Line Tracking
+Demonstrates exact mathematical line tracking without a trajectory optimizer (generates 60 dense waypoints dynamically). Supports full 6-DOF control including dynamic end-effector orientation (wrist twisting) via SLERP axis-angle interpolation.
 
 ```bash
-# Run the default straight line sweep
+# Run the default straight line sweep with a 45° twist
 python3 test_ik_line.py --ros
 
-# Test specific dynamic coordinates (auto-truncates if unreachable)
-python3 test_ik_line.py --ros --start 0.3 0.4 0.5 --end 0.65 -0.25 0.45
+# Test specific dynamic coordinates and a custom 90° twist
+python3 test_ik_line.py --ros --start 0.3 0.4 0.5 --end 0.65 -0.25 0.45 --twist 90
 ```
 
 ---
