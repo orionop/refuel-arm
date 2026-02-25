@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Import IK-Geo
-sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
 import ik_geometric as ik
 
 # ── Default Configuration ─────────────────────────────────────
@@ -298,7 +298,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
     # Save with trajectory-type naming convention in a dedicated output folder
-    save_dir = "output_graphs"
+    save_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output_graphs'))
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
         

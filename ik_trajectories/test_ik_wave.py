@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-KUKA KR6 R700 — Pure IK-Geo Cartesian Mobius Strip Tracking
+KUKA KR6 R700 — Pure IK-Geo Cartesian Line Tracking
 ===================================================
 
-Demonstrates plotting a 3D Mobius Strip edge in Cartesian space, decomposing it
+Demonstrates plotting a straight 3D line in Cartesian space, decomposing it
 into dense waypoints, and smoothly tracking it using purely algebraic IK-Geo.
 
 No STOMP. No IKFlow. Just math!
@@ -16,15 +16,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Import IK-Geo
-sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
 import ik_geometric as ik
 
 # ── Default Configuration ─────────────────────────────────────
-DEFAULT_CENTER = [0.4, 0.0, 0.45]
-RADIUS = 0.15
-MOBIUS_WIDTH  = 0.08  # Width/Amplitude of the Mobius strip in meters
-NUM_WAYPOINTS = 100 # Increased to 100 since Mobius is a 4*PI curve
-DT = 0.10  # Time per waypoint for execution (seconds)
+DEFAULT_START = [0.3, 0.4, 0.5]
+DEFAULT_END   = [0.65, -0.25, 0.45]
+Z_AMPLITUDE   = 0.10  # Peak height of the sine wave in meters
+NUM_WAYPOINTS = 60
+DT = 0.15  # Time per waypoint for execution (seconds)
 DEFAULT_TWIST_DEG = 45.0  # Default wrist twist in degrees
 
 # Base orientation: EE pointing forward, looking slightly down
@@ -119,9 +119,9 @@ def solve_closest_ik(target_pos, target_R, prev_q):
     return best_q
 
 
-def generate_mobius_trajectory(center_pt, radius, twist_deg=45.0):
-    """Interpolate Cartesian Mobius strip with dynamic tangent orientation and solve IK for each point."""
-    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} mobius waypoints around Center: {center_pt} with Radius: {radius}m...")
+def generate_wave_trajectory(start_pt, end_pt, twist_deg=45.0):
+    """Interpolate Cartesian sine wave with SLERP orientation and solve IK for each point."""
+    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} wave waypoints from {start_pt} to {end_pt}...")
     print(f"[Planning] End-effector twist: {twist_deg}° over trajectory")
     
     trajectory = []
@@ -130,13 +130,17 @@ def generate_mobius_trajectory(center_pt, radius, twist_deg=45.0):
     fk_errors = []
     orient_errors = []
     
-    # Generate parametric mobius loop (0 to 4*PI) to complete the full non-orientable edge
-    theta_vals = np.linspace(0, 4 * np.pi, NUM_WAYPOINTS)
+    # Generate X, Y coordinates linearly spaced
+    x_vals = np.linspace(start_pt[0], end_pt[0], NUM_WAYPOINTS)
+    y_vals = np.linspace(start_pt[1], end_pt[1], NUM_WAYPOINTS)
     
-    # Mobius strip edge parametrization
-    x_vals = center_pt[0] + (radius + MOBIUS_WIDTH * np.cos(theta_vals / 2)) * np.cos(theta_vals)
-    y_vals = center_pt[1] + (radius + MOBIUS_WIDTH * np.cos(theta_vals / 2)) * np.sin(theta_vals)
-    z_vals = center_pt[2] + MOBIUS_WIDTH * np.sin(theta_vals / 2)
+    # Generate Z coordinates with a multi-cycle sine wave (audio-like)
+    # base_z linearly drops from 0.5 to 0.45.
+    base_z = np.linspace(start_pt[2], end_pt[2], NUM_WAYPOINTS)
+    # sin(0) to sin(4*pi) creates 2 full wave cycles (up, down, up, down).
+    wave_freq = 4 * np.pi
+    wave_z = Z_AMPLITUDE * np.sin(np.linspace(0, wave_freq, NUM_WAYPOINTS))
+    z_vals = base_z + wave_z
 
     # Compute R_END by applying the twist around the tool X-axis (first column of R_START)
     twist_rad = np.radians(twist_deg)
@@ -151,28 +155,19 @@ def generate_mobius_trajectory(center_pt, radius, twist_deg=45.0):
         cartesian_points.append(wp_pos)
         
         # Calculate dynamic orientation (Real-time trajectory shape tracking)
-        # We calculate the instantaneous slope (dz/dx, dy) directly from the adjacent coordinate points,
-        # ensuring the robot "feels" the 3D shape of the path dynamically.
+        # We calculate the instantaneous slope (dz/dx) directly from the adjacent coordinate points,
+        # ensuring the robot "feels" the shape of the path dynamically without relying on hardcoded functions.
         if i < NUM_WAYPOINTS - 1:
             dx = x_vals[i+1] - x_vals[i]
-            dy = y_vals[i+1] - y_vals[i]
             dz = z_vals[i+1] - z_vals[i]
         else:
             dx = x_vals[i] - x_vals[i-1]
-            dy = y_vals[i] - y_vals[i-1]
             dz = z_vals[i] - z_vals[i-1]
             
-        path_speed = np.hypot(dx, dy)
-        instantaneous_pitch = np.arctan2(dz, path_speed) * 0.5
+        instantaneous_pitch = np.arctan2(dz, dx) * 0.5
         
-        # Calculate horizontal normal vector to the path to act as the exact 3D tilt axis
-        if path_speed > 1e-6:
-            rot_axis = np.array([-dy, dx, 0.0]) / path_speed
-        else:
-            rot_axis = np.array([0.0, 1.0, 0.0])
-        
-        # 1. Base rotation tangent to the instantaneous path slope mapping exactly to the 3D curve
-        R_tangent = ik.rot(rot_axis, -instantaneous_pitch) @ R_START
+        # 1. Base rotation tangent to the instantaneous path slope
+        R_tangent = R_START @ ik.rot(np.array([0.0, 1.0, 0.0]), -instantaneous_pitch) # Negative pitch rotates tool 'up' when slope is positive
         
         # 2. Compute SLERP Twist over the newly pitched frame
         twist_rad = np.radians(twist_deg)
@@ -267,7 +262,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     axs[0].set_xlim(1, len(trajectory))
 
     # --- Plot 2: Euclidean Jump Distance (Least Squares Norm Profile) ---
-    axs[1].set_title(r"Configuration Stability: Joint Space Jump Distance ($\Delta Q$)" + "\n(Proves minimal Euclidean distance selection)", fontsize=11, loc='left')
+    axs[1].set_title("Configuration Stability: Joint Space Jump Distance ($\Delta Q$)\n(Proves minimal Euclidean distance selection)", fontsize=11, loc='left')
     # Pad the jump array since there is no 'jump' for the very first WP
     padded_jumps = [0.0] + jump_distances 
     axs[1].plot(steps, padded_jumps, color='darkorange', linewidth=2, drawstyle='steps-mid', fillstyle='bottom')
@@ -311,7 +306,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
     # Save with trajectory-type naming convention in a dedicated output folder
-    save_dir = "output_graphs"
+    save_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output_graphs'))
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
         
@@ -488,26 +483,27 @@ def execute_ros(trajectory, cartesian_points, mode="ros"):
 
     
 def main():
-    parser = argparse.ArgumentParser(description="Pure IK-Geo Mobius Strip Tracking")
+    parser = argparse.ArgumentParser(description="Pure IK-Geo Sine Wave Tracking")
     parser.add_argument("--ros", action="store_true", help="Execute in Gazebo via ROS")
     parser.add_argument("--rviz", action="store_true", help="Execute purely in RViz (no physics)")
-    parser.add_argument("--center", nargs=3, type=float, default=DEFAULT_CENTER, help="Center XYZ coordinates (m)")
-    parser.add_argument("--radius", type=float, default=RADIUS, help="Radius of the Mobius strip (m)")
+    parser.add_argument("--start", nargs=3, type=float, default=DEFAULT_START, help="Start XYZ coordinates (m)")
+    parser.add_argument("--end", nargs=3, type=float, default=DEFAULT_END, help="End XYZ coordinates (m)")
     parser.add_argument("--twist", type=float, default=DEFAULT_TWIST_DEG, help="End-effector twist angle in degrees (default: 45°)")
     args = parser.parse_args()
 
-    center_pt = np.array(args.center)
+    line_start = np.array(args.start)
+    line_end = np.array(args.end)
 
     print("=" * 65)
-    print("  KUKA KR6 R700 — Pure IK-Geo 6-DOF Mobius Strip Tracking")
-    print(f"  Cartesian mobius (Radius {args.radius}m, Width {MOBIUS_WIDTH}m) + {args.twist}° twist")
+    print("  KUKA KR6 R700 — Pure IK-Geo 6-DOF Sine Wave Tracking")
+    print(f"  Cartesian wave (Amplitude {Z_AMPLITUDE}m) + {args.twist}° wrist twist")
     print("=" * 65)
 
     # 1. Plan trajectory with orientation
-    trajectory, cartesian_points, jump_distances, fk_errors, orient_errors = generate_mobius_trajectory(center_pt, args.radius, twist_deg=args.twist)
+    trajectory, cartesian_points, jump_distances, fk_errors, orient_errors = generate_wave_trajectory(line_start, line_end, twist_deg=args.twist)
     
     # Generate the Matplotlib Analysis Graphs
-    plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_errors, shape_name="mobius")
+    plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_errors, shape_name="wave")
     
     # 2. Add HOME block at the front and back for safety
     print("\nAdding HOME sequence for safe deployment...")

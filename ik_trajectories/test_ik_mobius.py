@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-KUKA KR6 R700 — Pure IK-Geo Cartesian Pringle Tracking
+KUKA KR6 R700 — Pure IK-Geo Cartesian Mobius Strip Tracking
 ===================================================
 
-Demonstrates plotting a 3D saddle (Hyperbolic Paraboloid / Pringle) in Cartesian space, decomposing it
+Demonstrates plotting a 3D Mobius Strip edge in Cartesian space, decomposing it
 into dense waypoints, and smoothly tracking it using purely algebraic IK-Geo.
 
 No STOMP. No IKFlow. Just math!
@@ -16,15 +16,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Import IK-Geo
-sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
 import ik_geometric as ik
 
 # ── Default Configuration ─────────────────────────────────────
-DEFAULT_CENTER = [0.5, 0.0, 0.45]
+DEFAULT_CENTER = [0.4, 0.0, 0.45]
 RADIUS = 0.15
-Z_AMPLITUDE   = 0.08  # Peak height of the pringle "saddle" in meters
-NUM_WAYPOINTS = 60
-DT = 0.15  # Time per waypoint for execution (seconds)
+MOBIUS_WIDTH  = 0.08  # Width/Amplitude of the Mobius strip in meters
+NUM_WAYPOINTS = 100 # Increased to 100 since Mobius is a 4*PI curve
+DT = 0.10  # Time per waypoint for execution (seconds)
 DEFAULT_TWIST_DEG = 45.0  # Default wrist twist in degrees
 
 # Base orientation: EE pointing forward, looking slightly down
@@ -119,9 +119,9 @@ def solve_closest_ik(target_pos, target_R, prev_q):
     return best_q
 
 
-def generate_pringle_trajectory(center_pt, radius, twist_deg=45.0):
-    """Interpolate Cartesian Pringle (hyperbolic paraboloid) with dynamic tangent orientation and solve IK for each point."""
-    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} pringle waypoints around Center: {center_pt} with Radius: {radius}m...")
+def generate_mobius_trajectory(center_pt, radius, twist_deg=45.0):
+    """Interpolate Cartesian Mobius strip with dynamic tangent orientation and solve IK for each point."""
+    print(f"\n[Planning] Interpolating {NUM_WAYPOINTS} mobius waypoints around Center: {center_pt} with Radius: {radius}m...")
     print(f"[Planning] End-effector twist: {twist_deg}° over trajectory")
     
     trajectory = []
@@ -130,13 +130,13 @@ def generate_pringle_trajectory(center_pt, radius, twist_deg=45.0):
     fk_errors = []
     orient_errors = []
     
-    # Generate parametric circle (0 to 2*PI)
-    theta_vals = np.linspace(0, 2 * np.pi, NUM_WAYPOINTS)
+    # Generate parametric mobius loop (0 to 4*PI) to complete the full non-orientable edge
+    theta_vals = np.linspace(0, 4 * np.pi, NUM_WAYPOINTS)
     
-    x_vals = center_pt[0] + radius * np.cos(theta_vals)
-    y_vals = center_pt[1] + radius * np.sin(theta_vals)
-    # Cos(2*theta) creates exactly 2 peaks and 2 valleys around the circle — perfectly forming a Pringle chip.
-    z_vals = center_pt[2] + Z_AMPLITUDE * np.cos(2 * theta_vals)
+    # Mobius strip edge parametrization
+    x_vals = center_pt[0] + (radius + MOBIUS_WIDTH * np.cos(theta_vals / 2)) * np.cos(theta_vals)
+    y_vals = center_pt[1] + (radius + MOBIUS_WIDTH * np.cos(theta_vals / 2)) * np.sin(theta_vals)
+    z_vals = center_pt[2] + MOBIUS_WIDTH * np.sin(theta_vals / 2)
 
     # Compute R_END by applying the twist around the tool X-axis (first column of R_START)
     twist_rad = np.radians(twist_deg)
@@ -267,7 +267,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     axs[0].set_xlim(1, len(trajectory))
 
     # --- Plot 2: Euclidean Jump Distance (Least Squares Norm Profile) ---
-    axs[1].set_title("Configuration Stability: Joint Space Jump Distance ($\Delta Q$)\n(Proves minimal Euclidean distance selection)", fontsize=11, loc='left')
+    axs[1].set_title(r"Configuration Stability: Joint Space Jump Distance ($\Delta Q$)" + "\n(Proves minimal Euclidean distance selection)", fontsize=11, loc='left')
     # Pad the jump array since there is no 'jump' for the very first WP
     padded_jumps = [0.0] + jump_distances 
     axs[1].plot(steps, padded_jumps, color='darkorange', linewidth=2, drawstyle='steps-mid', fillstyle='bottom')
@@ -311,7 +311,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
     # Save with trajectory-type naming convention in a dedicated output folder
-    save_dir = "output_graphs"
+    save_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output_graphs'))
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
         
@@ -488,26 +488,26 @@ def execute_ros(trajectory, cartesian_points, mode="ros"):
 
     
 def main():
-    parser = argparse.ArgumentParser(description="Pure IK-Geo Pringle (Saddle) Tracking")
+    parser = argparse.ArgumentParser(description="Pure IK-Geo Mobius Strip Tracking")
     parser.add_argument("--ros", action="store_true", help="Execute in Gazebo via ROS")
     parser.add_argument("--rviz", action="store_true", help="Execute purely in RViz (no physics)")
     parser.add_argument("--center", nargs=3, type=float, default=DEFAULT_CENTER, help="Center XYZ coordinates (m)")
-    parser.add_argument("--radius", type=float, default=RADIUS, help="Radius of the Pringle (m)")
+    parser.add_argument("--radius", type=float, default=RADIUS, help="Radius of the Mobius strip (m)")
     parser.add_argument("--twist", type=float, default=DEFAULT_TWIST_DEG, help="End-effector twist angle in degrees (default: 45°)")
     args = parser.parse_args()
 
     center_pt = np.array(args.center)
 
     print("=" * 65)
-    print("  KUKA KR6 R700 — Pure IK-Geo 6-DOF Pringle (Saddle) Tracking")
-    print(f"  Cartesian pringle (Radius {args.radius}m, Amp {Z_AMPLITUDE}m) + {args.twist}° twist")
+    print("  KUKA KR6 R700 — Pure IK-Geo 6-DOF Mobius Strip Tracking")
+    print(f"  Cartesian mobius (Radius {args.radius}m, Width {MOBIUS_WIDTH}m) + {args.twist}° twist")
     print("=" * 65)
 
     # 1. Plan trajectory with orientation
-    trajectory, cartesian_points, jump_distances, fk_errors, orient_errors = generate_pringle_trajectory(center_pt, args.radius, twist_deg=args.twist)
+    trajectory, cartesian_points, jump_distances, fk_errors, orient_errors = generate_mobius_trajectory(center_pt, args.radius, twist_deg=args.twist)
     
     # Generate the Matplotlib Analysis Graphs
-    plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_errors, shape_name="pringle")
+    plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_errors, shape_name="mobius")
     
     # 2. Add HOME block at the front and back for safety
     print("\nAdding HOME sequence for safe deployment...")

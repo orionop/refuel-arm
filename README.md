@@ -34,76 +34,23 @@ STOMP (Stochastic Trajectory Optimization for Motion Planning) is used to genera
 
 ## Quick Start
 
-> **Prerequisites:** Ubuntu 20.04 with ROS Noetic, Gazebo, and an NVIDIA GPU (optional for simulation).
+For full installation and execution instructions across Ubuntu, ROS Noetic, and Python environments, please see the **[SETUP.md](SETUP.md)** file!
 
+### Basic Execution Previews
+
+1. **Full Robotic Refueling Pipeline (`HOME → YELLOW → RED → YELLOW → HOME`)**:
 ```bash
-# 1. Clone into your ROS workspace
-mkdir -p ~/kuka_ws/src
-cd ~/kuka_ws/src
-git clone https://github.com/orionop/refuel-arm.git
-cd refuel-arm
-
-# 2. Build ROS Noetic workspace
-source /opt/ros/noetic/setup.bash
-cd kuka_refuel_ws
-catkin_make
-source devel/setup.bash
-cd ..
-```
-
-### Scenario A: Full Refueling Mission (IK + STOMP)
-Executes the complex `HOME → YELLOW → RED → YELLOW → HOME` mission.
-
-```bash
-# Launch purely in RViz (No Physics)
-python3 test_full_pipeline.py --rviz
-
-# OR: Launch in Gazebo (Full Physics)
-# Terminal 1:
-roslaunch kuka_kr6_gazebo gazebo.launch
-# Terminal 2:
 python3 test_full_pipeline.py --ros
 ```
 
-### Scenario B: Pure IK-Geo 6-DOF Cartesian Line Tracking
-Demonstrates exact mathematical line tracking without a trajectory optimizer (generates 60 dense waypoints dynamically). Supports full 6-DOF control including dynamic end-effector orientation (wrist twisting) via SLERP axis-angle interpolation.
-
+2. **Topological 6-DOF Trajectory Tests (e.g. Möbius Strip)**:
 ```bash
-# Run the default straight line sweep with a 45° twist
-python3 test_ik_line.py --ros
-
-# Test specific dynamic coordinates and a custom 90° twist
-python3 test_ik_line.py --ros --start 0.3 0.4 0.5 --end 0.65 -0.25 0.45 --twist 90
+python3 ik_trajectories/test_ik_mobius.py --ros
 ```
 
-### Scenario C: Dynamic Orientation Wave Tracking (Human Painting Motion)
-Demonstrates a multi-cycle Cartesian sine wave where the end-effector dynamically adjusts its pitch to stay tangent to the curve's analytical derivative (resembling a "painting" motion) while simultaneously applying a continuous wrist twist.
-
-```bash
-# Run the wave trajectory in Gazebo
-python3 test_ik_wave.py --ros
-```
-
-### Scenario D: Hyperbolic Paraboloid (Pringle) Tracking
-Demonstrates navigating a purely 3D multi-axis curve (a circle in XY with a saddle-like variation in Z). The orientation dynamically computes the 3D cross-product normal to tilt the tool completely tangent to the swoop.
-
-```bash
-python3 test_ik_pringle.py --ros
-```
-
-### Scenario E: Non-Orientable Topological Tracking (Möbius Strip)
-Acts as the ultimate algebraic stress test. The robot traces the continuous edge of a Möbius strip, sweeping a massive $4\pi$ (720°) loop. Computes the instantaneous topological tangent to safely handle the topological inversion without an elbow flip.
-
-```bash
-python3 test_ik_mobius.py --ros
-```
-
-### Scenario F: STOMP Pipeline Analysis (4-Panel Graph)
-Generates the same 4-panel analysis graphs (joint angles, jump distances, Cartesian step distance, orientation smoothness) for the STOMP refueling pipeline — without modifying `test_full_pipeline.py`.
-
+3. **STOMP Pipeline Analysis Visualization (4-Panel Graph)**:
 ```bash
 python3 analyze_pipeline.py
-# Output: output_graphs/analysis_pipeline_full.png
 ```
 
 ---
@@ -112,22 +59,17 @@ python3 analyze_pipeline.py
 
 ```
 refuel-arm/
-├── test_full_pipeline.py            # STOMP Refueling mission execution
-├── test_ik_line.py                  # Pure algebraic IK Cartesian line tracker
-├── test_ik_wave.py                  # Multi-cycle audio-wave with dynamic pitch
-├── test_ik_pringle.py               # 3D hyperbolic paraboloid tracking
-├── test_ik_mobius.py                # 4π Möbius strip topological tracker
-├── analyze_pipeline.py              # 4-panel STOMP analysis graph generator
-├── stomp_planner.py                 # Core STOMP trajectory optimizer
-├── ik-geo/                          # Algebraic IK library (MATLAB/Python/C++/Rust)
+├── test_full_pipeline.py            # Main STOMP Refueling execution orchestrator
+├── analyze_pipeline.py              # STOMP 4-panel analysis graph generator
+├── stomp_planner.py                 # Core standalone STOMP trajectory optimizer
+├── ik_trajectories/                 # 6-DOF Topological Tracking Scripts
+│   ├── test_ik_line.py              # Pure algebraic IK Cartesian line tracker
+│   ├── test_ik_wave.py              # Multi-cycle audio-wave with dynamic pitch
+│   ├── test_ik_pringle.py           # 3D hyperbolic paraboloid (saddle) tracking
+│   └── test_ik_mobius.py            # 4π Möbius strip topological inversion tracker
 │
+├── ik-geo/                          # Algebraic IK library submodule
 ├── output_graphs/                   # Generated analysis plots
-│   ├── analysis_line_full.png
-│   ├── analysis_wave_full.png
-│   └── analysis_pipeline_full.png
-│
-├── deprecated/                      # Previous approaches (IKFlow, Kaggle, JRL)
-│
 ├── kuka_refuel_ws/                  # ROS Noetic catkin workspace
 │   └── src/kuka_kr6_gazebo/
 │       ├── urdf/                    #   URDF with accurate physical inertials
@@ -137,6 +79,9 @@ refuel-arm/
 │       └── scripts/
 │           ├── ik_geometric.py      #   Python port of IK_spherical_2_parallel
 │
+├── deprecated/                      # Previous approaches (IKFlow, MATLAB, instructions)
+├── report/                          # LaTeX files for empirical mathematical tracking analysis
+├── SETUP.md                         # Easy Quick-Start guide for execution & installation
 ├── SAFE_DEV_RULES.md                # Shared lab machine safety protocol
 └── README.md
 ```
