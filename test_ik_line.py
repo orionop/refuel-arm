@@ -274,7 +274,7 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors, orient_error
     axs[3].grid(True, which="both", linestyle='--', alpha=0.6)
     axs[3].set_xlim(1, len(trajectory))
     axs[3].yaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=5))
-    axs[3].set_ylim(bottom=1e-17, top=1e-13)
+    axs[3].set_ylim(bottom=1e-17, top=1e-6)
     
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
