@@ -84,6 +84,20 @@ Demonstrates a multi-cycle Cartesian sine wave where the end-effector dynamicall
 python3 test_ik_wave.py --ros
 ```
 
+### Scenario D: Hyperbolic Paraboloid (Pringle) Tracking
+Demonstrates navigating a purely 3D multi-axis curve (a circle in XY with a saddle-like variation in Z). The orientation dynamically computes the 3D cross-product normal to tilt the tool completely tangent to the swoop.
+
+```bash
+python3 test_ik_pringle.py --ros
+```
+
+### Scenario E: Non-Orientable Topological Tracking (Möbius Strip)
+Acts as the ultimate algebraic stress test. The robot traces the continuous edge of a Möbius strip, sweeping a massive $4\pi$ (720°) loop. Computes the instantaneous topological tangent to safely handle the topological inversion without an elbow flip.
+
+```bash
+python3 test_ik_mobius.py --ros
+```
+
 ---
 
 ## Repository Structure
