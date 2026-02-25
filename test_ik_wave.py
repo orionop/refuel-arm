@@ -138,8 +138,26 @@ def generate_wave_trajectory(start_pt, end_pt, twist_deg=45.0):
     # base_z linearly drops from 0.5 to 0.45.
     base_z = np.linspace(start_pt[2], end_pt[2], NUM_WAYPOINTS)
     # sin(0) to sin(4*pi) creates 2 full wave cycles (up, down, up, down).
-    wave_z = Z_AMPLITUDE * np.sin(np.linspace(0, 4 * np.pi, NUM_WAYPOINTS))
+    wave_freq = 4 * np.pi
+    wave_z = Z_AMPLITUDE * np.sin(np.linspace(0, wave_freq, NUM_WAYPOINTS))
     z_vals = base_z + wave_z
+
+    # Compute the analytical derivative (dz/dx) to find the tangent angle (pitch)
+    # Z = base_z_slope * x + Z_AMPLITUDE * sin(wave_freq * (x - start_x) / (end_x - start_x))
+    # dz/dx = base_z_slope + Z_AMPLITUDE * (wave_freq / dx_total) * cos(...)
+    dx_total = end_pt[0] - start_pt[0]
+    dz_base_dx = (end_pt[2] - start_pt[2]) / dx_total if dx_total != 0 else 0
+    
+    # Calculate x parameter t from 0 to 1
+    t_vals = np.linspace(0, 1, NUM_WAYPOINTS)
+    # Derivative of amplitude * sin(freq * t) with respect to x is amplitude * freq/dx * cos(freq * t)
+    dz_dx = dz_base_dx + Z_AMPLITUDE * (wave_freq / dx_total) * np.cos(wave_freq * t_vals)
+    
+    # The required pitch angle to stay tangent to the curve is atan2(dz, dx)
+    # Note: KUKA tool Z points 'forward', X points 'down'. 
+    # To 'look' along the path, rotate around the tool's original Y axis.
+    # We apply a 0.5 dampening factor so it "paints" naturally without hitting the wrist's physical joint limits.
+    pitch_angles = np.arctan(dz_dx) * 0.5
 
     # Compute R_END by applying the twist around the tool X-axis (first column of R_START)
     twist_rad = np.radians(twist_deg)
@@ -153,9 +171,19 @@ def generate_wave_trajectory(start_pt, end_pt, twist_deg=45.0):
         wp_pos = np.array([x_vals[i], y_vals[i], z_vals[i]])
         cartesian_points.append(wp_pos)
         
-        # Interpolate orientation via axis-angle SLERP
+        # Calculate dynamic orientation
+        # 1. Base rotation tangent to the curve (Pitch)
+        # We want to pivot the hand up/down based on the path's slope, simulating a "painting" motion.
+        current_pitch = pitch_angles[i]
+        R_tangent = R_START @ ik.rot(np.array([0.0, 1.0, 0.0]), -current_pitch) # Negative pitch rotates tool 'up' when slope is positive
+        
+        # 2. Compute SLERP Twist over the newly pitched frame
+        twist_rad = np.radians(twist_deg)
+        R_END_tangent = R_tangent @ ik.rot(np.array([1.0, 0.0, 0.0]), twist_rad) # Twist around local X (tool pointing axis)
+        
         t = i / max(NUM_WAYPOINTS - 1, 1)
-        R_target = interpolate_orientation(R_START, R_END, t)
+        # 3. Combine both: The frame is pitched correctly, now SLERP the twist across it
+        R_target = interpolate_orientation(R_tangent, R_END_tangent, t)
         
         # Calculate Cartesian chunk distance
         if prev_wp_pos is not None:
