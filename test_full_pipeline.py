@@ -20,7 +20,7 @@ import argparse
 import numpy as np
 
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
-from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700
+from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700, rot
 from stomp_planner import stomp_optimize
 
 # ── Official KUKA KR6 R700-2 Joint Limits (from URDF) ───────────
@@ -37,8 +37,25 @@ JOINT_LIMITS = np.array([
 Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])       # REST position (Straight Up)
 Q_NOZZLE = np.array([0.785, -0.94, 0.94, 0.0, 0.0, 0.0])     # YELLOW dot (Tall, Z=0.696m on right)
 REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-left, height=0.5m)
-REFUEL_TARGET_R = np.eye(3)                                  # Tool orientation
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
+
+# ── Dynamic Orientation (Wave-Style Tangent Pitching) ───────────
+# Base EE orientation: tool pointing forward (same as test_ik_wave.py)
+R_START = np.array([
+    [ 0,  0,  1],
+    [ 0,  1,  0],
+    [-1,  0,  0]
+])
+
+# Compute natural approach orientation at RED based on YELLOW→RED direction
+_, P_NOZZLE_FK = fwd_kinematics(Q_NOZZLE)
+_approach_dir = REFUEL_TARGET_XYZ - P_NOZZLE_FK
+_dx = _approach_dir[0]
+_dy = _approach_dir[1]
+_dz = _approach_dir[2]
+_horiz_speed = np.hypot(_dx, _dy)
+_pitch = np.arctan2(_dz, _horiz_speed) * 0.5  # 50% damping like wave script
+REFUEL_TARGET_R = R_START @ rot(np.array([0.0, 1.0, 0.0]), -_pitch)  # Pitch along approach
 
 
 def within_joint_limits(q):
