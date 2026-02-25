@@ -154,13 +154,15 @@ Upgrade kernel
 
 ------------------------------------------------------------
 
-8) DATA SAFETY
+8) DATA SAFETY AND DEPRECATION
 
 Do not delete unknown folders.
 Do not modify other researchers’ datasets.
 Store all outputs inside your designated workspace bounds:
-
 `~/kuka_ws`
+
+**DEPRECATION RULE (NEW):**
+Never delete old code, scripts, or non-active environments (like old `venv` folders). If something is no longer in use or replaced by a new implementation, move it into the `deprecated/` folder. Preserve history; do not `rm -rf` project files.
 
 ------------------------------------------------------------
 
