@@ -76,6 +76,14 @@ python3 test_ik_line.py --ros
 python3 test_ik_line.py --ros --start 0.3 0.4 0.5 --end 0.65 -0.25 0.45 --twist 90
 ```
 
+### Scenario C: Dynamic Orientation Wave Tracking (Human Painting Motion)
+Demonstrates a multi-cycle Cartesian sine wave where the end-effector dynamically adjusts its pitch to stay tangent to the curve's analytical derivative (resembling a "painting" motion) while simultaneously applying a continuous wrist twist.
+
+```bash
+# Run the wave trajectory in Gazebo
+python3 test_ik_wave.py --ros
+```
+
 ---
 
 ## Repository Structure
