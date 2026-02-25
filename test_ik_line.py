@@ -146,9 +146,28 @@ def generate_line_trajectory(start_pt, end_pt, twist_deg=45.0):
         wp_pos = np.array([x_vals[i], y_vals[i], z_vals[i]])
         cartesian_points.append(wp_pos)
         
-        # Interpolate orientation via axis-angle SLERP
+        # Calculate dynamic orientation (Real-time trajectory shape tracking)
+        # We calculate the instantaneous slope (dz/dx) directly from the adjacent coordinate points.
+        # This guarantees the robot "feels" the shape of the path dynamically.
+        if i < NUM_WAYPOINTS - 1:
+            dx = x_vals[i+1] - x_vals[i]
+            dz = z_vals[i+1] - z_vals[i]
+        else:
+            dx = x_vals[i] - x_vals[i-1]
+            dz = z_vals[i] - z_vals[i-1]
+            
+        instantaneous_pitch = np.arctan2(dz, dx) * 0.5
+        
+        # 1. Base rotation tangent to the instantaneous path slope
+        R_tangent = R_START @ ik.rot(np.array([0.0, 1.0, 0.0]), -instantaneous_pitch)
+        
+        # 2. Compute SLERP Twist over the newly pitched frame
+        twist_rad = np.radians(twist_deg)
+        R_END_tangent = R_tangent @ ik.rot(np.array([1.0, 0.0, 0.0]), twist_rad) # Twist around local X (tool pointing axis)
+        
         t = i / max(NUM_WAYPOINTS - 1, 1)
-        R_target = interpolate_orientation(R_START, R_END, t)
+        # 3. Combine both: The frame is pitched correctly, now SLERP the twist across it
+        R_target = interpolate_orientation(R_tangent, R_END_tangent, t)
         
         # Calculate Cartesian chunk distance
         if prev_wp_pos is not None:

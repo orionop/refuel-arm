@@ -142,23 +142,6 @@ def generate_wave_trajectory(start_pt, end_pt, twist_deg=45.0):
     wave_z = Z_AMPLITUDE * np.sin(np.linspace(0, wave_freq, NUM_WAYPOINTS))
     z_vals = base_z + wave_z
 
-    # Compute the analytical derivative (dz/dx) to find the tangent angle (pitch)
-    # Z = base_z_slope * x + Z_AMPLITUDE * sin(wave_freq * (x - start_x) / (end_x - start_x))
-    # dz/dx = base_z_slope + Z_AMPLITUDE * (wave_freq / dx_total) * cos(...)
-    dx_total = end_pt[0] - start_pt[0]
-    dz_base_dx = (end_pt[2] - start_pt[2]) / dx_total if dx_total != 0 else 0
-    
-    # Calculate x parameter t from 0 to 1
-    t_vals = np.linspace(0, 1, NUM_WAYPOINTS)
-    # Derivative of amplitude * sin(freq * t) with respect to x is amplitude * freq/dx * cos(freq * t)
-    dz_dx = dz_base_dx + Z_AMPLITUDE * (wave_freq / dx_total) * np.cos(wave_freq * t_vals)
-    
-    # The required pitch angle to stay tangent to the curve is atan2(dz, dx)
-    # Note: KUKA tool Z points 'forward', X points 'down'. 
-    # To 'look' along the path, rotate around the tool's original Y axis.
-    # We apply a 0.5 dampening factor so it "paints" naturally without hitting the wrist's physical joint limits.
-    pitch_angles = np.arctan(dz_dx) * 0.5
-
     # Compute R_END by applying the twist around the tool X-axis (first column of R_START)
     twist_rad = np.radians(twist_deg)
     tool_x_axis = R_START[:, 0]  # The approach direction of the end-effector
@@ -171,11 +154,20 @@ def generate_wave_trajectory(start_pt, end_pt, twist_deg=45.0):
         wp_pos = np.array([x_vals[i], y_vals[i], z_vals[i]])
         cartesian_points.append(wp_pos)
         
-        # Calculate dynamic orientation
-        # 1. Base rotation tangent to the curve (Pitch)
-        # We want to pivot the hand up/down based on the path's slope, simulating a "painting" motion.
-        current_pitch = pitch_angles[i]
-        R_tangent = R_START @ ik.rot(np.array([0.0, 1.0, 0.0]), -current_pitch) # Negative pitch rotates tool 'up' when slope is positive
+        # Calculate dynamic orientation (Real-time trajectory shape tracking)
+        # We calculate the instantaneous slope (dz/dx) directly from the adjacent coordinate points,
+        # ensuring the robot "feels" the shape of the path dynamically without relying on hardcoded functions.
+        if i < NUM_WAYPOINTS - 1:
+            dx = x_vals[i+1] - x_vals[i]
+            dz = z_vals[i+1] - z_vals[i]
+        else:
+            dx = x_vals[i] - x_vals[i-1]
+            dz = z_vals[i] - z_vals[i-1]
+            
+        instantaneous_pitch = np.arctan2(dz, dx) * 0.5
+        
+        # 1. Base rotation tangent to the instantaneous path slope
+        R_tangent = R_START @ ik.rot(np.array([0.0, 1.0, 0.0]), -instantaneous_pitch) # Negative pitch rotates tool 'up' when slope is positive
         
         # 2. Compute SLERP Twist over the newly pitched frame
         twist_rad = np.radians(twist_deg)
