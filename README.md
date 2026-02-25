@@ -98,6 +98,14 @@ Acts as the ultimate algebraic stress test. The robot traces the continuous edge
 python3 test_ik_mobius.py --ros
 ```
 
+### Scenario F: STOMP Pipeline Analysis (4-Panel Graph)
+Generates the same 4-panel analysis graphs (joint angles, jump distances, Cartesian step distance, orientation smoothness) for the STOMP refueling pipeline — without modifying `test_full_pipeline.py`.
+
+```bash
+python3 analyze_pipeline.py
+# Output: output_graphs/analysis_pipeline_full.png
+```
+
 ---
 
 ## Repository Structure
@@ -106,10 +114,19 @@ python3 test_ik_mobius.py --ros
 refuel-arm/
 ├── test_full_pipeline.py            # STOMP Refueling mission execution
 ├── test_ik_line.py                  # Pure algebraic IK Cartesian line tracker
+├── test_ik_wave.py                  # Multi-cycle audio-wave with dynamic pitch
+├── test_ik_pringle.py               # 3D hyperbolic paraboloid tracking
+├── test_ik_mobius.py                # 4π Möbius strip topological tracker
+├── analyze_pipeline.py              # 4-panel STOMP analysis graph generator
 ├── stomp_planner.py                 # Core STOMP trajectory optimizer
 ├── ik-geo/                          # Algebraic IK library (MATLAB/Python/C++/Rust)
 │
-├── deprecated/                      # Previous ML approaches (IKFlow, Kaggle, JRL)
+├── output_graphs/                   # Generated analysis plots
+│   ├── analysis_line_full.png
+│   ├── analysis_wave_full.png
+│   └── analysis_pipeline_full.png
+│
+├── deprecated/                      # Previous approaches (IKFlow, Kaggle, JRL)
 │
 ├── kuka_refuel_ws/                  # ROS Noetic catkin workspace
 │   └── src/kuka_kr6_gazebo/
