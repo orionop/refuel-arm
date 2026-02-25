@@ -208,19 +208,22 @@ def plot_trajectory_analysis(trajectory, jump_distances, fk_errors):
 
     # --- Plot 3: Forward Kinematics Error (Scientific Precision Proof) ---
     axs[2].set_title("Mathematical Precision: Forward Kinematics Tracking Error\n(Proves algebraic exactness vs neural net approximation)", fontsize=11, loc='left')
-    axs[2].plot(steps, fk_errors, color='crimson', marker='o', markersize=3, linestyle='-', linewidth=1.5)
+    
+    # Mathematical 0.0 on a log scale plunges to negative infinity. 
+    # Clamp the values to the precision floor (1e-16) to keep the graph visually flat.
+    printable_errors = np.maximum(fk_errors, 1e-16)
+    
+    axs[2].plot(steps, printable_errors, color='crimson', marker='o', markersize=3, linestyle='-', linewidth=1.5)
     axs[2].set_xlabel("Cartesian Waypoint Number", fontsize=10)
     axs[2].set_ylabel("FK Error (meters)", fontsize=10)
     axs[2].set_yscale('log') # Log scale because error is normally 10^-16
     axs[2].grid(True, which="both", linestyle='--', alpha=0.6)
     axs[2].set_xlim(1, len(trajectory))
-    axs[2].set_ylim(bottom=1e-18, top=1e-12)
-
     
     # Format log axis to be readable
     import matplotlib.ticker as ticker
     axs[2].yaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=5))
-    axs[2].set_ylim(bottom=1e-18, top=1e-12)
+    axs[2].set_ylim(bottom=1e-17, top=1e-13)
     
     plt.tight_layout(rect=[0, 0.03, 1, 0.93])
     
