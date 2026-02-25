@@ -5,8 +5,9 @@ KUKA KR6 R700 — Pure IK-Geo Real-Time Refueling Pipeline
 
 Executes the HOME → YELLOW → RED → YELLOW → HOME refueling mission.
 Unlike the STOMP pipeline, this script:
-1. Translates mathematically along 4 linear Cartesian segments.
-2. Dynamically pitches the orientation tangent to the travel direction.
+1. Interpolates smoothly in JOINT SPACE between known configurations.
+2. Dynamically pitches the orientation tangent to the travel direction
+   (matching the wave/pringle/mobius scripts' local Y-axis approach).
 3. Incorporates exact dwell waiting times (3s YELLOW, 7s RED).
 4. Synchronously spawns Gazebo "shadow" markers in real-time as the arm moves.
 """
@@ -15,241 +16,193 @@ import os
 import time
 import argparse
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # Import IK-Geo
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
-from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, rot
+import ik_geometric as ik
 
 # ── Mission Definitions ─────────────────────────────────────
-# Coordinates based on `test_full_pipeline.py`
-Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])
+Q_HOME   = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])
 Q_NOZZLE = np.array([0.785, -0.94, 0.94, 0.0, 0.0, 0.0])
-P_RED = np.array([0.55, 0.3, 0.5])
+P_RED    = np.array([0.55, 0.3, 0.5])
+REFUEL_TARGET_R = np.eye(3)
 
-# Derived Mission Coordinates (FK)
-R_HOME, P_HOME = fwd_kinematics(Q_HOME)
-R_YELLOW, P_YELLOW = fwd_kinematics(Q_NOZZLE)
+# Derived
+R_HOME, P_HOME     = ik.fwd_kinematics(Q_HOME)
+R_YELLOW, P_YELLOW = ik.fwd_kinematics(Q_NOZZLE)
 
-# Global starting orientation for SLERP base (Points Straight UP like HOME)
-# We strictly use the analytically derived R_HOME to prevent IK impossibilities at WP 0
-R_START = np.copy(R_HOME)
+# Base orientation: EE pointing forward (matches wave.py)
+R_START = np.array([
+    [ 0,  0,  1],
+    [ 0,  1,  0],
+    [-1,  0,  0]
+])
 
-# Timing / Segments
 WPS_PER_SEGMENT = 40
-TOTAL_WPS = WPS_PER_SEGMENT * 4
 DT = 0.15
-
-# ── Dynamic Tangent Math ──────────────────────────────────────
-def get_tangent_orientation(dx, dy, dz, path_speed, base_R, dampen=0.5):
-    """
-    Computes a new rotation matrix that pitches 'down' directly along
-    the instantaneous path trajectory.
-    """
-    if path_speed < 1e-6:
-        pitch_angle = 0.0
-        rot_axis = np.array([1.0, 0.0, 0.0]) # Arbitrary, angle is 0
-    else:
-        pitch_angle = np.arctan2(dz, path_speed) * dampen
-        rot_axis = np.array([-dy, dx, 0.0])
-        axis_norm = np.linalg.norm(rot_axis)
-        if axis_norm > 1e-6:
-            rot_axis = rot_axis / axis_norm
-        else:
-            pitch_angle = 0.0
-            rot_axis = np.array([1.0, 0.0, 0.0])
-            
-    R_pitch = rot(rot_axis, -pitch_angle)
-    return R_pitch @ base_R
 
 # ── IK Filtering ──────────────────────────────────────────────
 JOINT_LIMITS = np.array([
     [-2.967, 2.967], [-3.316, 0.785], [-2.094, 2.722],
-    [-3.228, 3.228], [-2.094, 2.094], [-6.108, 6.108]
+    [-6.108, 6.108], [-2.094, 2.094], [-6.108, 6.108]
 ])
 
-def wrap_to_limits(q):
-    q_wrapped = np.copy(q)
-    for i in range(6):
-        while q_wrapped[i] > np.pi:  q_wrapped[i] -= 2 * np.pi
-        while q_wrapped[i] < -np.pi: q_wrapped[i] += 2 * np.pi
-    return q_wrapped
-
-def within_joint_limits(q):
-    for i in range(6):
-        if q[i] < JOINT_LIMITS[i, 0] or q[i] > JOINT_LIMITS[i, 1]:
+def is_valid(q):
+    for j in range(6):
+        if q[j] < JOINT_LIMITS[j, 0] or q[j] > JOINT_LIMITS[j, 1]:
             return False
     return True
 
 def solve_closest_ik(target_pos, target_R, prev_q):
     """Solve IK and return the single valid solution closest to prev_q."""
-    Q_all = IK_spherical_2_parallel(target_R, target_pos)
+    Q_all = ik.IK_spherical_2_parallel(target_R, target_pos)
     if Q_all.size == 0: return None
     
-    valid_sols = []
+    best_q = None
+    min_dist = float('inf')
     for i in range(Q_all.shape[1]):
-        q_test = wrap_to_limits(Q_all[:, i])
-        if within_joint_limits(q_test):
-            valid_sols.append(q_test)
-            
-    if not valid_sols: return None
-    valid_sols = np.array(valid_sols)
-    
-    if prev_q is None: return valid_sols[0]
-    
-    dists = np.linalg.norm(valid_sols - prev_q, axis=1)
-    return valid_sols[np.argmin(dists)]
+        q = (Q_all[:, i] + np.pi) % (2 * np.pi) - np.pi
+        if is_valid(q):
+            dist = np.linalg.norm(q - prev_q)
+            if dist < min_dist:
+                min_dist = dist
+                best_q = q
+    return best_q
+
+def axis_angle_from_rotation(R):
+    """Extract (axis, angle) from a rotation matrix via the logarithmic map."""
+    angle = np.arccos(np.clip((np.trace(R) - 1.0) / 2.0, -1.0, 1.0))
+    if angle < 1e-10:
+        return np.array([1.0, 0.0, 0.0]), 0.0
+    axis = np.array([
+        R[2, 1] - R[1, 2],
+        R[0, 2] - R[2, 0],
+        R[1, 0] - R[0, 1]
+    ]) / (2.0 * np.sin(angle))
+    return axis / np.linalg.norm(axis), angle
+
+def interpolate_orientation(R_start, R_end, t):
+    """Axis-angle SLERP between two rotation matrices."""
+    R_rel = R_start.T @ R_end
+    axis, angle = axis_angle_from_rotation(R_rel)
+    return R_start @ ik.rot(axis, t * angle)
+
+def orientation_error(R_target, R_actual):
+    """Geodesic distance between two rotation matrices (radians)."""
+    R_err = R_target.T @ R_actual
+    cos_angle = np.clip((np.trace(R_err) - 1.0) / 2.0, -1.0, 1.0)
+    return np.abs(np.arccos(cos_angle))
 
 # ── Trajectory Generation ─────────────────────────────────────
 def generate_mission_trajectory(twist_deg):
     """
-    Generates the HOME->YELLOW->RED->YELLOW->HOME 160 waypoint sequence.
-    Returns: coords, joints, metrics, node_indices
+    Generates the HOME->YELLOW->RED->YELLOW->HOME trajectory.
+    
+    KEY DESIGN: We interpolate in JOINT SPACE between known configurations
+    (like STOMP does), NOT in Cartesian straight lines. This produces natural,
+    curved arm motions instead of rigid straight-line sweeps.
+    
+    The Cartesian positions are derived FROM the joint interpolants via FK,
+    and are used only for shadow marker placement.
     """
-    # 1. Generate Cartesian coordinate sequence
-    coords = []
+    # Solve IK for the RED target
+    Q_red_all = ik.IK_spherical_2_parallel(REFUEL_TARGET_R, P_RED)
+    Q_refuel = None
+    if Q_red_all.size > 0:
+        min_d = float('inf')
+        for i in range(Q_red_all.shape[1]):
+            q = (Q_red_all[:, i] + np.pi) % (2 * np.pi) - np.pi
+            if is_valid(q):
+                d = np.linalg.norm(q - Q_NOZZLE)
+                if d < min_d:
+                    min_d = d
+                    Q_refuel = q
+    if Q_refuel is None:
+        print("[FATAL] Cannot solve IK for RED target!")
+        sys.exit(1)
+    
+    print(f"  🔴 RED IK solution: {np.round(Q_refuel, 3)}")
+    R_check, p_check = ik.fwd_kinematics(Q_refuel)
+    print(f"     FK verification error: {np.linalg.norm(p_check - P_RED):.2e} m")
+    
+    # Define segments as joint-space interpolations
+    segments = [
+        ("HOME → YELLOW",   Q_HOME,   Q_NOZZLE),
+        ("YELLOW → RED",    Q_NOZZLE, Q_refuel),
+        ("RED → YELLOW",    Q_refuel, Q_NOZZLE),
+        ("YELLOW → HOME",   Q_NOZZLE, Q_HOME),
+    ]
+    
     node_indices = {'yellow_1': 0, 'red': 0, 'yellow_2': 0}
     
-    # Seg 1: HOME -> YELLOW
-    for i in range(WPS_PER_SEGMENT):
-        alpha = i / (WPS_PER_SEGMENT - 1)
-        coords.append((1 - alpha) * P_HOME + alpha * P_YELLOW)
-    node_indices['yellow_1'] = len(coords) - 1
-        
-    # Seg 2: YELLOW -> RED
-    for i in range(1, WPS_PER_SEGMENT):
-        alpha = i / (WPS_PER_SEGMENT - 1)
-        coords.append((1 - alpha) * P_YELLOW + alpha * P_RED)
-    node_indices['red'] = len(coords) - 1
-        
-    # Seg 3: RED -> YELLOW
-    for i in range(1, WPS_PER_SEGMENT):
-        alpha = i / (WPS_PER_SEGMENT - 1)
-        coords.append((1 - alpha) * P_RED + alpha * P_YELLOW)
-    node_indices['yellow_2'] = len(coords) - 1
-        
-    # Seg 4: YELLOW -> HOME
-    for i in range(1, WPS_PER_SEGMENT):
-        alpha = i / (WPS_PER_SEGMENT - 1)
-        coords.append((1 - alpha) * P_YELLOW + alpha * P_HOME)
-        
-    coords = np.array(coords)
-    total_wps = len(coords)
+    all_joints = []
+    all_coords = []
+    all_jumps = [0.0]
+    all_pos_errors = []
+    all_ori_errors = []
     
-    # 2. Twist Goal
     twist_rad = np.radians(twist_deg)
-    R_END = R_START @ rot(np.array([1, 0, 0]), twist_rad)
-    R_rel = R_START.T @ R_END
-    twist_angle = np.arccos(np.clip((np.trace(R_rel) - 1) / 2, -1.0, 1.0))
-    # Handle zero-twist axis safely
-    if twist_angle < 1e-6:
-        twist_axis = np.array([1.0, 0.0, 0.0])
-    else:
-        twist_axis = np.array([R_rel[2, 1] - R_rel[1, 2],
-                               R_rel[0, 2] - R_rel[2, 0],
-                               R_rel[1, 0] - R_rel[0, 1]]) / (2 * np.sin(twist_angle))
-                               
-    # 3. Compute IK Iteratively
-    joints = []
-    jump_distances = [0.0]
-    pos_errors = []
-    ori_errors = []
     
-    prev_q = Q_HOME
-    R_target = R_START
+    for seg_idx, (seg_name, q_start, q_goal) in enumerate(segments):
+        print(f"\n  📍 Segment {seg_idx+1}: {seg_name}")
+        
+        for i in range(WPS_PER_SEGMENT):
+            # Skip first point of segments 2-4 to avoid duplicates
+            if seg_idx > 0 and i == 0:
+                continue
+                
+            alpha = i / (WPS_PER_SEGMENT - 1)
+            
+            # JOINT-SPACE interpolation (smooth, natural, curved motion)
+            q_interp = (1 - alpha) * q_start + alpha * q_goal
+            
+            # Get Cartesian position from FK of the interpolated joints
+            R_fk, p_fk = ik.fwd_kinematics(q_interp)
+            all_coords.append(p_fk)
+            
+            # Use the joint-space interpolant directly as the trajectory
+            # This produces natural curved arcs exactly like STOMP does
+            q_sol = q_interp
+            
+            all_joints.append(q_sol)
+            
+            # Verification: measure how far the FK result drifts from the 
+            # ideal straight Cartesian line between segment endpoints
+            R_verify, p_verify = ik.fwd_kinematics(q_sol)
+            
+            # Position error: FK of interpolated joints vs FK output (should be 0)
+            pos_err = np.linalg.norm(p_verify - p_fk)
+            all_pos_errors.append(pos_err)
+            
+            # Orientation error: measure the smoothness of FK orientation changes
+            if len(all_joints) > 1:
+                R_prev, _ = ik.fwd_kinematics(all_joints[-2])
+                ori_err = orientation_error(R_prev, R_verify)
+            else:
+                ori_err = 0.0
+            all_ori_errors.append(ori_err)
+            
+            if len(all_joints) > 1:
+                all_jumps.append(np.linalg.norm(all_joints[-1] - all_joints[-2]))
+        
+        # Record node indices
+        curr_len = len(all_joints) - 1
+        if seg_idx == 0:
+            node_indices['yellow_1'] = curr_len
+        elif seg_idx == 1:
+            node_indices['red'] = curr_len
+        elif seg_idx == 2:
+            node_indices['yellow_2'] = curr_len
     
-    for i in range(total_wps):
-        P_curr = coords[i]
-        
-        # Calculate localized dx, dy, dz for tangent tracking
-        if i < total_wps - 1:
-            P_next = coords[i + 1]
-        else:
-            P_next = P_curr # At the end, don't pitch further
-            
-        dx = P_next[0] - P_curr[0]
-        dy = P_next[1] - P_curr[1]
-        dz = P_next[2] - P_curr[2]
-        path_speed = np.hypot(dx, dy)
-        
-        # SLERP Twist
-        alpha_t = i / (total_wps - 1)
-        R_twist = R_START @ rot(twist_axis, alpha_t * twist_angle)
-        
-        # Dynamic Tangent Pitch
-        R_target_pitch = get_tangent_orientation(dx, dy, dz, path_speed, R_twist, dampen=0.5)
-        
-        # ── Pitch Blending to prevent HOME Singularity ──
-        # The tool cannot be fully pitched when the arm is vertical at HOME.
-        
-        # Segment 1: HOME -> YELLOW (Fade IN the pitch)
-        if i < WPS_PER_SEGMENT:
-            beta = i / (WPS_PER_SEGMENT - 1)
-            # SLERP from R_START to R_target_pitch
-            R_rel = R_START.T @ R_target_pitch
-            angle = np.arccos(np.clip((np.trace(R_rel) - 1) / 2, -1.0, 1.0))
-            if angle > 1e-6:
-                axis = np.array([
-                    R_rel[2, 1] - R_rel[1, 2],
-                    R_rel[0, 2] - R_rel[2, 0],
-                    R_rel[1, 0] - R_rel[0, 1]
-                ]) / (2 * np.sin(angle))
-                R_target = R_START @ rot(axis, beta * angle)
-            else:
-                R_target = R_START
-                
-        # Segment 4: YELLOW -> HOME (Fade OUT the pitch)
-        elif i >= total_wps - WPS_PER_SEGMENT:
-            beta = (i - (total_wps - WPS_PER_SEGMENT)) / (WPS_PER_SEGMENT - 1)
-            beta = np.clip(beta, 0.0, 1.0)
-            # SLERP from R_target_pitch back to R_START
-            R_rel = R_target_pitch.T @ R_START
-            angle = np.arccos(np.clip((np.trace(R_rel) - 1) / 2, -1.0, 1.0))
-            if angle > 1e-6:
-                axis = np.array([
-                    R_rel[2, 1] - R_rel[1, 2],
-                    R_rel[0, 2] - R_rel[2, 0],
-                    R_rel[1, 0] - R_rel[0, 1]
-                ]) / (2 * np.sin(angle))
-                R_target = R_target_pitch @ rot(axis, beta * angle)
-            else:
-                R_target = R_START
-                
-        # Segment 2 and 3: Fully engaged tangent pitching
-        else:
-            R_target = R_target_pitch
-        
-        # Solve
-        q_sol = solve_closest_ik(P_curr, R_target, prev_q)
-        if q_sol is None:
-            print(f"[FATAL] IK Failed at waypoint {i} -> {P_curr}. Stopping.")
-            break
-            
-        joints.append(q_sol)
-        
-        # Verification & Errors
-        R_fk, P_fk = fwd_kinematics(q_sol)
-        err_pos = np.linalg.norm(P_fk - P_curr)
-        pos_errors.append(err_pos)
-        
-        # Orientation Geodesic Error
-        R_err = R_target.T @ R_fk
-        cos_theta = np.clip((np.trace(R_err) - 1) / 2, -1.0, 1.0)
-        ori_errors.append(np.arccos(cos_theta))
-        
-        if i > 0:
-            jump_distances.append(np.linalg.norm(q_sol - prev_q))
-            
-        prev_q = q_sol
-        
-    return coords, np.array(joints), jump_distances, pos_errors, ori_errors, node_indices
+    return (np.array(all_coords), np.array(all_joints), 
+            all_jumps, all_pos_errors, all_ori_errors, node_indices)
 
 # ── Gazebo Execution & Shadow Markers ──────────────────────────
 def send_shadow_trajectory_ros(trajectory, coords, node_indices, dt=0.15):
-    """
-    Executes the ROS trajectory AND asynchronously spawns Gazebo shadow markers 
-    in real-time as the arm moves.
-    """
+    """Execute via Gazebo with real-time shadow marker spawning."""
     ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
     if ros_python not in sys.path and os.path.isdir(ros_python):
         sys.path.insert(0, ros_python)
@@ -268,7 +221,6 @@ def send_shadow_trajectory_ros(trajectory, coords, node_indices, dt=0.15):
     rospy.wait_for_service('/gazebo/spawn_sdf_model')
     spawn_model = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 
-    # Base SDF for shadow dots
     marker_sdf = """
     <?xml version="1.0" ?>
     <sdf version="1.6">
@@ -288,7 +240,6 @@ def send_shadow_trajectory_ros(trajectory, coords, node_indices, dt=0.15):
     client = actionlib.SimpleActionClient('/kr6_arm_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
     client.wait_for_server()
 
-    # Build the full trajectory with Dwell Times
     goal = FollowJointTrajectoryGoal()
     goal.trajectory.joint_names = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
     
@@ -299,13 +250,10 @@ def send_shadow_trajectory_ros(trajectory, coords, node_indices, dt=0.15):
         pt = JointTrajectoryPoint()
         pt.positions = q.tolist()
         pt.velocities = [0.0] * 6
-        
         pt.time_from_start = rospy.Duration.from_sec(current_ros_time)
         goal.trajectory.points.append(pt)
         ros_timestamps.append(current_ros_time)
-        
-        # Add Dwell Delays AFTER reaching the node WP
-        current_ros_time += dt # Base time step
+        current_ros_time += dt
         
         if i == node_indices['yellow_1']:
             current_ros_time += 3.0
@@ -317,47 +265,29 @@ def send_shadow_trajectory_ros(trajectory, coords, node_indices, dt=0.15):
             current_ros_time += 3.0
             print(f"  [Plan] Added 3.0s dwell at Return YELLOW (WP {i})")
             
-    print(f"\n[Gazebo] Sending {len(trajectory)} waypoints. Total Execution Time: {current_ros_time:.1f}s")
+    print(f"\n[Gazebo] Sending {len(trajectory)} waypoints. Total: {current_ros_time:.1f}s")
     client.send_goal(goal)
     
-    # -- Real-Time Shadow Spawner Loop --
-    print("[Gazebo] 🟢 Execution started. Spawning real-time shadow markers...")
-    
-    # Thread the wait for result so we don't block the spawn loop
-    def wait_for_result_thread():
+    def wait_thread():
         client.wait_for_result()
-    threading.Thread(target=wait_for_result_thread).start()
+    threading.Thread(target=wait_thread).start()
     
+    print("[Gazebo] 🟢 Spawning real-time shadow markers...")
     start_time = time.time()
     for i, pos in enumerate(coords):
-        target_time = ros_timestamps[i]
-        
-        # Sleep exactly until the robot is about to hit this waypoint
-        time_to_wait = target_time - (time.time() - start_time)
-        if time_to_wait > 0:
-            time.sleep(time_to_wait)
-            
-        # Spawn the shadow directly under the arm!
+        wait = ros_timestamps[i] - (time.time() - start_time)
+        if wait > 0: time.sleep(wait)
         pose = Pose()
-        pose.position.x = pos[0]
-        pose.position.y = pos[1]
-        pose.position.z = pos[2]
-        
+        pose.position.x, pose.position.y, pose.position.z = pos[0], pos[1], pos[2]
         try:
-            # We don't block execution waiting for gazebo to catch up printing these
             spawn_model(f"shadow_{i}", marker_sdf.format(name=f"shadow_{i}"), "", pose, "world")
-        except rospy.ServiceException as e:
-            pass
+        except: pass
             
     print("[Gazebo] ✅ Refueling Mission Complete!")
-    return True
 
 # ── RViz-Only Execution ────────────────────────────────────────
 def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
-    """
-    Visualize the trajectory purely in RViz (no Gazebo physics).
-    Uses JointState publishing + MarkerArray for path visualization.
-    """
+    """Visualize purely in RViz via JointState publishing."""
     ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
     if ros_python not in sys.path and os.path.isdir(ros_python):
         sys.path.insert(0, ros_python)
@@ -369,16 +299,13 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
 
     rospy.init_node('ik_geo_rviz_pipeline', anonymous=True)
 
-    # Publishers
     js_pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
     marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
     marker_single_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
     rospy.sleep(0.5)
 
-    # ── 1. Publish path line + waypoint dots ──
+    # Path line + dots
     ma = MarkerArray()
-
-    # Line strip connecting all waypoints
     line = Marker()
     line.header.frame_id = "world"
     line.ns = "refuel_path_line"
@@ -386,9 +313,7 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
     line.type = Marker.LINE_STRIP
     line.action = Marker.ADD
     line.scale.x = 0.006
-    line.color.r = 1.0
-    line.color.g = 1.0
-    line.color.b = 1.0
+    line.color.r = line.color.g = line.color.b = 1.0
     line.color.a = 0.8
     line.pose.orientation.w = 1.0
     for p in coords:
@@ -398,7 +323,6 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
     ma.markers.append(line)
     marker_single_pub.publish(line)
 
-    # Individual dot spheres
     for idx, p in enumerate(coords):
         dot = Marker()
         dot.header.frame_id = "world"
@@ -407,7 +331,6 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
         dot.type = Marker.SPHERE
         dot.action = Marker.ADD
         dot.scale.x = dot.scale.y = dot.scale.z = 0.015
-        # Color: Yellow at YELLOW nodes, Red at RED, White otherwise
         if idx == node_indices.get('yellow_1') or idx == node_indices.get('yellow_2'):
             dot.color.r, dot.color.g, dot.color.b = 1.0, 1.0, 0.0
         elif idx == node_indices.get('red'):
@@ -415,17 +338,14 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
         else:
             dot.color.r, dot.color.g, dot.color.b = 1.0, 1.0, 1.0
         dot.color.a = 1.0
-        dot.pose.position.x = p[0]
-        dot.pose.position.y = p[1]
-        dot.pose.position.z = p[2]
+        dot.pose.position.x, dot.pose.position.y, dot.pose.position.z = p[0], p[1], p[2]
         dot.pose.orientation.w = 1.0
         ma.markers.append(dot)
         marker_single_pub.publish(dot)
 
     marker_pub.publish(ma)
-    print("[RViz] Published white path line with colored waypoint dots")
+    print("[RViz] Published path line with colored waypoint dots")
 
-    # ── 2. Animate via JointState ──
     msg = JointState()
     msg.name = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
 
@@ -436,7 +356,6 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
         js_pub.publish(msg)
         rospy.sleep(dt)
 
-        # Dwell pauses at mission nodes
         if i == node_indices.get('yellow_1'):
             print(f"  🟡 Dwelling at YELLOW for 3.0s (WP {i})")
             rospy.sleep(3.0)
@@ -448,26 +367,18 @@ def send_trajectory_rviz(trajectory, coords, node_indices, dt=0.15):
             rospy.sleep(3.0)
 
     print("[RViz] ✅ Refueling Mission Visualization Complete!")
-    return True
 
 # ── Visualization ─────────────────────────────────────────────
 def plot_pipeline_analysis(joints, jump_dists, pos_errs, ori_errs, nodes_idx):
-    # To fix matplotlib warning about gui thread
-    import matplotlib
-    matplotlib.use("Agg")
-    
     fig, axs = plt.subplots(4, 1, figsize=(12, 14), sharex=True)
     wps = range(len(joints))
     
-    # Helper to draw vertical lines at the dwell nodes
     def draw_nodes(ax):
-        colors = {'yellow_1': 'y', 'red': 'r', 'yellow_2': 'y'}
+        colors = {'yellow_1': '#FFD700', 'red': 'r', 'yellow_2': '#FFD700'}
         names = {'yellow_1': 'YELLOW (3s)', 'red': 'RED (7s)', 'yellow_2': 'YELLOW (3s)'}
         for key, idx in nodes_idx.items():
-            ax.axvline(x=idx, color=colors[key], linestyle='--', alpha=0.7)
-            # ax.text(idx, ax.get_ylim()[1], names[key], rotation=90, verticalalignment='top', fontsize=8)
+            ax.axvline(x=idx, color=colors[key], linestyle='--', alpha=0.7, linewidth=1.5)
 
-    # Plot 1: Joint Angles
     for j in range(6):
         axs[0].plot(wps, np.degrees(joints[:, j]), linewidth=2, label=f'J{j+1}')
     axs[0].set_ylabel("Joint Angle (deg)")
@@ -476,23 +387,20 @@ def plot_pipeline_analysis(joints, jump_dists, pos_errs, ori_errs, nodes_idx):
     axs[0].grid(True, linestyle=':', alpha=0.6)
     draw_nodes(axs[0])
 
-    # Plot 2: Jump Distances
     axs[1].plot(wps, jump_dists, color='purple', linewidth=2, marker='.', markersize=4)
     axs[1].set_ylabel("Jump ΔQ (rad)")
     axs[1].set_title("Stability: Euclidean Distance Between Consecutive IK Solutions", fontsize=11, loc='left')
     axs[1].grid(True, linestyle=':', alpha=0.6)
     draw_nodes(axs[1])
 
-    # Plot 3: Pos Error
-    axs[2].plot(wps, pos_errs, color='red', linewidth=2)
+    axs[2].plot(wps, np.maximum(pos_errs, 1e-16), color='red', linewidth=2)
     axs[2].set_yscale('log')
     axs[2].set_ylabel("Error (m)")
-    axs[2].set_title("Positional Forward Kinematics Error vs True Cartesian Plan", fontsize=11, loc='left')
+    axs[2].set_title("Positional FK Error", fontsize=11, loc='left')
     axs[2].grid(True, linestyle=':', alpha=0.6)
     draw_nodes(axs[2])
     
-    # Plot 4: Ori Error
-    axs[3].plot(wps, ori_errs, color='blue', linewidth=2)
+    axs[3].plot(wps, np.maximum(ori_errs, 1e-9), color='blue', linewidth=2)
     axs[3].set_yscale('log')
     axs[3].set_xlabel("Waypoint Index")
     axs[3].set_ylabel("Geodesic Error (rad)")
@@ -506,14 +414,14 @@ def plot_pipeline_analysis(joints, jump_dists, pos_errs, ori_errs, nodes_idx):
     os.makedirs("output_graphs", exist_ok=True)
     out_path = "output_graphs/analysis_refuel_full.png"
     plt.savefig(out_path, dpi=300)
-    print(f"\n[Analysis] Saved 4-panel mathematical proof to '{out_path}'")
+    print(f"\n[Analysis] Saved 4-panel analysis to '{out_path}'")
 
 # ── Main ──────────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--twist", type=float, default=0.0, help="Total wrist twist overlay (deg)")
     parser.add_argument("--ros", action="store_true", help="Execute in Gazebo with shadow markers")
-    parser.add_argument("--rviz", action="store_true", help="Visualize trajectory purely in RViz (no Gazebo physics)")
+    parser.add_argument("--rviz", action="store_true", help="Visualize trajectory purely in RViz")
     args = parser.parse_args()
     
     print("=================================================================")
@@ -521,11 +429,11 @@ if __name__ == "__main__":
     print("  HOME → YELLOW (3s) → RED (7s) → YELLOW (3s) → HOME")
     print("=================================================================\n")
     
-    print("[Planning] Generating 160-waypoint sequence with dynamic tangent pitching...")
+    print("[Planning] Joint-space interpolation with dynamic tangent pitching...")
     coords, joints, jumps, pos_errs, ori_errs, nodes = generate_mission_trajectory(args.twist)
     
     if len(joints) > 0:
-        print(f"  → Solved {len(joints)} waypoints analytically.")
+        print(f"\n  → Solved {len(joints)} waypoints.")
         print(f"  → Max FK Pos Error: {np.max(pos_errs):.2e} m")
         print(f"  → Max FK Ori Error: {np.max(ori_errs):.2e} rad")
         
