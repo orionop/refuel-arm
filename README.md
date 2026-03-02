@@ -30,6 +30,10 @@ The KR6 R700 belongs to the `IK_spherical_2_parallel` kinematic family. IK-Geo d
 
 STOMP (Stochastic Trajectory Optimization for Motion Planning) is used to generate smooth, collision-free waypoints along the Cartesian paths between the 5 mission stages. Instead of instantly jumping between algebraic IK solutions, STOMP optimizes 30 smooth intermediate waypoints per segment, ensuring acceleration limits and joint limits are respected before execution via ROS's `JointTrajectoryController`.
 
+### Configuration Space (C-Space) Interpolation
+
+For high-speed, mechanically smooth motions where a perfectly straight Cartesian line is not required, the repository supports purely linear joint-space interpolation. By solving IK only at the start and end of a segment, this method ensures constant joint velocities and eliminates the risk of IK failures or singularities in the middle of a motion.
+
 ---
 
 ## Quick Start
@@ -58,6 +62,11 @@ python3 ik_trajectories/analyze_ik_accuracy.py
 python3 analyze_pipeline.py
 ```
 
+5. **Configuration Space (Joint Space) vs Workspace Comparison**:
+```bash
+python3 ik_trajectories/test_joint_line.py
+```
+
 ---
 
 ## Repository Structure
@@ -70,6 +79,7 @@ refuel-arm/
 ├── ik_trajectories/                 # 6-DOF Topological Tracking Scripts
 │   ├── analyze_ik_accuracy.py       # Empirical 3,830-root mathematical precision benchmark
 │   ├── test_ik_line.py              # Pure algebraic IK Cartesian line tracker
+│   ├── test_joint_line.py           # Configuration Space (Joint Space) linear tracker
 │   ├── test_ik_wave.py              # Multi-cycle audio-wave with dynamic pitch
 │   ├── test_ik_pringle.py           # 3D hyperbolic paraboloid (saddle) tracking
 │   └── test_ik_mobius.py            # 4π Möbius strip topological inversion tracker
