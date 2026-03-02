@@ -48,7 +48,12 @@ python3 test_full_pipeline.py --ros
 python3 ik_trajectories/test_ik_mobius.py --ros
 ```
 
-3. **STOMP Pipeline Analysis Visualization (4-Panel Graph)**:
+3. **IK-Geo Mathematical Accuracy Benchmark**:
+```bash
+python3 ik_trajectories/analyze_ik_accuracy.py
+```
+
+4. **STOMP Pipeline Analysis Visualization (4-Panel Graph)**:
 ```bash
 python3 analyze_pipeline.py
 ```
@@ -63,6 +68,7 @@ refuel-arm/
 ├── analyze_pipeline.py              # STOMP 4-panel analysis graph generator
 ├── stomp_planner.py                 # Core standalone STOMP trajectory optimizer
 ├── ik_trajectories/                 # 6-DOF Topological Tracking Scripts
+│   ├── analyze_ik_accuracy.py       # Empirical 3,830-root mathematical precision benchmark
 │   ├── test_ik_line.py              # Pure algebraic IK Cartesian line tracker
 │   ├── test_ik_wave.py              # Multi-cycle audio-wave with dynamic pitch
 │   ├── test_ik_pringle.py           # 3D hyperbolic paraboloid (saddle) tracking
@@ -78,9 +84,11 @@ refuel-arm/
 │       ├── worlds/                  #   Gazebo world with Yellow & Red markers
 │       └── scripts/
 │           ├── ik_geometric.py      #   Python port of IK_spherical_2_parallel
+│       └── Validation/
+│           └── program_flowchart.md #   Step-by-step logic for validation pipeline
 │
 ├── deprecated/                      # Previous approaches (IKFlow, MATLAB, instructions)
-├── report/                          # LaTeX files for empirical mathematical tracking analysis
+├── report/                          # 8-page LaTeX report (Mathematical Benchmarking & Step-by-Step Analysis)
 ├── SETUP.md                         # Easy Quick-Start guide for execution & installation
 ├── SAFE_DEV_RULES.md                # Shared lab machine safety protocol
 └── README.md

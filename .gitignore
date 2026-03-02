@@ -1,44 +1,19 @@
-# Operating System Files
-.DS_Store
-*.swp
-*~
-
-# Python Environment
+# Python
 __pycache__/
-*.pyc
-*.pyo
-venv/
-env/
-.env
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
 
-# ROS / Catkin build artifacts
-build/
-devel/
-install/
-logs/
-.catkin_workspace
-.ros/
-
-# LaTeX Build Files (from the report directory)
-report/
+# LaTeX
 *.aux
 *.log
 *.out
-*.pdf
 *.toc
-*.fls
+*.nav
+*.snm
 *.fdb_latexmk
+*.fls
 *.synctex.gz
 
-# IDEs / Editors
-.vscode/
-.idea/
-
-# Local data / graphs / temporary stuff
-output_graphs/
-data/
-*.png
-*.jpg
-*.gif
-*.mp4
-*.csv
+# OS
+.DS_Store
