@@ -214,7 +214,7 @@ To demystify the error distributions presented in the previous section, the foll
 
 \textbf{To Find:} The full $3 \times 3$ Goal Matrix ($\mathbf{R}_{\text{target}}$).
 
-\textbf{Method:} Use Euler rotation matrices around the Y-axis. The identity matrix is transformed by rotating it by the pitch angle $\phi$.
+\textbf{Method:} This step is called an \textbf{Elementary Rotation} (or Principal Rotation) around the Y-axis. It is necessary because the IK-Geo solver requires a $3 \times 3$ matrix (a coordinate frame) as input, rather than a raw angle. We transform the Identity Matrix by applying the pitch angle $\phi$ to the X and Z bases.
 \begin{align*}
     \mathbf{p}_{\text{target}} &= \begin{bmatrix} 0.706 \\ 0.000 \\ 0.413 \end{bmatrix} \\[10pt]
     \mathbf{R}_{\text{target}} &= \begin{bmatrix} \cos(15^\circ) & 0 & \sin(15^\circ) \\ 0 & 1 & 0 \\ -\sin(15^\circ) & 0 & \cos(15^\circ) \end{bmatrix} \approx \begin{bmatrix} 0.966 & 0.000 & 0.259 \\ 0.000 & 1.000 & 0.000 \\ -0.259 & 0.000 & 0.966 \end{bmatrix}
