@@ -20,56 +20,51 @@ The core trajectory generation combines two complementary kinematics strategies:
 
 ---
 
+---
+
 ## Technical Approach
 
 ### Terminal Pose — IK-Geo (Exact Algebraic Solver)
 
-The KR6 R700 belongs to the `IK_spherical_2_parallel` kinematic family. IK-Geo decomposes the 6-DOF inverse kinematics into a sequence of canonical subproblems (Paden–Kahan), yielding **up to 8 closed-form solutions** per pose — no iterative methods, no local minima, no convergence failures. It successfully finds exact configurations for the tall Yellow Nozzle dock and the realistic Red car inlet target.
+The KR6 R700 belongs to the `IK_spherical_2_parallel` kinematic family. IK-Geo decomposes the 6-DOF inverse kinematics into a sequence of canonical subproblems (Paden–Kahan), yielding **up to 8 closed-form solutions** per pose. This ensures exact spatial accuracy for critical refueling targets without the convergence risks of iterative solvers.
 
-### Trajectory Planning — STOMP Optimizer
+### Trajectory Planning — Collision-Aware STOMP (Sensor Fusion)
 
-STOMP (Stochastic Trajectory Optimization for Motion Planning) is used to generate smooth, collision-free waypoints along the Cartesian paths between the 5 mission stages. Instead of instantly jumping between algebraic IK solutions, STOMP optimizes 30 smooth intermediate waypoints per segment, ensuring acceleration limits and joint limits are respected before execution via ROS's `JointTrajectoryController`.
+We utilize a **Gradient-Free Sensor Fusion** approach for trajectory generation. By integrating STOMP (Stochastic Trajectory Optimization) with a **2.5D Euclidean Distance Transform (EDT)** generated from workspace point clouds, the robot generates smooth, collision-free paths. Unlike standard RRT planners, this method:
+- Guarantees constant joint velocities and mechanical smoothness.
+- Avoids singularities by utilizing algebraic IK foundations.
+- Operates natively over 2.5D heightmaps for efficient unstructured environment navigation.
 
 ### Configuration Space (C-Space) Interpolation
 
-For high-speed, mechanically smooth motions where a perfectly straight Cartesian line is not required, the repository supports purely linear joint-space interpolation. By solving IK only at the start and end of a segment, this method ensures constant joint velocities and eliminates the risk of IK failures or singularities in the middle of a motion.
+For high-speed transitions where a straight Cartesian line is not required, we implement purely linear joint-space interpolation. This eliminates the need for per-waypoint IK and provides the most mechanically efficient motion profile possible for a 6-DOF arm.
 
 ---
 
 ## Quick Start
 
-For full installation and execution instructions across Ubuntu, ROS Noetic, and Python environments, please see the **[SETUP.md](SETUP.md)** file!
+For full installation and execution instructions, please see **[SETUP.md](SETUP.md)**.
 
-### Basic Execution Previews
+### Primary Execution Previews
 
-1. **Full Robotic Refueling Pipeline (`HOME → YELLOW → RED → YELLOW → HOME`)**:
+1. **Autonomous Refueling Pipeline (STOMP + 2.5D Collision Avoidance)**:
 ```bash
 python3 test_full_pipeline.py --ros
 ```
 
-2. **Topological 6-DOF Trajectory Tests (e.g. Möbius Strip)**:
+2. **C-Space vs. Workspace Motion Strategy Comparison**:
+```bash
+python3 ik_trajectories/compare_cspace_workspace.py
+```
+
+3. **Topological 6-DOF Manifold Tracking (e.g. Möbius Strip)**:
 ```bash
 python3 ik_trajectories/test_ik_mobius.py --ros
 ```
 
-3. **IK-Geo Mathematical Accuracy Benchmark**:
+4. **IK-Geo Mathematical Accuracy Benchmark (3,830 Roots)**:
 ```bash
 python3 ik_trajectories/analyze_ik_accuracy.py
-```
-
-4. **STOMP Pipeline Analysis Visualization (4-Panel Graph)**:
-```bash
-python3 analyze_pipeline.py
-```
-
-5. **Configuration Space (Joint Space) vs Workspace Demonstration**:
-```bash
-python3 ik_trajectories/test_joint_line.py
-```
-
-6. **Detailed C-Space vs Workspace Motion Strategy Comparison**:
-```bash
-python3 ik_trajectories/compare_cspace_workspace.py
 ```
 
 ---
@@ -78,35 +73,22 @@ python3 ik_trajectories/compare_cspace_workspace.py
 
 ```
 refuel-arm/
-├── test_full_pipeline.py            # Main STOMP Refueling execution orchestrator
+├── test_full_pipeline.py            # Main Refueling execution orchestrator
+├── stomp_collision.py               # 2.5D Collision-Aware STOMP Optimizer (NEW)
 ├── analyze_pipeline.py              # STOMP 4-panel analysis graph generator
-├── stomp_planner.py                 # Core standalone STOMP trajectory optimizer
-├── ik_trajectories/                 # 6-DOF Topological Tracking Scripts
-│   ├── analyze_ik_accuracy.py       # Empirical 3,830-root mathematical precision benchmark
-│   ├── test_ik_line.py              # Pure algebraic IK Cartesian line tracker
-│   ├── test_joint_line.py           # Configuration Space (Joint Space) linear tracker
+├── ik_trajectories/                 # 6-DOF Topological Tracking & Comparison
 │   ├── compare_cspace_workspace.py  # Dual-strategy comparison and visualization
-│   ├── test_ik_wave.py              # Multi-cycle audio-wave with dynamic pitch
-│   ├── test_ik_pringle.py           # 3D hyperbolic paraboloid (saddle) tracking
-│   └── test_ik_mobius.py            # 4π Möbius strip topological inversion tracker
+│   ├── analyze_ik_accuracy.py       # Empirical mathematical precision benchmark
+│   ├── test_joint_line.py           # Configuration Space linear interpolation
+│   ├── test_ik_line.py              # Pure algebraic IK Cartesian line tracker
+│   ├── test_ik_mobius.py            # 4π Möbius strip topological tracker
+│   └── test_ik_pringle.py           # 3D hyperbolic paraboloid (saddle) tracking
 │
 ├── ik-geo/                          # Algebraic IK library submodule
 ├── output_graphs/                   # Generated analysis plots
 ├── kuka_refuel_ws/                  # ROS Noetic catkin workspace
-│   └── src/kuka_kr6_gazebo/
-│       ├── urdf/                    #   URDF with accurate physical inertials
-│       ├── config/                  #   gazebo_ros_controllers & RViz config
-│       ├── launch/                  #   gazebo.launch and rviz.launch
-│       ├── worlds/                  #   Gazebo world with Yellow & Red markers
-│       └── scripts/
-│           ├── ik_geometric.py      #   Python port of IK_spherical_2_parallel
-│       └── Validation/
-│           └── program_flowchart.md #   Step-by-step logic for validation pipeline
-│
-├── deprecated/                      # Previous approaches (IKFlow, MATLAB, instructions)
-├── report/                          # 8-page LaTeX report (Mathematical Benchmarking & Step-by-Step Analysis)
-├── SETUP.md                         # Easy Quick-Start guide for execution & installation
-├── SAFE_DEV_RULES.md                # Shared lab machine safety protocol
+├── deprecated/                      # Previous approaches (stomp_planner.py, legacy IK)
+├── report/                          # 8-page LaTeX report
 └── README.md
 ```
 
