@@ -72,7 +72,6 @@ python3 ik_trajectories/analyze_ik_accuracy.py
 refuel-arm/
 ├── test_full_pipeline.py            # Main Refueling execution orchestrator
 ├── analyze_pipeline.py              # STOMP 4-panel analysis graph generator
-├── stomp_planner.py                 # Core standalone STOMP trajectory optimizer (deprecated)
 ├── ik_trajectories/                 # 6-DOF Topological Tracking & Comparison
 │   ├── compare_cspace_workspace.py  # Dual-strategy comparison and visualization
 │   ├── analyze_ik_accuracy.py       # Empirical mathematical precision benchmark
@@ -84,7 +83,7 @@ refuel-arm/
 ├── ik-geo/                          # Algebraic IK library submodule
 ├── output_graphs/                   # Generated analysis plots
 ├── kuka_refuel_ws/                  # ROS Noetic catkin workspace
-├── deprecated/                      # Previous approaches (legacy IK, MATLAB)
+├── deprecated/                      # Previous approaches (stomp_planner.py, legacy IK)
 ├── report/                          # 8-page LaTeX report
 └── README.md
 ```
