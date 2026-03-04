@@ -62,9 +62,14 @@ python3 ik_trajectories/analyze_ik_accuracy.py
 python3 analyze_pipeline.py
 ```
 
-5. **Configuration Space (Joint Space) vs Workspace Comparison**:
+5. **Configuration Space (Joint Space) vs Workspace Demonstration**:
 ```bash
 python3 ik_trajectories/test_joint_line.py
+```
+
+6. **Detailed C-Space vs Workspace Motion Strategy Comparison**:
+```bash
+python3 ik_trajectories/compare_cspace_workspace.py
 ```
 
 ---
@@ -80,6 +85,7 @@ refuel-arm/
 │   ├── analyze_ik_accuracy.py       # Empirical 3,830-root mathematical precision benchmark
 │   ├── test_ik_line.py              # Pure algebraic IK Cartesian line tracker
 │   ├── test_joint_line.py           # Configuration Space (Joint Space) linear tracker
+│   ├── compare_cspace_workspace.py  # Dual-strategy comparison and visualization
 │   ├── test_ik_wave.py              # Multi-cycle audio-wave with dynamic pitch
 │   ├── test_ik_pringle.py           # 3D hyperbolic paraboloid (saddle) tracking
 │   └── test_ik_mobius.py            # 4π Möbius strip topological inversion tracker
