@@ -28,12 +28,9 @@ The core trajectory generation combines two complementary kinematics strategies:
 
 The KR6 R700 belongs to the `IK_spherical_2_parallel` kinematic family. IK-Geo decomposes the 6-DOF inverse kinematics into a sequence of canonical subproblems (Paden–Kahan), yielding **up to 8 closed-form solutions** per pose. This ensures exact spatial accuracy for critical refueling targets without the convergence risks of iterative solvers.
 
-### Trajectory Planning — Collision-Aware STOMP (Sensor Fusion)
+### Trajectory Planning — STOMP Optimizer
 
-We utilize a **Gradient-Free Sensor Fusion** approach for trajectory generation. By integrating STOMP (Stochastic Trajectory Optimization) with a **2.5D Euclidean Distance Transform (EDT)** generated from workspace point clouds, the robot generates smooth, collision-free paths. Unlike standard RRT planners, this method:
-- Guarantees constant joint velocities and mechanical smoothness.
-- Avoids singularities by utilizing algebraic IK foundations.
-- Operates natively over 2.5D heightmaps for efficient unstructured environment navigation.
+STOMP (Stochastic Trajectory Optimization for Motion Planning) is used to generate smooth trajectories along the Cartesian paths between mission stages. It optimizes joint waypoints ensuring acceleration limits and joint limits are respected before execution via ROS's `JointTrajectoryController`.
 
 ### Configuration Space (C-Space) Interpolation
 
@@ -47,7 +44,7 @@ For full installation and execution instructions, please see **[SETUP.md](SETUP.
 
 ### Primary Execution Previews
 
-1. **Autonomous Refueling Pipeline (STOMP + 2.5D Collision Avoidance)**:
+1. **Autonomous Refueling Pipeline (STOMP)**:
 ```bash
 python3 test_full_pipeline.py --ros
 ```
@@ -74,8 +71,8 @@ python3 ik_trajectories/analyze_ik_accuracy.py
 ```
 refuel-arm/
 ├── test_full_pipeline.py            # Main Refueling execution orchestrator
-├── stomp_collision.py               # 2.5D Collision-Aware STOMP Optimizer (NEW)
 ├── analyze_pipeline.py              # STOMP 4-panel analysis graph generator
+├── stomp_planner.py                 # Core standalone STOMP trajectory optimizer (deprecated)
 ├── ik_trajectories/                 # 6-DOF Topological Tracking & Comparison
 │   ├── compare_cspace_workspace.py  # Dual-strategy comparison and visualization
 │   ├── analyze_ik_accuracy.py       # Empirical mathematical precision benchmark
@@ -87,7 +84,7 @@ refuel-arm/
 ├── ik-geo/                          # Algebraic IK library submodule
 ├── output_graphs/                   # Generated analysis plots
 ├── kuka_refuel_ws/                  # ROS Noetic catkin workspace
-├── deprecated/                      # Previous approaches (stomp_planner.py, legacy IK)
+├── deprecated/                      # Previous approaches (legacy IK, MATLAB)
 ├── report/                          # 8-page LaTeX report
 └── README.md
 ```
