@@ -23,10 +23,10 @@ import ik_geometric as ik
 # --- TARGET POSES (THE ONLY INPUTS FOR C-SPACE) ---
 START_POS = np.array([0.3, 0.4, 0.5])
 END_POS   = np.array([0.706, 0.000, 0.413])
-TWIST_DEG = 0.0 # User specified 15 pitch, assuming no additional twist unless requested
+TWIST_DEG = 0.0 
 END_PITCH = 15.0 # Degrees
 
-# Resolution for Graphing/Execution (Not a Planning Constraint for C-Space)
+# Resolution for Graphing/Execution
 PLOT_RESOLUTION = 60 
 
 # Base orientation: Forward looking slightly down
@@ -76,12 +76,10 @@ def interpolate_orientation(R_start, R_end, t):
 def run_comparison():
     # 1. Setup orientations for the two end states
     R_target_start = R_START
-    # Target orientation is a 15 degree pitch from horizontal
     R_target_end = ik.rot(np.array([0.0, 1.0, 0.0]), np.radians(END_PITCH))
 
     # --- STRATEGY 1: WORKSPACE PLANNING (LINE-AWARE) ---
-    # The solver must "know" the path. We must give it every waypoint.
-    print("[1/2] Generating Workspace Trajectory (Solver solves IK at EVERY waypoint)...")
+    print("[1/2] Generating Workspace Trajectory...")
     ws_q_traj = []
     ws_pos_traj = []
     current_q = Q_HOME
@@ -89,77 +87,113 @@ def run_comparison():
         t = i / (PLOT_RESOLUTION - 1)
         pos = START_POS + t * (END_POS - START_POS)
         rot_t = interpolate_orientation(R_target_start, R_target_end, t)
-        q = solve_closest_ik(pos, rot_t, current_q) # IK CALL PER WAYPOINT
+        q = solve_closest_ik(pos, rot_t, current_q)
         ws_q_traj.append(q)
         ws_pos_traj.append(pos)
         current_q = q
 
     # --- STRATEGY 2: C-SPACE PLANNING (PATH-AGNOSTIC) ---
-    # The solver only knows START and END. 
-    print("[2/2] Generating C-Space Trajectory (Solver solves IK only TWICE)...")
+    print("[2/2] Generating C-Space Trajectory...")
+    q_start = solve_closest_ik(START_POS, R_target_start, Q_HOME)
+    q_goal  = solve_closest_ik(END_POS, R_target_end, q_start)
     
-    q_start = solve_closest_ik(START_POS, R_target_start, Q_HOME) # IK CALL 1
-    q_goal  = solve_closest_ik(END_POS, R_target_end, q_start)    # IK CALL 2
-    
-    # Everything else is just a percentage slide (discretized here only for the graph)
     cs_q_traj = []
     cs_pos_traj = []
     for i in range(PLOT_RESOLUTION):
         t = i / (PLOT_RESOLUTION - 1)
-        q_t = q_start + t * (q_goal - q_start) # NO IK NEEDED HERE
+        q_t = q_start + t * (q_goal - q_start)
         _, p_actual = ik.fwd_kinematics(q_t)
         cs_q_traj.append(q_t)
         cs_pos_traj.append(p_actual)
 
-    return np.array(ws_q_traj), np.array(ws_pos_traj), np.array(cs_q_traj), np.array(cs_pos_traj)
-
-def plot_comparison(ws_q, ws_p, cs_q, cs_p):
-    steps = np.arange(1, PLOT_RESOLUTION + 1)
-    fig, axs = plt.subplots(2, 2, figsize=(14, 11))
+    # --- ERROR ANALYSIS ---
+    ws_pos_errs = []
+    ws_ori_errs = []
+    cs_pos_errs = []
+    cs_ori_errs = []
     
-    # Lowered Information Box
-    start_pitch = 90.0 # From R_START (Look Down)
+    for i in range(PLOT_RESOLUTION):
+        t = i / (PLOT_RESOLUTION - 1)
+        p_ideal = START_POS + t * (END_POS - START_POS)
+        R_ideal = interpolate_orientation(R_target_start, R_target_end, t)
+        
+        # Workspace actuals
+        q_ws = ws_q_traj[i]
+        R_ws, p_ws = ik.fwd_kinematics(q_ws)
+        
+        # C-Space actuals
+        q_cs = cs_q_traj[i]
+        R_cs, p_cs = ik.fwd_kinematics(q_cs)
+        
+        # Position Errors
+        ws_pos_errs.append(np.linalg.norm(p_ws - p_ideal))
+        cs_pos_errs.append(np.linalg.norm(p_cs - p_ideal))
+        
+        # Orientation Errors
+        _, angle_ws = axis_angle_from_rotation(R_ws.T @ R_ideal)
+        _, angle_cs = axis_angle_from_rotation(R_cs.T @ R_ideal)
+        ws_ori_errs.append(np.degrees(angle_ws))
+        cs_ori_errs.append(np.degrees(angle_cs))
+
+    return (np.array(ws_q_traj), np.array(ws_pos_traj), np.array(ws_pos_errs), np.array(ws_ori_errs),
+            np.array(cs_q_traj), np.array(cs_pos_traj), np.array(cs_pos_errs), np.array(cs_ori_errs),
+            q_start, q_goal)
+
+def plot_comparison(ws_q, ws_p, ws_pe, ws_oe, cs_q, cs_p, cs_pe, cs_oe, q_start, q_goal):
+    steps = np.arange(1, PLOT_RESOLUTION + 1)
+    fig, axs = plt.subplots(2, 2, figsize=(14, 11)) # Reverting to 2 rows (C-Space vs W-Space)
+    
+    start_pitch = 90.0 
+    q_start_str = ", ".join([f"{v:.2f}" for v in q_start])
+    q_goal_str  = ", ".join([f"{v:.2f}" for v in q_goal])
+    
     info_str = (f"Target 1 (Start): {START_POS} | Target 2 (Goal): {END_POS}\n"
-                f"Start Pitch: {start_pitch}° | Target Pitch: {END_PITCH}°")
+                f"Start Pitch: {start_pitch}° | Target Pitch: {END_PITCH}°\n"
+                f"Selected q_start: [{q_start_str}] rad\n"
+                f"Selected q_goal:  [{q_goal_str}] rad")
     
     fig.suptitle('Motion Strategy Comparison: Workspace (Linear) vs. Configuration Space (Linear)', 
                  fontsize=16, fontweight='bold', y=0.98)
     
-    # Moved informative text lower (y=0.91) to avoid clipping and overlap
-    fig.text(0.5, 0.91, info_str, ha='center', fontsize=11, 
+    fig.text(0.5, 0.92, info_str, ha='center', fontsize=11, 
              bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.4))
-
+    
     j_labels = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6']
 
     # --- Row 1: Joint Angles ---
     axs[0, 0].set_title("Workspace Strategy: Solver solves IK @ every step", color='navy', fontweight='bold', pad=20)
     for j in range(6): axs[0, 0].plot(steps, ws_q[:, j], label=j_labels[j], linewidth=2)
-    axs[0, 0].set_ylabel("Radians")
-    axs[0, 0].grid(True, alpha=0.3)
-    axs[0, 0].legend(fontsize=8, loc='upper right')
+    axs[0, 0].set_ylabel("Radians"); axs[0, 0].grid(True, alpha=0.3); axs[0, 0].legend(fontsize=8, loc='upper right')
 
     axs[0, 1].set_title("C-Space Strategy: Solver solves IK @ Start/End ONLY", color='darkgreen', fontweight='bold', pad=20)
     for j in range(6): axs[0, 1].plot(steps, cs_q[:, j], label=j_labels[j], linewidth=2)
-    axs[0, 1].set_ylabel("Radians")
-    axs[0, 1].grid(True, alpha=0.3)
+    axs[0, 1].set_ylabel("Radians"); axs[0, 1].grid(True, alpha=0.3)
 
     # --- Row 2: Cartesian Paths ---
     axs[1, 0].set_title("Resulting Workspace Path (Constraint: Straight Line)", color='navy', fontweight='bold')
     axs[1, 0].plot(steps, ws_p[:, 0], 'r', label='X'); axs[1, 0].plot(steps, ws_p[:, 1], 'g', label='Y'); axs[1, 0].plot(steps, ws_p[:, 2], 'b', label='Z')
-    axs[1, 0].set_ylabel("Meters"); axs[1, 0].set_xlabel("Step Number"); axs[1, 0].grid(True, alpha=0.3); axs[1, 0].legend()
+    axs[1, 0].set_ylabel("Meters"); axs[1, 0].grid(True, alpha=0.3); axs[1, 0].legend()
 
     axs[1, 1].set_title("Resulting C-Space Path (Result: Dynamic Arc)", color='darkgreen', fontweight='bold')
     axs[1, 1].plot(steps, cs_p[:, 0], 'r', label='X'); axs[1, 1].plot(steps, cs_p[:, 1], 'g', label='Y'); axs[1, 1].plot(steps, cs_p[:, 2], 'b', label='Z')
-    axs[1, 1].set_ylabel("Meters"); axs[1, 1].set_xlabel("Step Number"); axs[1, 1].grid(True, alpha=0.3)
+    axs[1, 1].set_ylabel("Meters"); axs[1, 1].grid(True, alpha=0.3)
 
-    plt.tight_layout(rect=[0, 0.03, 1, 0.88]) # Adjusted rect for the info box
+    # --- Row 3: Quantitative Error Analysis (COMMENTED OUT) ---
+    # axs[2, 0].set_title("Position Error (L2 Norm to Straight Line)", color='purple', fontweight='bold')
+    # axs[2, 0].plot(steps, ws_pe, 'b', label='Workspace Error', linewidth=2)
+    # axs[2, 0].plot(steps, cs_pe, 'r--', label='C-Space Deviation', linewidth=2)
+    # axs[2, 0].set_ylabel("Error (Meters)"); axs[2, 0].set_xlabel("Step Number"); axs[2, 0].grid(True, alpha=0.3); axs[2, 0].legend()
+
+    # axs[2, 1].set_title("Orientation Error (Geodesic Distance to Target Rot)", color='purple', fontweight='bold')
+    # axs[2, 1].plot(steps, ws_oe, 'b', label='Workspace Error', linewidth=2)
+    # axs[2, 1].plot(steps, cs_oe, 'r--', label='C-Space Deviation', linewidth=2)
+    # axs[2, 1].set_ylabel("Error (Degrees)"); axs[2, 1].set_xlabel("Step Number"); axs[2, 1].grid(True, alpha=0.3); axs[2, 1].legend()
+
+    plt.tight_layout(rect=[0, 0.03, 1, 0.88])
     save_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output_graphs', 'cspace_vs_wspace_comparison.png'))
     plt.savefig(save_path, dpi=200)
     print(f"\n[Success] Comparison graph saved to: {save_path}")
-    plt.show(block=False)
-    plt.pause(2.0)
 
-# --- ROS/GAZEBO INTEGRATION ---
 def execute_ros(trajectory, cartesian_points, mode="ros"):
     import rospy
     from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -203,8 +237,13 @@ def main():
     parser.add_argument("--cs", action="store_true")
     args = parser.parse_args()
 
-    ws_q, ws_p, cs_q, cs_p = run_comparison()
-    plot_comparison(ws_q, ws_p, cs_q, cs_p)
+    (ws_q, ws_p, ws_pe, ws_oe, 
+     cs_q, cs_p, cs_pe, cs_oe, 
+     q_s, q_g) = run_comparison()
+    
+    plot_comparison(ws_q, ws_p, ws_pe, ws_oe, 
+                    cs_q, cs_p, cs_pe, cs_oe, 
+                    q_s, q_g)
 
     if args.ros or args.rviz:
         import os
