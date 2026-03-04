@@ -119,6 +119,55 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Grid3D, margin: float = 0.3) ->
                 cost[i] += ((margin - d) / margin) ** 2
     return cost
 
+import matplotlib.pyplot as plt
+
+def visualize_stomp_results(trajectory, costs, grid, pc):
+    """Generate a 3-panel analysis graph for the collision-aware planner."""
+    fig = plt.figure(figsize=(15, 5))
+    
+    # 1. Cost Progression
+    ax1 = fig.add_subplot(1, 3, 1)
+    ax1.plot(costs, 'b-o', markersize=4)
+    ax1.set_title("Total Cost Progression")
+    ax1.set_xlabel("Iteration (x10)")
+    ax1.set_ylabel("Cost")
+    ax1.grid(True)
+
+    # 2. Joint Angles
+    ax2 = fig.add_subplot(1, 3, 2)
+    for j in range(trajectory.shape[1]):
+        ax2.plot(trajectory[:, j], label=f"J{j+1}")
+    ax2.set_title("Final Optimized Joint Angles")
+    ax2.set_xlabel("Waypoint")
+    ax2.set_ylabel("Angle (rad)")
+    ax2.legend()
+    ax2.grid(True)
+
+    # 3. 3D Workspace Path vs Obstacles
+    ax3 = fig.add_subplot(1, 3, 3, projection='3d')
+    
+    # Plot obstacle point cloud
+    pc = np.array(pc)
+    ax3.scatter(pc[:, 0], pc[:, 1], pc[:, 2], c='red', alpha=0.3, s=10, label="Obstacle PC")
+    
+    # Calculate EE path
+    ee_path = []
+    kin = ik.KIN_KR6_R700
+    for q in trajectory:
+        _, p = ik.fwd_kinematics(q, kin)
+        ee_path.append(p)
+    ee_path = np.array(ee_path)
+    
+    ax3.plot(ee_path[:, 0], ee_path[:, 1], ee_path[:, 2], 'b-p', linewidth=2, label="EE Trajectory")
+    ax3.set_title("3D End-Effector Path")
+    ax3.set_xlabel("X (m)"); ax3.set_ylabel("Y (m)"); ax3.set_zlabel("Z (m)")
+    ax3.legend()
+    
+    plt.tight_layout()
+    os.makedirs("output_graphs", exist_ok=True)
+    plt.savefig("output_graphs/stomp_collision_analysis.png")
+    print("\n📊 Visualization saved to output_graphs/stomp_collision_analysis.png")
+
 def stomp_optimize(
     q_start: np.ndarray,
     q_goal: np.ndarray,
@@ -135,7 +184,7 @@ def stomp_optimize(
     w_obs: float = 1000.0,
     safety_margin: float = 0.2,
     verbose: bool = True,
-) -> np.ndarray:
+):
     """STOMP Optimizer with 2.5D Grid Avoidance."""
     ndof = len(q_start)
     trajectory = np.zeros((n_waypoints, ndof))
@@ -148,6 +197,8 @@ def stomp_optimize(
     n_interior = n_waypoints - 2
     best_cost = float("inf")
     noise = noise_stddev
+    
+    cost_history = []
 
     if verbose: print(f"STOMP Collision-Aware execution: {n_iterations} itrs, grid_enabled={bool(grid)}")
 
@@ -192,11 +243,12 @@ def stomp_optimize(
         noise *= noise_decay
 
         if verbose and (it % 10 == 0 or it == n_iterations - 1):
+            cost_history.append(current_cost)
             print(f"  [iter {it:3d}/{n_iterations}] total={current_cost:.1f} (smooth: {c_smooth:.1f}, limit: {c_limit:.1f}, obs: {c_obs:.1f})")
 
     for j in range(ndof): trajectory[:, j] = np.clip(trajectory[:, j], joint_limits[j, 0], joint_limits[j, 1])
     trajectory[0] = q_start; trajectory[-1] = q_goal
-    return trajectory
+    return trajectory, cost_history
 
 
 if __name__ == "__main__":
@@ -206,20 +258,22 @@ if __name__ == "__main__":
         [-2.967,  2.967], [-3.316,  0.785], [-2.094,  2.722],
         [-3.228,  3.228], [-2.094,  2.094], [-6.108,  6.108],
     ])
-    q_home = np.zeros(6); q_goal = np.array([0.5, -0.3, 0.8, -0.2, 0.4, 0.1])
+    q_home = np.zeros(6); q_goal = np.array([0.5, -1.2, 1.5, -0.2, 0.4, 0.1])
     
-    # Fake Point Cloud representing a table at Z=0.2 in front of robot
+    # Fake Point Cloud representing a table/barrier directly in front
     pc = []
-    for x in np.linspace(0.3, 0.7, 10):
-        for y in np.linspace(-0.2, 0.2, 10):
-            pc.append([x, y, 0.2])
+    for x in np.linspace(0.4, 0.6, 15):
+        for y in np.linspace(-0.3, 0.3, 15):
+            pc.append([x, y, 0.4]) # Barrier at Z=0.4
     print(f"Created a {len(pc)}-point synthetic obstacle.")
 
     grid = Grid3D(resolution=0.05)
     grid.build_from_point_cloud(np.array(pc))
-    print(f"Distance to center of table: {grid.get_distance(np.array([0.5, 0.0, 0.2])):.3f}m")
-
+    
     print("\nRunning Collision-Aware STOMP Optimizer...")
-    traj = stomp_optimize(q_home, q_goal, limits, grid=grid, n_iterations=40, verbose=True)
+    traj, history = stomp_optimize(q_home, q_goal, limits, grid=grid, n_iterations=100, verbose=True)
 
     print("\n✅ Valid trajectory generated resolving obstacles.")
+    
+    # Visualize
+    visualize_stomp_results(traj, history, grid, pc)
