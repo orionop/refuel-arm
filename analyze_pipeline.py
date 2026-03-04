@@ -23,7 +23,7 @@ import matplotlib.ticker as ticker
 sys.path.insert(0, ".")
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
 from ik_geometric import IK_spherical_2_parallel, fwd_kinematics
-from stomp_planner import stomp_optimize
+from stomp_collision import stomp_optimize
 from test_full_pipeline import (
     Q_HOME, Q_NOZZLE, REFUEL_TARGET_XYZ, REFUEL_TARGET_R,
     JOINT_LIMITS, filter_solutions, within_joint_limits, plan_segment

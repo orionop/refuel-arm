@@ -21,7 +21,7 @@ import numpy as np
 
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
 from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700, rot
-from stomp_planner import stomp_optimize
+from stomp_collision import stomp_optimize
 
 # ── Official KUKA KR6 R700-2 Joint Limits (from URDF) ───────────
 JOINT_LIMITS = np.array([
