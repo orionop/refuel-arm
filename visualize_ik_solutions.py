@@ -188,7 +188,7 @@ def execute_trajectory(q_target, duration=2.0):
 
 def spawn_target_marker(target_pos):
     """Spawn a simple black sphere at the target EE location."""
-    xml = f\"\"\"<?xml version="1.0" ?>
+    xml = f"""<?xml version="1.0" ?>
     <sdf version="1.5">
       <model name="ik_target_marker">
         <static>true</static>
@@ -202,7 +202,7 @@ def spawn_target_marker(target_pos):
           </visual>
         </link>
       </model>
-    </sdf>\"\"\"
+    </sdf>"""
     pose = Pose()
     pose.position.x = target_pos[0]
     pose.position.y = target_pos[1]

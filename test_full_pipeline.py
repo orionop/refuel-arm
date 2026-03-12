@@ -169,7 +169,7 @@ def spawn_gazebo_markers(p_nozzle, p_refuel):
     spawn_srv = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 
     # 1. Yellow Cylinder
-    yellow_sdf = f\"\"\"<?xml version="1.0" ?>
+    yellow_sdf = f"""<?xml version="1.0" ?>
     <sdf version="1.5">
       <model name="nozzle_station">
         <static>true</static>
@@ -180,7 +180,7 @@ def spawn_gazebo_markers(p_nozzle, p_refuel):
           </visual>
         </link>
       </model>
-    </sdf>\"\"\"
+    </sdf>"""
     pose_y = Pose()
     pose_y.position.x = 0.478
     pose_y.position.y = -0.478
@@ -190,7 +190,7 @@ def spawn_gazebo_markers(p_nozzle, p_refuel):
     except Exception: pass
 
     # 2. Red Sphere
-    red_sdf = f\"\"\"<?xml version="1.0" ?>
+    red_sdf = f"""<?xml version="1.0" ?>
     <sdf version="1.5">
       <model name="car_refuel_inlet">
         <static>true</static>
@@ -201,7 +201,7 @@ def spawn_gazebo_markers(p_nozzle, p_refuel):
           </visual>
         </link>
       </model>
-    </sdf>\"\"\"
+    </sdf>"""
     pose_r = Pose()
     pose_r.position.x = 0.55
     pose_r.position.y = 0.3
