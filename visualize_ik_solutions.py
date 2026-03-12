@@ -44,12 +44,12 @@ JOINT_NAMES = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
 Q_HOME = [0.0, -1.570796326, 0.0, 0.0, 0.0, 0.0]  # REST position
 
 GAZEBO_COLORS = [
-    "Gazebo/Green",
-    "Gazebo/Blue",
-    "Gazebo/Red",
-    "Gazebo/Yellow",
-    "Gazebo/Orange",
-    "Gazebo/Purple",
+    "Gazebo/GreenTransparent",
+    "Gazebo/BlueTransparent",
+    "Gazebo/RedTransparent",
+    "Gazebo/YellowTransparent",
+    "Gazebo/OrangeTransparent",
+    "Gazebo/PurpleTransparent",
 ]
 
 URDF_PATH = os.path.abspath(os.path.join(
