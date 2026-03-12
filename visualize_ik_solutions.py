@@ -100,8 +100,6 @@ def get_ghost_urdf(q, color_name="Gazebo/Green"):
     for link in root.findall('link'):
         coll = link.find('collision')
         if coll is not None: link.remove(coll)
-        inert = link.find('inertial')
-        if inert is not None: link.remove(inert)
         
         name = link.get('name')
         if name != 'world':
