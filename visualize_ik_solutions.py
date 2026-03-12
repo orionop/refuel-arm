@@ -58,6 +58,9 @@ GHOST_COLORS = [
 URDF_PATH = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'urdf', 'kr6_r700_2_clean.urdf'))
 
+RVIZ_CONFIG_PATH = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'config', 'multi_ik_ghost.rviz'))
+
 
 def is_valid(q):
     for j in range(6):
@@ -113,14 +116,128 @@ def print_solution_table(solutions, target_pos):
     return valid_count
 
 
+def generate_rviz_config(num_ghosts):
+    """Auto-generate a .rviz config with ghost RobotModel displays."""
+    ghost_displays = ""
+    for i in range(num_ghosts):
+        r, g, b = GHOST_COLORS[i % len(GHOST_COLORS)]
+        # RViz color format is 0-255 int
+        ri, gi, bi = int(r*255), int(g*255), int(b*255)
+        ghost_displays += f"""
+    - Alpha: 0.4
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Tree: false
+        Expand Upward: false
+      Name: Ghost_{i}
+      Robot Description: /ghost_{i}/robot_description
+      TF Prefix: ghost_{i}
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true"""
+
+    config = f"""Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Status1
+      Splitter Ratio: 0.5
+    Tree Height: 549
+Visualization Manager:
+  Class: \"\"
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 10
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Tree: false
+        Expand Upward: false
+      Name: RobotModel_Base
+      Robot Description: robot_description
+      TF Prefix: \"\"
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true{ghost_displays}
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visualization_marker
+      Name: TargetMarker
+      Queue Size: 10
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /visualization_marker_array
+      Name: SolutionLabels
+      Queue Size: 10
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 2.0
+      Enable Suspend: true
+      Focal Point:
+        X: 0.3
+        Y: 0.15
+        Z: 0.4
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.4
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 0.8
+    Saved: ~
+"""
+    with open(RVIZ_CONFIG_PATH, 'w') as f:
+        f.write(config)
+    print(f"[RViz] Auto-generated config with {num_ghosts} ghost displays: {RVIZ_CONFIG_PATH}")
+
+
 def load_urdf_string(tf_prefix):
-    """Load URDF and modify link/joint names for TF prefix namespacing."""
+    """Load URDF string for parameter server."""
     with open(URDF_PATH, 'r') as f:
         urdf = f.read()
-    
-    # For TF-prefixed ghost arms, we don't modify the URDF itself.
-    # Instead, robot_state_publisher uses the tf_prefix parameter to
-    # automatically prefix all TF frames.
     return urdf
 
 
@@ -228,10 +345,13 @@ def main():
     
     valid_solutions = [s for s in solutions if s['valid']]
     
-    # 2. Initialize ROS
+    # 2. Auto-generate RViz config with ghost displays
+    generate_rviz_config(len(valid_solutions))
+    
+    # 3. Initialize ROS
     rospy.init_node('ik_multi_solution_viz', anonymous=True)
     
-    # 3. Spawn ghost arm publishers
+    # 4. Spawn ghost arm publishers
     print("[ROS] Spawning ghost arm publishers...")
     processes = spawn_ghost_publishers(valid_solutions)
     rospy.sleep(1.0)  # Wait for publishers to connect
@@ -246,16 +366,9 @@ def main():
     marker_array_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
     rospy.sleep(0.5)
     
-    # 5. Main loop: continuously publish joint states
-    print(f"\n[ROS] Publishing {len(valid_solutions)} ghost arms. Press Ctrl+C to stop.\n")
-    print("  💡 In RViz, add a 'RobotModel' display for each ghost:")
-    for i, sol in enumerate(valid_solutions):
-        r, g, b = GHOST_COLORS[i % len(GHOST_COLORS)]
-        print(f"     Ghost {i} (Sol #{sol['index']}): "
-              f"Robot Description: /ghost_{i}/robot_description | "
-              f"TF Prefix: ghost_{i} | "
-              f"Color: ({r},{g},{b})")
-    print()
+    # 6. Main loop: continuously publish joint states
+    print(f"\n[ROS] Publishing {len(valid_solutions)} ghost arms. Press Ctrl+C to stop.")
+    print("  💡 Ghost displays are AUTO-CONFIGURED in RViz. No manual setup needed!\n")
     
     rate = rospy.Rate(10)  # 10 Hz
     
