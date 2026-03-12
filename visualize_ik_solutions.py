@@ -7,17 +7,16 @@ For a given EE pose, IK-Geo produces up to 8 closed-form solutions.
 This script:
   1. Solves IK for the target pose.
   2. Filters valid solutions (within joint limits).
-  3. Publishes each valid solution as a separate "ghost arm" in RViz
-     using TF-prefixed robot_state_publishers.
+  3. Draws each valid config as a colored "ghost arm" in RViz
+     using FK-computed link positions rendered as Line/Sphere markers.
 
 Usage:
-  Terminal 1: roslaunch kuka_kr6_gazebo multi_ik_viz.launch
+  Terminal 1: roslaunch kuka_kr6_gazebo rviz.launch
   Terminal 2: python3 visualize_ik_solutions.py
               python3 visualize_ik_solutions.py --x 0.55 --y 0.3 --z 0.5 --pitch 15
 """
 import sys
 import os
-import subprocess
 import signal
 import argparse
 import numpy as np
@@ -34,6 +33,8 @@ if ros_python not in sys.path and os.path.isdir(ros_python):
 import rospy
 from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
+from geometry_msgs.msg import Point
+from std_msgs.msg import ColorRGBA
 
 # ── Config ────────────────────────────────────────────────────────
 JOINT_LIMITS = np.array([
@@ -45,21 +46,15 @@ JOINT_NAMES = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
 
 # Color palette for ghost arms (R, G, B)
 GHOST_COLORS = [
-    (0.2, 0.8, 0.2),   # Green  — Solution 0
-    (0.2, 0.2, 1.0),   # Blue   — Solution 1
-    (1.0, 0.2, 0.2),   # Red    — Solution 2
-    (1.0, 1.0, 0.2),   # Yellow — Solution 3
-    (1.0, 0.5, 0.0),   # Orange — Solution 4
-    (0.8, 0.2, 0.8),   # Purple — Solution 5
-    (0.0, 1.0, 1.0),   # Cyan   — Solution 6
-    (1.0, 1.0, 1.0),   # White  — Solution 7
+    (0.2, 0.9, 0.2),   # Green
+    (0.3, 0.3, 1.0),   # Blue
+    (1.0, 0.3, 0.3),   # Red
+    (1.0, 1.0, 0.2),   # Yellow
+    (1.0, 0.5, 0.0),   # Orange
+    (0.8, 0.2, 0.8),   # Purple
+    (0.0, 1.0, 1.0),   # Cyan
+    (1.0, 1.0, 1.0),   # White
 ]
-
-URDF_PATH = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'urdf', 'kr6_r700_2_clean.urdf'))
-
-RVIZ_CONFIG_PATH = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'config', 'multi_ik_ghost.rviz'))
 
 
 def is_valid(q):
@@ -95,6 +90,24 @@ def solve_all_ik(target_pos, target_R):
     return solutions
 
 
+def compute_link_positions(q):
+    """Compute all joint/link positions via FK chain for visualization."""
+    kin = ik.KIN_KR6_R700
+    H, P = kin['H'], kin['P']
+    
+    positions = []
+    R = np.eye(3)
+    p = P[:, 0].copy()
+    positions.append(p.copy())  # Base
+    
+    for j in range(6):
+        R = R @ ik.rot(H[:, j], q[j])
+        p = p + R @ P[:, j + 1]
+        positions.append(p.copy())
+    
+    return positions
+
+
 def print_solution_table(solutions, target_pos):
     """Pretty-print all IK solutions."""
     print(f"\n{'='*90}")
@@ -116,209 +129,83 @@ def print_solution_table(solutions, target_pos):
     return valid_count
 
 
-def generate_rviz_config(num_ghosts):
-    """Auto-generate a .rviz config with ghost RobotModel displays."""
-    ghost_displays = ""
-    for i in range(num_ghosts):
-        r, g, b = GHOST_COLORS[i % len(GHOST_COLORS)]
-        # RViz color format is 0-255 int
-        ri, gi, bi = int(r*255), int(g*255), int(b*255)
-        ghost_displays += f"""
-    - Alpha: 0.4
-      Class: rviz/RobotModel
-      Collision Enabled: false
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Tree: false
-        Expand Upward: false
-      Name: Ghost_{i}
-      Robot Description: /ghost_{i}/robot_description
-      TF Prefix: ghost_{i}
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true"""
-
-    config = f"""Panels:
-  - Class: rviz/Displays
-    Help Height: 78
-    Name: Displays
-    Property Tree Widget:
-      Expanded:
-        - /Global Options1
-        - /Status1
-      Splitter Ratio: 0.5
-    Tree Height: 549
-Visualization Manager:
-  Class: \"\"
-  Displays:
-    - Alpha: 0.5
-      Cell Size: 1
-      Class: rviz/Grid
-      Color: 160; 160; 164
-      Enabled: true
-      Line Style:
-        Line Width: 0.03
-        Value: Lines
-      Name: Grid
-      Normal Cell Count: 0
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Plane: XY
-      Plane Cell Count: 10
-      Reference Frame: <Fixed Frame>
-      Value: true
-    - Alpha: 1
-      Class: rviz/RobotModel
-      Collision Enabled: false
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Tree: false
-        Expand Upward: false
-      Name: RobotModel_Base
-      Robot Description: robot_description
-      TF Prefix: \"\"
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true{ghost_displays}
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: /visualization_marker
-      Name: TargetMarker
-      Queue Size: 10
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /visualization_marker_array
-      Name: SolutionLabels
-      Queue Size: 10
-      Value: true
-  Enabled: true
-  Global Options:
-    Background Color: 48; 48; 48
-    Fixed Frame: world
-    Frame Rate: 30
-  Name: root
-  Tools:
-    - Class: rviz/Interact
-      Hide Inactive Objects: true
-    - Class: rviz/MoveCamera
-    - Class: rviz/Select
-    - Class: rviz/FocusCamera
-  Value: true
-  Views:
-    Current:
-      Class: rviz/Orbit
-      Distance: 2.0
-      Enable Suspend: true
-      Focal Point:
-        X: 0.3
-        Y: 0.15
-        Z: 0.4
-      Focal Shape Fixed Size: true
-      Focal Shape Size: 0.05
-      Invert Z Axis: false
-      Name: Current View
-      Near Clip Distance: 0.01
-      Pitch: 0.4
-      Target Frame: <Fixed Frame>
-      Value: Orbit (rviz)
-      Yaw: 0.8
-    Saved: ~
-"""
-    with open(RVIZ_CONFIG_PATH, 'w') as f:
-        f.write(config)
-    print(f"[RViz] Auto-generated config with {num_ghosts} ghost displays: {RVIZ_CONFIG_PATH}")
-
-
-def load_urdf_string(tf_prefix):
-    """Load URDF string for parameter server."""
-    with open(URDF_PATH, 'r') as f:
-        urdf = f.read()
-    return urdf
-
-
-def spawn_ghost_publishers(valid_solutions):
-    """Spawn a robot_state_publisher per valid solution with TF prefix."""
-    processes = []
-    urdf_str = load_urdf_string("")
+def build_ghost_markers(valid_solutions):
+    """Build MarkerArray with ghost arms rendered as colored line strips + joint spheres."""
+    ma = MarkerArray()
     
     for i, sol in enumerate(valid_solutions):
-        ns = f"ghost_{i}"
-        tf_prefix = f"ghost_{i}"
+        r, g, b = GHOST_COLORS[i % len(GHOST_COLORS)]
+        link_positions = compute_link_positions(sol['q'])
         
-        # Set the robot_description on the parameter server under namespace
-        rospy.set_param(f'/{ns}/robot_description', urdf_str)
-        rospy.set_param(f'/{ns}/tf_prefix', tf_prefix)
+        # Line strip connecting all joints
+        line = Marker()
+        line.header.frame_id = "world"
+        line.ns = f"ghost_arm_{i}"
+        line.id = i * 100
+        line.type = Marker.LINE_STRIP
+        line.action = Marker.ADD
+        line.scale.x = 0.02  # Line width
+        line.color = ColorRGBA(r=r, g=g, b=b, a=0.7)
+        line.pose.orientation.w = 1.0
         
-        # Launch robot_state_publisher in the ghost namespace
-        cmd = [
-            'rosrun', 'robot_state_publisher', 'robot_state_publisher',
-            f'__ns:={ns}',
-            f'_tf_prefix:={tf_prefix}',
-            f'robot_description:=/{ns}/robot_description',
-        ]
+        for p in link_positions:
+            line.points.append(Point(x=p[0], y=p[1], z=p[2]))
+        ma.markers.append(line)
         
-        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        processes.append(proc)
-        rospy.loginfo(f"  🤖 Ghost {i} (Sol #{sol['index']}): robot_state_publisher started [TF: {tf_prefix}/]")
+        # Spheres at each joint
+        for j, p in enumerate(link_positions):
+            sphere = Marker()
+            sphere.header.frame_id = "world"
+            sphere.ns = f"ghost_joints_{i}"
+            sphere.id = i * 100 + j + 1
+            sphere.type = Marker.SPHERE
+            sphere.action = Marker.ADD
+            sphere.pose.position.x = p[0]
+            sphere.pose.position.y = p[1]
+            sphere.pose.position.z = p[2]
+            sphere.pose.orientation.w = 1.0
+            sphere.scale.x = 0.04
+            sphere.scale.y = 0.04
+            sphere.scale.z = 0.04
+            sphere.color = ColorRGBA(r=r, g=g, b=b, a=0.9)
+            ma.markers.append(sphere)
+        
+        # Text label at the EE position
+        label = Marker()
+        label.header.frame_id = "world"
+        label.ns = "ghost_labels"
+        label.id = i * 100 + 50
+        label.type = Marker.TEXT_VIEW_FACING
+        label.action = Marker.ADD
+        ee = link_positions[-1]
+        label.pose.position.x = ee[0]
+        label.pose.position.y = ee[1]
+        label.pose.position.z = ee[2] + 0.08
+        label.pose.orientation.w = 1.0
+        label.scale.z = 0.05
+        label.color = ColorRGBA(r=r, g=g, b=b, a=1.0)
+        q_str = ', '.join([f'{v:.1f}°' for v in np.degrees(sol['q'])])
+        label.text = f"Sol {sol['index']}\n[{q_str}]"
+        ma.markers.append(label)
     
-    return processes
+    return ma
 
 
-def publish_ghost_joint_states(valid_solutions, publishers):
-    """Publish joint states for each ghost arm."""
-    for i, (sol, pub) in enumerate(zip(valid_solutions, publishers)):
-        msg = JointState()
-        msg.header.stamp = rospy.Time.now()
-        msg.header.frame_id = ''
-        msg.name = JOINT_NAMES
-        msg.position = sol['q'].tolist()
-        pub.publish(msg)
-
-
-def publish_target_marker(target_pos, marker_pub):
-    """Publish a sphere at the target position."""
+def build_target_marker(target_pos):
+    """Build a bright red sphere at the target."""
     m = Marker()
     m.header.frame_id = "world"
-    m.header.stamp = rospy.Time.now()
     m.ns = "ik_target"
-    m.id = 0
+    m.id = 999
     m.type = Marker.SPHERE
     m.action = Marker.ADD
     m.pose.position.x = target_pos[0]
     m.pose.position.y = target_pos[1]
     m.pose.position.z = target_pos[2]
     m.pose.orientation.w = 1.0
-    m.scale.x = 0.06; m.scale.y = 0.06; m.scale.z = 0.06
-    m.color.r = 1.0; m.color.g = 0.0; m.color.b = 0.0; m.color.a = 1.0
-    marker_pub.publish(m)
-
-
-def publish_solution_labels(valid_solutions, marker_pub):
-    """Publish text labels near each ghost's EE."""
-    ma = MarkerArray()
-    for i, sol in enumerate(valid_solutions):
-        m = Marker()
-        m.header.frame_id = "world"
-        m.header.stamp = rospy.Time.now()
-        m.ns = "solution_labels"
-        m.id = i + 10
-        m.type = Marker.TEXT_VIEW_FACING
-        m.action = Marker.ADD
-        m.pose.position.x = sol['fk_pos'][0]
-        m.pose.position.y = sol['fk_pos'][1]
-        m.pose.position.z = sol['fk_pos'][2] + 0.08
-        m.pose.orientation.w = 1.0
-        m.scale.z = 0.04
-        r, g, b = GHOST_COLORS[i % len(GHOST_COLORS)]
-        m.color.r = r; m.color.g = g; m.color.b = b; m.color.a = 1.0
-        m.text = f"Sol {sol['index']}"
-        ma.markers.append(m)
-    marker_pub.publish(ma)
+    m.scale.x = 0.08; m.scale.y = 0.08; m.scale.z = 0.08
+    m.color = ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0)
+    return m
 
 
 def main():
@@ -345,45 +232,38 @@ def main():
     
     valid_solutions = [s for s in solutions if s['valid']]
     
-    # 2. Auto-generate RViz config with ghost displays
-    generate_rviz_config(len(valid_solutions))
-    
-    # 3. Initialize ROS
+    # 2. Initialize ROS
     rospy.init_node('ik_multi_solution_viz', anonymous=True)
     
-    # 4. Spawn ghost arm publishers
-    print("[ROS] Spawning ghost arm publishers...")
-    processes = spawn_ghost_publishers(valid_solutions)
-    rospy.sleep(1.0)  # Wait for publishers to connect
+    marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
+    target_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
+    rospy.sleep(1.0)
     
-    # 4. Create joint_state publishers for each ghost
-    js_publishers = []
-    for i in range(len(valid_solutions)):
-        pub = rospy.Publisher(f'/ghost_{i}/joint_states', JointState, queue_size=10)
-        js_publishers.append(pub)
+    # 3. Build markers
+    ghost_markers = build_ghost_markers(valid_solutions)
+    target_marker = build_target_marker(target_pos)
     
-    marker_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
-    marker_array_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
-    rospy.sleep(0.5)
+    print(f"[RViz] Publishing {len(valid_solutions)} ghost arms as colored markers.")
+    print("  💡 Make sure RViz has 'Marker' and 'MarkerArray' displays enabled!")
+    print("  Press Ctrl+C to stop.\n")
     
-    # 6. Main loop: continuously publish joint states
-    print(f"\n[ROS] Publishing {len(valid_solutions)} ghost arms. Press Ctrl+C to stop.")
-    print("  💡 Ghost displays are AUTO-CONFIGURED in RViz. No manual setup needed!\n")
+    # 4. Main loop
+    rate = rospy.Rate(5)
     
-    rate = rospy.Rate(10)  # 10 Hz
-    
-    def shutdown_handler(sig, frame):
-        print("\n[Shutdown] Killing ghost publishers...")
-        for p in processes:
-            p.terminate()
+    def shutdown(sig, frame):
+        print("\n[Shutdown] Done.")
         sys.exit(0)
-    
-    signal.signal(signal.SIGINT, shutdown_handler)
+    signal.signal(signal.SIGINT, shutdown)
     
     while not rospy.is_shutdown():
-        publish_ghost_joint_states(valid_solutions, js_publishers)
-        publish_target_marker(target_pos, marker_pub)
-        publish_solution_labels(valid_solutions, marker_array_pub)
+        # Update timestamps
+        now = rospy.Time.now()
+        for m in ghost_markers.markers:
+            m.header.stamp = now
+        target_marker.header.stamp = now
+        
+        marker_pub.publish(ghost_markers)
+        target_pub.publish(target_marker)
         rate.sleep()
 
 
