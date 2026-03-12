@@ -236,6 +236,13 @@ def main():
     valid_solutions = [s for s in solutions if s['valid']]
     print(f"\n[IK-Geo] Found {len(valid_solutions)} valid solutions for target {target_pos}.")
     
+    print("\n--- Valid Joint Configurations (in degrees) ---")
+    for sol in valid_solutions:
+        q_deg = np.degrees(sol['q'])
+        q_str = "  ".join([f"{val:7.2f}°" for val in q_deg])
+        print(f"Sol #{sol['index']}: [{q_str}]")
+    print("-----------------------------------------------")
+    
     # 2. Setup ROS and Services
     rospy.init_node('ik_gazebo_ghost_spawner', anonymous=True)
     
