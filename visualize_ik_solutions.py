@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 """
-KUKA KR6 R700 — IK-Geo Multi-Solution Visualizer (Ghost Arms)
-==============================================================
+KUKA KR6 R700 — IK-Geo Multi-Solution Visualizer (Gazebo Ghost Arms)
+=====================================================================
 
-For a given EE pose, IK-Geo produces up to 8 closed-form solutions.
-This script:
-  1. Solves IK for the target pose.
-  2. Filters valid solutions (within joint limits).
-  3. Draws each valid config as a colored "ghost arm" in RViz
-     using FK-computed link positions rendered as Line/Sphere markers.
+This script connects directly to a running Gazebo simulation, solves IK
+for a given target pose, and spawns up to 8 fully rendered robotic arms in Gazebo.
+These "ghost arms" are static (frozen in place) and visualized in different colors
+to demonstrate the multimodal reachability of the IK-Geo solver in 3D physical space.
 
 Usage:
-  Terminal 1: roslaunch kuka_kr6_gazebo rviz.launch
+  Terminal 1: roslaunch kuka_kr6_gazebo kr6_main.launch
   Terminal 2: python3 visualize_ik_solutions.py
-              python3 visualize_ik_solutions.py --x 0.55 --y 0.3 --z 0.5 --pitch 15
 """
 import sys
 import os
@@ -31,10 +28,8 @@ if ros_python not in sys.path and os.path.isdir(ros_python):
     sys.path.insert(0, ros_python)
 
 import rospy
-from sensor_msgs.msg import JointState
-from visualization_msgs.msg import Marker, MarkerArray
-from geometry_msgs.msg import Point
-from std_msgs.msg import ColorRGBA
+from gazebo_msgs.srv import SpawnModel, DeleteModel, SetModelConfiguration
+from geometry_msgs.msg import Pose
 
 # ── Config ────────────────────────────────────────────────────────
 JOINT_LIMITS = np.array([
@@ -44,17 +39,19 @@ JOINT_LIMITS = np.array([
 
 JOINT_NAMES = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
 
-# Color palette for ghost arms (R, G, B)
-GHOST_COLORS = [
-    (0.2, 0.9, 0.2),   # Green
-    (0.3, 0.3, 1.0),   # Blue
-    (1.0, 0.3, 0.3),   # Red
-    (1.0, 1.0, 0.2),   # Yellow
-    (1.0, 0.5, 0.0),   # Orange
-    (0.8, 0.2, 0.8),   # Purple
-    (0.0, 1.0, 1.0),   # Cyan
-    (1.0, 1.0, 1.0),   # White
+GAZEBO_COLORS = [
+    "Gazebo/Green",
+    "Gazebo/Blue",
+    "Gazebo/Red",
+    "Gazebo/Yellow",
+    "Gazebo/Orange",
+    "Gazebo/Purple",
 ]
+
+URDF_PATH = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'urdf', 'kr6_r700_2_clean.urdf'))
+
+SPAWNED_MODELS = []
 
 
 def is_valid(q):
@@ -86,130 +83,59 @@ def solve_all_ik(target_pos, target_R):
             'fk_err': fk_err,
             'valid': valid,
         })
-    
     return solutions
 
 
-def compute_link_positions(q):
-    """Compute all joint/link positions via FK chain for visualization."""
-    kin = ik.KIN_KR6_R700
-    H, P = kin['H'], kin['P']
+def get_ghost_urdf(color_name="Gazebo/Green"):
+    """Modify the URDF in-memory to be a static, collision-free, colored ghost."""
+    import xml.etree.ElementTree as ET
+    tree = ET.parse(URDF_PATH)
+    root = tree.getroot()
     
-    positions = []
-    R = np.eye(3)
-    p = P[:, 0].copy()
-    positions.append(p.copy())  # Base
+    # Force the entire robot to be static in Gazebo so it doesn't fall due to gravity
+    # The world joint prevents falling, but this ensures no jitter
+    gazebo_static = ET.SubElement(root, 'gazebo')
+    ET.SubElement(gazebo_static, 'static').text = 'true'
     
-    for j in range(6):
-        R = R @ ik.rot(H[:, j], q[j])
-        p = p + R @ P[:, j + 1]
-        positions.append(p.copy())
-    
-    return positions
-
-
-def print_solution_table(solutions, target_pos):
-    """Pretty-print all IK solutions."""
-    print(f"\n{'='*90}")
-    print(f"  IK-Geo Multi-Solution Analysis for Target: {target_pos}")
-    print(f"{'='*90}")
-    print(f"  {'Sol':>3} | {'Valid':>5} | {'FK Error (m)':>12} | Joint Angles (rad)")
-    print(f"  {'-'*3}-+-{'-'*5}-+-{'-'*12}-+-{'-'*50}")
-    
-    valid_count = 0
-    for s in solutions:
-        q_str = ', '.join([f'{v:+7.3f}' for v in s['q']])
-        status = '  ✅' if s['valid'] else '  ❌'
-        print(f"  {s['index']:3d} | {status} | {s['fk_err']:12.2e} | [{q_str}]")
-        if s['valid']:
-            valid_count += 1
-    
-    print(f"\n  Total: {len(solutions)} solutions, {valid_count} valid (within joint limits)")
-    print(f"{'='*90}\n")
-    return valid_count
-
-
-def build_ghost_markers(valid_solutions):
-    """Build MarkerArray with ghost arms rendered as colored line strips + joint spheres."""
-    ma = MarkerArray()
-    
-    for i, sol in enumerate(valid_solutions):
-        r, g, b = GHOST_COLORS[i % len(GHOST_COLORS)]
-        link_positions = compute_link_positions(sol['q'])
+    for link in root.findall('link'):
+        # 1. Remove collisions and inertia
+        coll = link.find('collision')
+        if coll is not None: link.remove(coll)
+        inert = link.find('inertial')
+        if inert is not None: link.remove(inert)
         
-        # Line strip connecting all joints
-        line = Marker()
-        line.header.frame_id = "world"
-        line.ns = f"ghost_arm_{i}"
-        line.id = i * 100
-        line.type = Marker.LINE_STRIP
-        line.action = Marker.ADD
-        line.scale.x = 0.02  # Line width
-        line.color = ColorRGBA(r=r, g=g, b=b, a=0.7)
-        line.pose.orientation.w = 1.0
-        
-        for p in link_positions:
-            line.points.append(Point(x=p[0], y=p[1], z=p[2]))
-        ma.markers.append(line)
-        
-        # Spheres at each joint
-        for j, p in enumerate(link_positions):
-            sphere = Marker()
-            sphere.header.frame_id = "world"
-            sphere.ns = f"ghost_joints_{i}"
-            sphere.id = i * 100 + j + 1
-            sphere.type = Marker.SPHERE
-            sphere.action = Marker.ADD
-            sphere.pose.position.x = p[0]
-            sphere.pose.position.y = p[1]
-            sphere.pose.position.z = p[2]
-            sphere.pose.orientation.w = 1.0
-            sphere.scale.x = 0.04
-            sphere.scale.y = 0.04
-            sphere.scale.z = 0.04
-            sphere.color = ColorRGBA(r=r, g=g, b=b, a=0.9)
-            ma.markers.append(sphere)
-        
-        # Text label at the EE position
-        label = Marker()
-        label.header.frame_id = "world"
-        label.ns = "ghost_labels"
-        label.id = i * 100 + 50
-        label.type = Marker.TEXT_VIEW_FACING
-        label.action = Marker.ADD
-        ee = link_positions[-1]
-        label.pose.position.x = ee[0]
-        label.pose.position.y = ee[1]
-        label.pose.position.z = ee[2] + 0.08
-        label.pose.orientation.w = 1.0
-        label.scale.z = 0.05
-        label.color = ColorRGBA(r=r, g=g, b=b, a=1.0)
-        q_str = ', '.join([f'{v:.1f}°' for v in np.degrees(sol['q'])])
-        label.text = f"Sol {sol['index']}\n[{q_str}]"
-        ma.markers.append(label)
-    
-    return ma
+        # 2. Add color
+        name = link.get('name')
+        if name != 'world':
+            gz = ET.SubElement(root, 'gazebo', {'reference': name})
+            mat = ET.SubElement(gz, 'material')
+            mat.text = color_name
+
+    # Remove the gazebo_ros_control plugin so the ghost doesn't try to conflict with the real robot
+    for gz in root.findall('gazebo'):
+        for plugin in gz.findall('plugin'):
+            if 'gazebo_ros_control' in plugin.get('name', ''):
+                gz.remove(plugin)
+                
+    return ET.tostring(root, encoding='utf8').decode('utf8')
 
 
-def build_target_marker(target_pos):
-    """Build a bright red sphere at the target."""
-    m = Marker()
-    m.header.frame_id = "world"
-    m.ns = "ik_target"
-    m.id = 999
-    m.type = Marker.SPHERE
-    m.action = Marker.ADD
-    m.pose.position.x = target_pos[0]
-    m.pose.position.y = target_pos[1]
-    m.pose.position.z = target_pos[2]
-    m.pose.orientation.w = 1.0
-    m.scale.x = 0.08; m.scale.y = 0.08; m.scale.z = 0.08
-    m.color = ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0)
-    return m
+def cleanup_ghosts():
+    """Delete all spawned ghosts from Gazebo."""
+    if not SPAWNED_MODELS:
+        return
+    print("\n[Gazebo] Cleaning up ghost arms...")
+    try:
+        delete_srv = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+        for model in SPAWNED_MODELS:
+            delete_srv(model)
+            print(f"  🗑️ Deleted {model}")
+    except Exception as e:
+        print(f"Failed to delete models: {e}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="IK-Geo Multi-Solution Ghost Arm Visualizer")
+    parser = argparse.ArgumentParser(description="IK-Geo Ghost Arms in Gazebo")
     parser.add_argument("--x", type=float, default=0.55, help="Target X (m)")
     parser.add_argument("--y", type=float, default=0.3, help="Target Y (m)")
     parser.add_argument("--z", type=float, default=0.5, help="Target Z (m)")
@@ -225,47 +151,59 @@ def main():
         print("❌ IK-Geo returned 0 solutions for this pose!")
         return
     
-    valid_count = print_solution_table(solutions, target_pos)
-    if valid_count == 0:
-        print("❌ No valid solutions within joint limits!")
+    valid_solutions = [s for s in solutions if s['valid']]
+    print(f"\n[IK-Geo] Found {len(valid_solutions)} valid solutions for target {target_pos}.")
+    
+    # 2. Setup ROS and Services
+    rospy.init_node('ik_gazebo_ghost_spawner', anonymous=True)
+    
+    print("[ROS] Waiting for Gazebo /spawn_urdf_model service...")
+    try:
+        rospy.wait_for_service('/gazebo/spawn_urdf_model', timeout=5.0)
+        rospy.wait_for_service('/gazebo/set_model_configuration', timeout=5.0)
+    except rospy.ROSException:
+        print("❌ Gazebo services not found. Is Gazebo running? (roslaunch kuka_kr6_gazebo kr6_main.launch)")
         return
     
-    valid_solutions = [s for s in solutions if s['valid']]
+    spawn_srv = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
+    set_config_srv = rospy.ServiceProxy('/gazebo/set_model_configuration', SetModelConfiguration)
     
-    # 2. Initialize ROS
-    rospy.init_node('ik_multi_solution_viz', anonymous=True)
-    
-    marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
-    target_pub = rospy.Publisher('/visualization_marker', Marker, queue_size=10)
-    rospy.sleep(1.0)
-    
-    # 3. Build markers
-    ghost_markers = build_ghost_markers(valid_solutions)
-    target_marker = build_target_marker(target_pos)
-    
-    print(f"[RViz] Publishing {len(valid_solutions)} ghost arms as colored markers.")
-    print("  💡 Make sure RViz has 'Marker' and 'MarkerArray' displays enabled!")
-    print("  Press Ctrl+C to stop.\n")
-    
-    # 4. Main loop
-    rate = rospy.Rate(5)
-    
-    def shutdown(sig, frame):
-        print("\n[Shutdown] Done.")
+    def shutdown_handler(sig, frame):
+        cleanup_ghosts()
         sys.exit(0)
-    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGINT, shutdown_handler)
     
-    while not rospy.is_shutdown():
-        # Update timestamps
-        now = rospy.Time.now()
-        for m in ghost_markers.markers:
-            m.header.stamp = now
-        target_marker.header.stamp = now
+    # 3. Spawn Ghosts
+    pose = Pose()
+    pose.orientation.w = 1.0
+    
+    for i, sol in enumerate(valid_solutions):
+        model_name = f"ghost_arm_sol_{sol['index']}"
+        color = GAZEBO_COLORS[i % len(GAZEBO_COLORS)]
         
-        marker_pub.publish(ghost_markers)
-        target_pub.publish(target_marker)
-        rate.sleep()
-
+        print(f"  👻 Spawning {model_name} in {color}...")
+        
+        # Get custom URDF
+        urdf_xml = get_ghost_urdf(color)
+        
+        # Spawn!
+        resp = spawn_srv(model_name, urdf_xml, f"/ghost_{i}", pose, "world")
+        if resp.success:
+            SPAWNED_MODELS.append(model_name)
+            
+            # Set the exact joint angles immediately
+            rospy.sleep(0.5)  # Let model load
+            q_list = sol['q'].tolist()
+            cfg_resp = set_config_srv(model_name, "kr6_r700", JOINT_NAMES, q_list)
+            if not cfg_resp.success:
+                print(f"    ⚠️ Failed to set joint angles for {model_name}: {cfg_resp.status_message}")
+        else:
+            print(f"    ❌ Failed to spawn: {resp.status_message}")
+    
+    print(f"\n✅ All {len(valid_solutions)} ghost arms spawned in Gazebo.")
+    print("Hit Ctrl+C to delete them and exit.")
+    
+    rospy.spin()
 
 if __name__ == "__main__":
     main()
