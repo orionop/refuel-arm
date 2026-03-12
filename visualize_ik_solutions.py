@@ -28,6 +28,9 @@ if ros_python not in sys.path and os.path.isdir(ros_python):
     sys.path.insert(0, ros_python)
 
 import rospy
+import actionlib
+from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+from trajectory_msgs.msg import JointTrajectoryPoint
 from gazebo_msgs.srv import SpawnModel, DeleteModel
 from geometry_msgs.msg import Pose
 
@@ -38,6 +41,7 @@ JOINT_LIMITS = np.array([
 ])
 
 JOINT_NAMES = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
+Q_HOME = [0.0, -1.570796326, 0.0, 0.0, 0.0, 0.0]  # REST position
 
 GAZEBO_COLORS = [
     "Gazebo/Green",
@@ -162,6 +166,56 @@ def cleanup_ghosts():
         print(f"Failed to delete models: {e}")
 
 
+def execute_trajectory(q_target, duration=2.0):
+    """Wait for the action server and send the target joint configuration."""
+    client = actionlib.SimpleActionClient('/kr6_arm_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+    if not client.wait_for_server(rospy.Duration(2.0)):
+        print("    ⚠️ Could not connect to /kr6_arm_controller action server. Is the robot fully spawned?")
+        return False
+        
+    goal = FollowJointTrajectoryGoal()
+    goal.trajectory.joint_names = JOINT_NAMES
+    
+    point = JointTrajectoryPoint()
+    point.positions = q_target
+    point.time_from_start = rospy.Duration(duration)
+    
+    goal.trajectory.points.append(point)
+    client.send_goal(goal)
+    client.wait_for_result()
+    return True
+
+
+def spawn_target_marker(target_pos):
+    """Spawn a simple black sphere at the target EE location."""
+    xml = f\"\"\"<?xml version="1.0" ?>
+    <sdf version="1.5">
+      <model name="ik_target_marker">
+        <static>true</static>
+        <link name="link">
+          <visual name="visual">
+            <geometry><sphere><radius>0.05</radius></sphere></geometry>
+            <material>
+              <ambient>0 0 0 1</ambient>
+              <diffuse>0 0 0 1</diffuse>
+            </material>
+          </visual>
+        </link>
+      </model>
+    </sdf>\"\"\"
+    pose = Pose()
+    pose.position.x = target_pos[0]
+    pose.position.y = target_pos[1]
+    pose.position.z = target_pos[2]
+    pose.orientation.w = 1.0
+    try:
+        spawn_srv = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+        resp = spawn_srv("ik_target_marker", xml, "/", pose, "world")
+        if resp.success: SPAWNED_MODELS.append("ik_target_marker")
+    except Exception as e:
+        print(f"Failed to spawn target marker: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="IK-Geo Ghost Arms in Gazebo")
     parser.add_argument("--x", type=float, default=0.55, help="Target X (m)")
@@ -188,8 +242,9 @@ def main():
     print("[ROS] Waiting for Gazebo /spawn_urdf_model service...")
     try:
         rospy.wait_for_service('/gazebo/spawn_urdf_model', timeout=5.0)
+        rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
     except rospy.ROSException:
-        print("❌ Gazebo services not found. Is Gazebo running? (roslaunch kuka_kr6_gazebo kr6_main.launch)")
+        print("❌ Gazebo services not found. Is Gazebo running? (roslaunch kuka_kr6_gazebo gazebo.launch)")
         return
     
     spawn_srv = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
@@ -207,7 +262,7 @@ def main():
         model_name = f"ghost_arm_sol_{sol['index']}"
         color = GAZEBO_COLORS[i % len(GAZEBO_COLORS)]
         
-        print(f"  👻 Spawning {model_name} in {color}...")
+        print(f"  👻 Spawning ghost {model_name} in {color}...")
         
         # Get custom URDF with baked joints
         urdf_xml = get_ghost_urdf(sol['q'], color)
@@ -217,10 +272,31 @@ def main():
         if resp.success:
             SPAWNED_MODELS.append(model_name)
         else:
-            print(f"    ❌ Failed to spawn: {resp.status_message}")
-    
+            print(f"    ❌ Failed to spawn ghost: {resp.status_message}")
+            
     print(f"\n✅ All {len(valid_solutions)} ghost arms spawned in Gazebo.")
-    print("Hit Ctrl+C to delete them and exit.")
+    
+    # 4. Target Marker
+    spawn_target_marker(target_pos)
+    
+    # 5. Animation Sequence
+    print(f"\n[Animation] Moving the real robot to each ghost configuration ONE BY ONE...")
+    rospy.sleep(2.0)
+    
+    for i, sol in enumerate(valid_solutions):
+        print(f"\n  👉 Animating to Sol #{sol['index']} (Ghost {i+1}/{len(valid_solutions)})...")
+        # Go to ghost pose
+        execute_trajectory(sol['q'].tolist(), duration=1.5)
+        # Admire
+        rospy.sleep(1.0)
+        
+        print("  👈 Returning to REST...")
+        # Return to REST
+        execute_trajectory(Q_HOME, duration=1.5)
+        # Settle
+        rospy.sleep(0.5)
+
+    print("\n✅ Animation complete. Hit Ctrl+C to delete ghosts and exit.")
     
     rospy.spin()
 

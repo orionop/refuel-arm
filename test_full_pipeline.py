@@ -159,6 +159,58 @@ def send_trajectory_ros(trajectory, dt=0.15):
     return client.get_result()
 
 
+def spawn_gazebo_markers(p_nozzle, p_refuel):
+    """Dynamically spawn the Yellow nozzle and Red refuel target in Gazebo."""
+    import rospy
+    from gazebo_msgs.srv import SpawnModel
+    from geometry_msgs.msg import Pose
+
+    rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
+    spawn_srv = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+
+    # 1. Yellow Cylinder
+    yellow_sdf = f\"\"\"<?xml version="1.0" ?>
+    <sdf version="1.5">
+      <model name="nozzle_station">
+        <static>true</static>
+        <link name="link">
+          <visual name="visual">
+            <geometry><cylinder><radius>0.05</radius><length>0.696</length></cylinder></geometry>
+            <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+          </visual>
+        </link>
+      </model>
+    </sdf>\"\"\"
+    pose_y = Pose()
+    pose_y.position.x = 0.478
+    pose_y.position.y = -0.478
+    pose_y.position.z = 0.348
+    pose_y.orientation.w = 1.0
+    try: spawn_srv("nozzle_station", yellow_sdf, "/", pose_y, "world")
+    except Exception: pass
+
+    # 2. Red Sphere
+    red_sdf = f\"\"\"<?xml version="1.0" ?>
+    <sdf version="1.5">
+      <model name="car_refuel_inlet">
+        <static>true</static>
+        <link name="link">
+          <visual name="visual">
+            <geometry><sphere><radius>0.05</radius></sphere></geometry>
+            <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+          </visual>
+        </link>
+      </model>
+    </sdf>\"\"\"
+    pose_r = Pose()
+    pose_r.position.x = 0.55
+    pose_r.position.y = 0.3
+    pose_r.position.z = 0.5
+    pose_r.orientation.w = 1.0
+    try: spawn_srv("car_refuel_inlet", red_sdf, "/", pose_r, "world")
+    except Exception: pass
+
+
 def send_trajectory_rviz(trajectory, dt=0.15):
     """Publish a trajectory directly to RViz via /joint_states."""
     # Auto-add ROS Noetic Python path
@@ -255,6 +307,9 @@ def main():
             from visualization_msgs.msg import Marker, MarkerArray
             rospy.init_node('refuel_mission', anonymous=True)
 
+            if args.ros:
+                spawn_gazebo_markers(p_nozzle, REFUEL_TARGET_XYZ)
+                
             if args.rviz:
                 # Publish static markers for RViz
                 marker_pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
