@@ -28,7 +28,7 @@ if ros_python not in sys.path and os.path.isdir(ros_python):
     sys.path.insert(0, ros_python)
 
 import rospy
-from gazebo_msgs.srv import SpawnModel, DeleteModel, SetModelConfiguration
+from gazebo_msgs.srv import SpawnModel, DeleteModel
 from geometry_msgs.msg import Pose
 
 # ── Config ────────────────────────────────────────────────────────
@@ -86,37 +86,67 @@ def solve_all_ik(target_pos, target_R):
     return solutions
 
 
-def get_ghost_urdf(color_name="Gazebo/Green"):
-    """Modify the URDF in-memory to be a static, collision-free, colored ghost."""
+def get_ghost_urdf(q, color_name="Gazebo/Green"):
+    """Modify the URDF in-memory: fix joints to specific angles, remove physics."""
     import xml.etree.ElementTree as ET
+    from scipy.spatial.transform import Rotation
+    
     tree = ET.parse(URDF_PATH)
     root = tree.getroot()
     
-    # Force the entire robot to be static in Gazebo so it doesn't fall due to gravity
-    # The world joint prevents falling, but this ensures no jitter
     gazebo_static = ET.SubElement(root, 'gazebo')
     ET.SubElement(gazebo_static, 'static').text = 'true'
     
     for link in root.findall('link'):
-        # 1. Remove collisions and inertia
         coll = link.find('collision')
         if coll is not None: link.remove(coll)
         inert = link.find('inertial')
         if inert is not None: link.remove(inert)
         
-        # 2. Add color
         name = link.get('name')
         if name != 'world':
             gz = ET.SubElement(root, 'gazebo', {'reference': name})
-            mat = ET.SubElement(gz, 'material')
-            mat.text = color_name
+            ET.SubElement(gz, 'material').text = color_name
+            ET.SubElement(gz, 'turnGravityOff').text = 'true'
 
-    # Remove the gazebo_ros_control plugin so the ghost doesn't try to conflict with the real robot
     for gz in root.findall('gazebo'):
         for plugin in gz.findall('plugin'):
-            if 'gazebo_ros_control' in plugin.get('name', ''):
-                gz.remove(plugin)
+            gz.remove(plugin)
+            
+    # Bake joint angles into fixed joints
+    for j in range(6):
+        joint = root.find(f".//joint[@name='joint_{j+1}']")
+        if joint is not None:
+            joint.set('type', 'fixed')
+            origin = joint.find('origin')
+            axis = joint.find('axis')
+            
+            rpy = [0.0, 0.0, 0.0]
+            if origin is not None and 'rpy' in origin.attrib:
+                rpy = [float(x) for x in origin.attrib['rpy'].split()]
                 
+            ax = [0.0, 0.0, 1.0]
+            if axis is not None and 'xyz' in axis.attrib:
+                ax = [float(x) for x in axis.attrib['xyz'].split()]
+            
+            # Base rotation R_origin
+            R_base = Rotation.from_euler('xyz', rpy).as_matrix()
+            
+            # Angle rotation R_joint(q) around axis
+            theta = q[j]
+            v = np.array(ax)
+            K = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+            R_joint = np.eye(3) + np.sin(theta)*K + (1-np.cos(theta))*(K@K)
+            
+            # Combined and back to Euler
+            R_total = R_base @ R_joint
+            new_rpy = Rotation.from_matrix(R_total).as_euler('xyz')
+            
+            if origin is None:
+                origin = ET.SubElement(joint, 'origin')
+                origin.set('xyz', '0 0 0')
+            origin.set('rpy', f"{new_rpy[0]:.6f} {new_rpy[1]:.6f} {new_rpy[2]:.6f}")
+            
     return ET.tostring(root, encoding='utf8').decode('utf8')
 
 
@@ -160,13 +190,11 @@ def main():
     print("[ROS] Waiting for Gazebo /spawn_urdf_model service...")
     try:
         rospy.wait_for_service('/gazebo/spawn_urdf_model', timeout=5.0)
-        rospy.wait_for_service('/gazebo/set_model_configuration', timeout=5.0)
     except rospy.ROSException:
         print("❌ Gazebo services not found. Is Gazebo running? (roslaunch kuka_kr6_gazebo kr6_main.launch)")
         return
     
     spawn_srv = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
-    set_config_srv = rospy.ServiceProxy('/gazebo/set_model_configuration', SetModelConfiguration)
     
     def shutdown_handler(sig, frame):
         cleanup_ghosts()
@@ -183,20 +211,13 @@ def main():
         
         print(f"  👻 Spawning {model_name} in {color}...")
         
-        # Get custom URDF
-        urdf_xml = get_ghost_urdf(color)
+        # Get custom URDF with baked joints
+        urdf_xml = get_ghost_urdf(sol['q'], color)
         
-        # Spawn!
+        # Spawn! No need for SetModelConfiguration anymore because it's baked!
         resp = spawn_srv(model_name, urdf_xml, f"/ghost_{i}", pose, "world")
         if resp.success:
             SPAWNED_MODELS.append(model_name)
-            
-            # Set the exact joint angles immediately
-            rospy.sleep(0.5)  # Let model load
-            q_list = sol['q'].tolist()
-            cfg_resp = set_config_srv(model_name, "kr6_r700", JOINT_NAMES, q_list)
-            if not cfg_resp.success:
-                print(f"    ⚠️ Failed to set joint angles for {model_name}: {cfg_resp.status_message}")
         else:
             print(f"    ❌ Failed to spawn: {resp.status_message}")
     
