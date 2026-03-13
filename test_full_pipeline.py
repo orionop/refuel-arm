@@ -36,33 +36,23 @@ JOINT_LIMITS = np.array([
 
 # ── Mission Waypoints ────────────────────────────────────────────
 Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])       # REST position (Straight Up)
-Q_NOZZLE = np.array([0.785, -0.94, 0.94, 0.0, 0.0, 0.0])     # YELLOW dot (Tall, Z=0.696m on right)
 REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-left, height=0.5m)
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
-# ── Obstacles ────────────────────────────────────────────────────
-# A spherical obstacle directly in the path from YELLOW to RED
+# ── Obstacles (UNKNOWN to the planner — simulates sensor detection) ──
+# Placed directly on the REST→RED EE arc at ~t=0.4 (arm must go AROUND)
 SIMPLE_OBSTACLES = [
-    (np.array([0.52, 0.05, 0.45]), 0.12)  # (Center XYZ, Radius) - A Blue floating sphere
+    (np.array([0.45, 0.15, 0.85]), 0.12)  # (Center XYZ, Radius) - Blue sphere on the EE arc
 ]
 
-# ── Dynamic Orientation (Wave-Style Tangent Pitching) ───────────
-# Base EE orientation: tool pointing forward (same as test_ik_wave.py)
+# ── EE Orientation ──────────────────────────────────────────────
+# Tool pointing forward (same as test_ik_wave.py)
 R_START = np.array([
     [ 0,  0,  1],
     [ 0,  1,  0],
     [-1,  0,  0]
 ])
-
-# Compute natural approach orientation at RED based on YELLOW→RED direction
-_, P_NOZZLE_FK = fwd_kinematics(Q_NOZZLE)
-_approach_dir = REFUEL_TARGET_XYZ - P_NOZZLE_FK
-_dx = _approach_dir[0]
-_dy = _approach_dir[1]
-_dz = _approach_dir[2]
-_horiz_speed = np.hypot(_dx, _dy)
-_pitch = np.arctan2(_dz, _horiz_speed) * 0.5  # 50% damping like wave script
-REFUEL_TARGET_R = R_START @ rot(np.array([0.0, 1.0, 0.0]), -_pitch)  # Pitch along approach
+REFUEL_TARGET_R = R_START  # Use the standard forward-pointing orientation
 
 
 def within_joint_limits(q):
@@ -167,8 +157,8 @@ def send_trajectory_ros(trajectory, dt=0.15):
     return client.get_result()
 
 
-def spawn_gazebo_markers(p_nozzle, p_refuel, simple_obstacles=None):
-    """Dynamically spawn the Yellow nozzle, Red refuel target, and Blue obstacles in Gazebo."""
+def spawn_gazebo_markers(p_refuel, simple_obstacles=None):
+    """Dynamically spawn the Red refuel target and Blue obstacles in Gazebo."""
     import rospy
     from gazebo_msgs.srv import SpawnModel
     from geometry_msgs.msg import Pose
@@ -176,28 +166,7 @@ def spawn_gazebo_markers(p_nozzle, p_refuel, simple_obstacles=None):
     rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
     spawn_srv = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 
-    # 1. Yellow Cylinder
-    yellow_sdf = f"""<?xml version="1.0" ?>
-    <sdf version="1.5">
-      <model name="nozzle_station">
-        <static>true</static>
-        <link name="link">
-          <visual name="visual">
-            <geometry><cylinder><radius>0.05</radius><length>0.696</length></cylinder></geometry>
-            <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
-          </visual>
-        </link>
-      </model>
-    </sdf>"""
-    pose_y = Pose()
-    pose_y.position.x = 0.478
-    pose_y.position.y = -0.478
-    pose_y.position.z = 0.348
-    pose_y.orientation.w = 1.0
-    try: spawn_srv("nozzle_station", yellow_sdf, "/", pose_y, "world")
-    except Exception: pass
-
-    # 2. Red Sphere
+    # 1. Red Sphere (known target)
     red_sdf = f"""<?xml version="1.0" ?>
     <sdf version="1.5">
       <model name="car_refuel_inlet">
@@ -211,14 +180,14 @@ def spawn_gazebo_markers(p_nozzle, p_refuel, simple_obstacles=None):
       </model>
     </sdf>"""
     pose_r = Pose()
-    pose_r.position.x = 0.55
-    pose_r.position.y = 0.3
-    pose_r.position.z = 0.5
+    pose_r.position.x = p_refuel[0]
+    pose_r.position.y = p_refuel[1]
+    pose_r.position.z = p_refuel[2]
     pose_r.orientation.w = 1.0
     try: spawn_srv("car_refuel_inlet", red_sdf, "/", pose_r, "world")
     except Exception: pass
 
-    # 3. Obstacles (Blue Spheres)
+    # 2. Obstacles (Blue Spheres — unknown to planner)
     if simple_obstacles:
         for i, obs in enumerate(simple_obstacles):
             center, radius = obs
@@ -342,74 +311,63 @@ def main():
 
     print("=" * 65)
     print("  KUKA KR6 R700 — Autonomous Refueling Mission")
-    print("  IK-Geo + STOMP + ROS Noetic")
+    print("  IK-Geo (Exact) + STOMP (Blind) + Elastic Strips (Reactive)")
     print("=" * 65)
 
-    # ── Step 0: Verify waypoints ─────────────────────────────────
-    print("\n[Setup] Verifying mission waypoints...")
+    # ── Step 0: IK-Geo solves for the RED target ─────────────────
+    print("\n[IK-Geo] Solving for RED target pose...")
+    print(f"  🔴 Target EE: {REFUEL_TARGET_XYZ} m")
 
-    # Verify nozzle station (yellow dot) FK
-    R_nozzle, p_nozzle = fwd_kinematics(Q_NOZZLE)
-    print(f"  🟡 YELLOW (nozzle station): {np.round(p_nozzle, 4)} m")
-    print(f"     Joint config: {np.round(Q_NOZZLE, 4)}")
-    assert within_joint_limits(Q_NOZZLE), "Nozzle config violates joint limits!"
-
-    # Solve IK for refueling target (red dot)
-    print(f"  🔴 RED (refuel inlet):      {REFUEL_TARGET_XYZ} m")
     Q = IK_spherical_2_parallel(REFUEL_TARGET_R, REFUEL_TARGET_XYZ)
-    Q_valid = filter_solutions(Q, Q_HOME)
+    Q_valid = filter_solutions(Q, Q_HOME)  # sorted by proximity to REST
 
     if Q_valid.size == 0:
         print("  ❌ No valid IK solution for refuel target!")
         return
 
-    q_refuel = Q_valid[:, 0]
+    q_refuel = Q_valid[:, 0]  # nearest valid solution to REST
     R_check, p_check = fwd_kinematics(q_refuel)
     fk_err = np.linalg.norm(p_check - REFUEL_TARGET_XYZ)
     print(f"     IK-Geo: {Q.shape[1]} solutions, {Q_valid.shape[1]} valid")
-    print(f"     Selected: {np.round(q_refuel, 4)}")
+    print(f"     Selected (nearest to REST): {np.round(q_refuel, 4)}")
     print(f"     FK error: {fk_err:.2e} m")
+    print(f"  🔵 Obstacle: UNKNOWN to planner (will be detected mid-execution)")
 
-    # ── Plan all 4 trajectory segments ───────────────────────────
-    print(f"\n[Planning] STOMP trajectory optimization for 4 motion segments")
+    # ── Step 1: STOMP plans BLIND (no obstacle knowledge) ────────
     n_wp = args.waypoints
+    print(f"\n[STOMP] Planning REST → RED trajectory (BLIND — no obstacles)")
+    seg_blind = plan_segment(Q_HOME, q_refuel, "REST → RED (BLIND)", n_wp)
 
-    seg1 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (pick up nozzle)",  n_wp)
-    seg2_blind = plan_segment(Q_NOZZLE,  q_refuel, "YELLOW → RED (approach refuel — BLIND)",  n_wp)
-        
-    # Plot: naive blind path vs C-Space (both collide!)
-    plot_stomp_vs_cspace(Q_NOZZLE, q_refuel, seg2_blind, SIMPLE_OBSTACLES)
+    # Show what the blind path looks like vs the obstacle
+    plot_stomp_vs_cspace(Q_HOME, q_refuel, seg_blind, SIMPLE_OBSTACLES)
 
-    # ── Elastic Strips: Discovers obstacle mid-path and reacts ───
-    print("\n  🎸 Elastic Strips: Obstacle UNKNOWN to planner!")
-    print("     → Simulating real-time sensor detection mid-execution...")
-    seg2_elastic, elastic_history = elastic_strip_deform(
-        seg2_blind,           # Feed the BLIND path (would collide!)
-        SIMPLE_OBSTACLES,     # Obstacle "discovered" by sensor during execution
-        n_iterations=150,
-        alpha=0.015,
-        k_contraction=2.0,
-        k_repulsion=8.0,
+    # ── Step 2: Elastic Strips reacts to the discovered obstacle ─
+    print("\n  🎸 Elastic Strips: Obstacle DETECTED mid-execution!")
+    print("     → Deforming trajectory to avoid...")
+    seg_elastic, elastic_history = elastic_strip_deform(
+        seg_blind,
+        SIMPLE_OBSTACLES,
+        n_iterations=200,
+        alpha=0.02,
+        k_contraction=1.5,
+        k_repulsion=10.0,
         safety_margin=0.20,
-        damping=0.92,
+        damping=0.90,
         verbose=True,
     )
     plot_elastic_comparison(
-        seg2_blind, seg2_elastic, SIMPLE_OBSTACLES, elastic_history,
+        seg_blind, seg_elastic, SIMPLE_OBSTACLES, elastic_history,
         save_path="output_graphs/elastic_strips_analysis.png"
     )
-    # Use the reactively-deformed trajectory for execution
-    seg2 = seg2_elastic
 
-    seg3 = plan_segment(q_refuel,  Q_NOZZLE, "RED → YELLOW (return nozzle)",    n_wp)
-    seg4 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)",n_wp)
+    # ── Step 3: Plan return (obstacle is now known) ──────────────
+    seg_return = plan_segment(q_refuel, Q_HOME, "RED → REST (return)", n_wp)
 
+    n_steps = 3
     all_segments = [
-        ("REST → YELLOW (pick up nozzle)", seg1, None, 0.12),
-        ("YELLOW → RED (approach refuel)", seg2, None, 0.25),
+        ("REST → RED (reactive avoidance)", seg_elastic, None, 0.20),
         ("🔴 REFUELING — holding position", None, DWELL_TIME, None),
-        ("RED → YELLOW (return nozzle)", seg3, None, 0.15),
-        ("YELLOW → REST (mission complete)", seg4, None, 0.10),
+        ("RED → REST (return home)", seg_return, None, 0.15),
     ]
 
     # ── Execute ──────────────────────────────────────────────────
@@ -426,7 +384,7 @@ def main():
             rospy.init_node('refuel_mission', anonymous=True)
 
             if args.ros:
-                spawn_gazebo_markers(p_nozzle, REFUEL_TARGET_XYZ, SIMPLE_OBSTACLES)
+                spawn_gazebo_markers(REFUEL_TARGET_XYZ, SIMPLE_OBSTACLES)
                 
             if args.rviz:
                 # Publish static markers for RViz
@@ -434,23 +392,6 @@ def main():
                 rospy.sleep(0.5)  # wait for connection
                 
                 ma = MarkerArray()
-                
-                # Yellow Nozzle Station (tall thin cylinder)
-                m_y = Marker()
-                m_y.header.frame_id = "world"  # same as robot base anchor
-                m_y.ns = "stations"
-                m_y.id = 0
-                m_y.type = Marker.CYLINDER
-                m_y.action = Marker.ADD
-                m_y.pose.position.x = p_nozzle[0]
-                m_y.pose.position.y = p_nozzle[1]
-                m_y.pose.position.z = p_nozzle[2] / 2.0  # rest on ground
-                m_y.pose.orientation.w = 1.0
-                m_y.scale.x = 0.05
-                m_y.scale.y = 0.05
-                m_y.scale.z = p_nozzle[2]
-                m_y.color.r = 1.0; m_y.color.g = 1.0; m_y.color.b = 0.0; m_y.color.a = 0.8
-                ma.markers.append(m_y)
 
                 # Red Refuel Inlet (sphere)
                 m_r = Marker()
@@ -491,7 +432,7 @@ def main():
                 marker_pub.publish(ma)
 
             for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
-                print(f"\n  Step {i}/5: {name}")
+                print(f"\n  Step {i}/{n_steps}: {name}")
                 if dwell is not None:
                     print(f"     ⏱️  Holding for {dwell:.0f} seconds...")
                     rospy.sleep(dwell)
@@ -515,16 +456,16 @@ def main():
         total_waypoints = 0
         for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
             if dwell is not None:
-                print(f"  Step {i}/5: {name} ({dwell:.0f}s dwell)")
+                print(f"  Step {i}/{n_steps}: {name} ({dwell:.0f}s dwell)")
             else:
                 total_waypoints += len(traj)
                 start = np.round(traj[0], 3)
                 end = np.round(traj[-1], 3)
-                print(f"  Step {i}/5: {name}")
+                print(f"  Step {i}/{n_steps}: {name}")
                 print(f"           start={start}")
                 print(f"           end  ={end}")
         print(f"\n  Total waypoints: {total_waypoints}")
-        print(f"  Total segments: 6 motion + 1 dwell ({DWELL_TIME:.0f}s)")
+        print(f"  Total segments: {n_steps} ({n_steps - 1} motion + 1 dwell)")
 
     print(f"\n{'=' * 65}")
     print("  Mission complete!")
