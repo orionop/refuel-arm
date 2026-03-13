@@ -37,7 +37,7 @@ JOINT_LIMITS = np.array([
 # ── Mission Waypoints ────────────────────────────────────────────
 Q_HOME = np.array([0.0, -np.pi/2, 0.0, 0.0, 0.0, 0.0])       # REST position (Straight Up)
 REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-left, height=0.5m)
-DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
+DWELL_TIME = 5.0                                              # Seconds to hold at refuel position
 
 # ── Obstacles (UNKNOWN to the planner — simulates sensor detection) ──
 # Placed 75% of the way along the REST→RED swing, identical size to RED target
@@ -361,13 +361,27 @@ def main():
     )
 
     # ── Step 3: Plan return (obstacle is now known) ──────────────
-    seg_return = plan_segment(q_refuel, Q_HOME, "RED → REST (return)", n_wp)
+    print(f"\n[STOMP] Planning RED → REST trajectory (BLIND)")
+    seg_return_blind = plan_segment(q_refuel, Q_HOME, "RED → REST (BLIND)", n_wp)
+
+    print("\n  🎸 Elastic Strips: Avoiding known obstacle on return trip...")
+    seg_return_elastic, _ = elastic_strip_deform(
+        seg_return_blind,
+        SIMPLE_OBSTACLES,
+        n_iterations=200,
+        alpha=0.02,
+        k_contraction=1.5,
+        k_repulsion=10.0,
+        safety_margin=0.20,
+        damping=0.90,
+        verbose=False,
+    )
 
     n_steps = 3
     all_segments = [
         ("REST → RED (reactive avoidance)", seg_elastic, None, 0.20),
         ("🔴 REFUELING — holding position", None, DWELL_TIME, None),
-        ("RED → REST (return home)", seg_return, None, 0.15),
+        ("RED → REST (return avoidance)", seg_return_elastic, None, 0.15),
     ]
 
     # ── Execute ──────────────────────────────────────────────────
