@@ -40,9 +40,9 @@ REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-lef
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
 # ── Obstacles (UNKNOWN to the planner — simulates sensor detection) ──
-# Placed directly on the REST→RED EE arc at ~t=0.4 (arm must go AROUND)
+# Same size as target, same Y-plane. Placed dead-center in the sweeping arc.
 SIMPLE_OBSTACLES = [
-    (np.array([0.45, 0.15, 0.85]), 0.12)  # (Center XYZ, Radius) - Blue sphere on the EE arc
+    (np.array([0.57, 0.30, 0.60]), 0.05)  # (Center XYZ, Radius) - Blue sphere
 ]
 
 # ── EE Orientation ──────────────────────────────────────────────
