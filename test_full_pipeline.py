@@ -375,17 +375,18 @@ def main():
     n_wp = args.waypoints
 
     seg1 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (pick up nozzle)",  n_wp)
-    seg2 = plan_segment(Q_NOZZLE,  q_refuel, "YELLOW → RED (approach refuel)",  n_wp, simple_obstacles=SIMPLE_OBSTACLES)
+    seg2_blind = plan_segment(Q_NOZZLE,  q_refuel, "YELLOW → RED (approach refuel — BLIND)",  n_wp)
         
-    # Plot performance for seg2
-    plot_stomp_vs_cspace(Q_NOZZLE, q_refuel, seg2, SIMPLE_OBSTACLES)
+    # Plot: naive blind path vs C-Space (both collide!)
+    plot_stomp_vs_cspace(Q_NOZZLE, q_refuel, seg2_blind, SIMPLE_OBSTACLES)
 
-    # ── Elastic Strips: Reactive refinement of STOMP path ────────
-    print("\n  🎸 Elastic Strips: Refining STOMP path reactively...")
+    # ── Elastic Strips: Discovers obstacle mid-path and reacts ───
+    print("\n  🎸 Elastic Strips: Obstacle UNKNOWN to planner!")
+    print("     → Simulating real-time sensor detection mid-execution...")
     seg2_elastic, elastic_history = elastic_strip_deform(
-        seg2,
-        SIMPLE_OBSTACLES,
-        n_iterations=120,
+        seg2_blind,           # Feed the BLIND path (would collide!)
+        SIMPLE_OBSTACLES,     # Obstacle "discovered" by sensor during execution
+        n_iterations=150,
         alpha=0.015,
         k_contraction=2.0,
         k_repulsion=8.0,
@@ -394,10 +395,10 @@ def main():
         verbose=True,
     )
     plot_elastic_comparison(
-        seg2, seg2_elastic, SIMPLE_OBSTACLES, elastic_history,
+        seg2_blind, seg2_elastic, SIMPLE_OBSTACLES, elastic_history,
         save_path="output_graphs/elastic_strips_analysis.png"
     )
-    # Use the elastic-refined trajectory for execution
+    # Use the reactively-deformed trajectory for execution
     seg2 = seg2_elastic
 
     seg3 = plan_segment(q_refuel,  Q_NOZZLE, "RED → YELLOW (return nozzle)",    n_wp)
