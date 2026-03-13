@@ -276,6 +276,7 @@ def plot_elastic_comparison(original_traj, deformed_traj, obstacles, history,
                             save_path="output_graphs/elastic_strips_analysis.png"):
     """Generate a 3-panel analysis comparing original vs deformed trajectories."""
     import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 — registers '3d' projection
 
     fig, axs = plt.subplots(1, 3, figsize=(18, 5))
 
