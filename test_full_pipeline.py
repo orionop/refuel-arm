@@ -40,9 +40,9 @@ REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-lef
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
 # ── Obstacles (UNKNOWN to the planner — simulates sensor detection) ──
-# Placed exactly at the mid-point of the REST→RED swing (t=0.5)
+# Placed 75% of the way along the REST→RED swing, identical size to RED target
 SIMPLE_OBSTACLES = [
-    (np.array([0.49, 0.13, 0.96]), 0.10)  # Blue sphere floating mid-path
+    (np.array([0.58, 0.23, 0.73]), 0.05)  # Blue sphere floating near target
 ]
 
 # ── EE Orientation ──────────────────────────────────────────────
