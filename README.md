@@ -72,6 +72,7 @@ python3 ik_trajectories/analyze_ik_accuracy.py
 refuel-arm/
 ├── test_full_pipeline.py            # Main Refueling execution orchestrator
 ├── stomp_collision.py               # Fast Mathematical Cartesian collision penalty engine
+├── elastic_strips.py                # Real-time reactive obstacle avoidance (Brock & Khatib 2002)
 ├── visualize_ik_solutions.py        # IK-Geo multimodal global solver and Gazebo visualizer
 ├── analyze_pipeline.py              # STOMP 4-panel analysis graph generator
 ├── ik_trajectories/                 # 6-DOF Topological Tracking & Comparison

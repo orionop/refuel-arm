@@ -22,6 +22,7 @@ import numpy as np
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
 from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700, rot
 from stomp_collision import stomp_optimize
+from elastic_strips import elastic_strip_deform, plot_elastic_comparison
 
 # ── Official KUKA KR6 R700-2 Joint Limits (from URDF) ───────────
 JOINT_LIMITS = np.array([
@@ -378,6 +379,26 @@ def main():
         
     # Plot performance for seg2
     plot_stomp_vs_cspace(Q_NOZZLE, q_refuel, seg2, SIMPLE_OBSTACLES)
+
+    # ── Elastic Strips: Reactive refinement of STOMP path ────────
+    print("\n  🎸 Elastic Strips: Refining STOMP path reactively...")
+    seg2_elastic, elastic_history = elastic_strip_deform(
+        seg2,
+        SIMPLE_OBSTACLES,
+        n_iterations=120,
+        alpha=0.015,
+        k_contraction=2.0,
+        k_repulsion=8.0,
+        safety_margin=0.20,
+        damping=0.92,
+        verbose=True,
+    )
+    plot_elastic_comparison(
+        seg2, seg2_elastic, SIMPLE_OBSTACLES, elastic_history,
+        save_path="output_graphs/elastic_strips_analysis.png"
+    )
+    # Use the elastic-refined trajectory for execution
+    seg2 = seg2_elastic
 
     seg3 = plan_segment(q_refuel,  Q_NOZZLE, "RED → YELLOW (return nozzle)",    n_wp)
     seg4 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)",n_wp)

@@ -1,0 +1,425 @@
+#!/usr/bin/env python3
+"""
+Elastic Strips: Real-Time Reactive Obstacle Avoidance for 6-DOF Arms
+=====================================================================
+
+Based on: Brock, O., & Khatib, O. (2002). "Elastic Strips: A Framework
+for Motion Generation in Human Environments." IJRR 21(12), 1031-1052.
+
+This module takes a pre-planned trajectory (e.g. from STOMP) and treats
+it as a physical rubber band. When dynamic obstacles intrude, the band
+stretches away smoothly using:
+  - Internal Forces: Spring tension between adjacent waypoints (smoothness)
+  - External Forces: Workspace repulsion translated to joint-space via J^T
+
+Standalone implementation for the KUKA KR6 R700. No GPU, no training.
+"""
+import sys
+import os
+import numpy as np
+
+# ── IK-Geo import ────────────────────────────────────────────────
+sys.path.insert(0, os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'kuka_refuel_ws', 'src',
+    'kuka_kr6_gazebo', 'scripts')))
+try:
+    import ik_geometric as ik
+except ImportError:
+    sys.path.insert(0, os.path.abspath(os.path.join(
+        os.path.dirname(__file__), '..', 'kuka_refuel_ws', 'src',
+        'kuka_kr6_gazebo', 'scripts')))
+    import ik_geometric as ik
+
+# ── Kinematics Constants ─────────────────────────────────────────
+KIN = ik.KIN_KR6_R700
+H_AXES = KIN['H']
+P_VECS = KIN['P']
+rot = ik.rot  # Rodriguez rotation
+
+JOINT_LIMITS = np.array([
+    [-2.967060285,  2.967060285],
+    [-3.316125571,  0.785398163],
+    [-2.094395100,  2.722713630],
+    [-3.228859113,  3.228859113],
+    [-2.094395100,  2.094395100],
+    [-6.108652375,  6.108652375],
+])
+
+# Links to check for collisions (indices into the 6 joints)
+# 2=elbow, 4=wrist, 5=tool tip
+CHECK_JOINTS = [2, 4, 5]
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  Core FK & Jacobian
+# ═══════════════════════════════════════════════════════════════════
+
+def fk_checkpoints(q):
+    """
+    Run Forward Kinematics for a 6-DOF config and return Cartesian
+    positions of key arm checkpoints (elbow, forearm_mid, wrist, tool).
+    Returns list of (joint_index, position_3d) tuples.
+    """
+    R = np.eye(3)
+    p = P_VECS[:, 0].copy()
+    points = []
+    for j in range(6):
+        R = R @ rot(H_AXES[:, j], q[j])
+        p = p + R @ P_VECS[:, j + 1]
+        if j in CHECK_JOINTS:
+            points.append((j, p.copy()))
+
+    # Add a forearm midpoint between elbow and wrist
+    if len(points) >= 2:
+        elbow_p = points[0][1]
+        wrist_p = points[1][1]
+        mid_p = elbow_p + 0.5 * (wrist_p - elbow_p)
+        points.append((3, mid_p))  # virtual link index 3
+
+    return points
+
+
+def numerical_jacobian(q, link_idx, eps=1e-6):
+    """
+    Compute the 3x6 positional Jacobian for a specific link checkpoint
+    using finite differences. Simple, robust, and exact enough at 1e-6.
+    """
+    J = np.zeros((3, 6))
+    _, p0 = _fk_single_link(q, link_idx)
+    for j in range(6):
+        q_plus = q.copy()
+        q_plus[j] += eps
+        _, p_plus = _fk_single_link(q_plus, link_idx)
+        J[:, j] = (p_plus - p0) / eps
+    return J
+
+
+def _fk_single_link(q, target_link_idx):
+    """FK up to a specific joint index, returning (R, p)."""
+    R = np.eye(3)
+    p = P_VECS[:, 0].copy()
+    for j in range(6):
+        R = R @ rot(H_AXES[:, j], q[j])
+        p = p + R @ P_VECS[:, j + 1]
+        if j == target_link_idx:
+            return R, p.copy()
+    return R, p.copy()
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  Force Calculations
+# ═══════════════════════════════════════════════════════════════════
+
+def internal_force(q_prev, q_curr, q_next, k_contraction=1.0):
+    """
+    Spring-like contraction force pulling waypoint toward its neighbors.
+    F_int = k_c * (q_{i-1} + q_{i+1} - 2*q_i)
+    This is a discrete Laplacian — it smooths the trajectory.
+    """
+    return k_contraction * (q_prev + q_next - 2.0 * q_curr)
+
+
+def external_force(q, obstacles, safety_margin=0.25, k_repulsion=1.0):
+    """
+    Compute the total repulsive force in joint-space from all obstacles.
+
+    For each checkpoint on the arm:
+      1. Calculate the Cartesian repulsion vector (away from obstacle)
+      2. Translate to joint-space torques via Jacobian Transpose: τ = J^T · F_ws
+
+    Returns a 6-DOF joint-space force vector.
+    """
+    tau_total = np.zeros(6)
+
+    checkpoints = fk_checkpoints(q)
+    for link_idx, pt in checkpoints:
+        for obs_center, obs_radius in obstacles:
+            vec = pt - obs_center                         # vector from obstacle to point
+            dist = np.linalg.norm(vec)
+            penetration = (obs_radius + safety_margin) - dist
+
+            if penetration > 0:
+                # Repulsion magnitude: quadratic ramp inside margin
+                magnitude = k_repulsion * (penetration / safety_margin) ** 2
+
+                # Direction: push AWAY from obstacle center
+                if dist > 1e-8:
+                    direction = vec / dist
+                else:
+                    direction = np.array([0.0, 0.0, 1.0])  # push up if coincident
+
+                F_workspace = magnitude * direction  # 3D Cartesian force
+
+                # J^T mapping: workspace force → joint-space torque
+                J = numerical_jacobian(q, link_idx)
+                tau_total += J.T @ F_workspace
+
+    return tau_total
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  Elastic Strips Optimizer
+# ═══════════════════════════════════════════════════════════════════
+
+def elastic_strip_deform(
+    trajectory,
+    obstacles,
+    joint_limits=None,
+    n_iterations=100,
+    alpha=0.02,
+    k_contraction=2.0,
+    k_repulsion=5.0,
+    safety_margin=0.25,
+    damping=0.95,
+    verbose=True,
+):
+    """
+    Deform a pre-planned trajectory (e.g. from STOMP) to avoid dynamic obstacles.
+
+    Parameters
+    ----------
+    trajectory : np.ndarray, shape (N, 6)
+        The initial trajectory (from STOMP or C-Space LERP).
+    obstacles : list of (center_xyz, radius)
+        Spherical obstacles to avoid.
+    joint_limits : np.ndarray, shape (6, 2), optional
+        If None, uses the KUKA KR6 R700 defaults.
+    n_iterations : int
+        Number of physics simulation steps.
+    alpha : float
+        Step size (learning rate) for the force integration.
+    k_contraction : float
+        Spring stiffness for internal smoothness forces.
+    k_repulsion : float
+        Repulsion strength for external obstacle forces.
+    safety_margin : float
+        Distance (meters) beyond the obstacle radius to start repelling.
+    damping : float
+        Velocity damping factor (0-1) to prevent oscillation.
+    verbose : bool
+        Print progress every 10 iterations.
+
+    Returns
+    -------
+    deformed : np.ndarray, shape (N, 6)
+        The deformed, obstacle-avoiding trajectory.
+    history : list of float
+        Min-distance-to-obstacle at each iteration (for plotting).
+    """
+    if joint_limits is None:
+        joint_limits = JOINT_LIMITS
+
+    N = len(trajectory)
+    deformed = trajectory.copy()
+    velocities = np.zeros_like(deformed)
+
+    # Pin start and end (they must not move)
+    q_start = deformed[0].copy()
+    q_goal = deformed[-1].copy()
+
+    history_min_dist = []
+
+    for it in range(n_iterations):
+        min_dist_this_iter = float('inf')
+
+        for i in range(1, N - 1):  # skip pinned endpoints
+            # --- Internal Force (Smoothness) ---
+            F_int = internal_force(
+                deformed[i - 1], deformed[i], deformed[i + 1],
+                k_contraction=k_contraction
+            )
+
+            # --- External Force (Obstacle Repulsion) ---
+            F_ext = external_force(
+                deformed[i], obstacles,
+                safety_margin=safety_margin,
+                k_repulsion=k_repulsion
+            )
+
+            # --- Physics Integration ---
+            total_force = F_int + F_ext
+            velocities[i] = damping * velocities[i] + alpha * total_force
+            deformed[i] = deformed[i] + velocities[i]
+
+            # --- Joint Limit Clamping ---
+            for j in range(6):
+                deformed[i, j] = np.clip(
+                    deformed[i, j], joint_limits[j, 0], joint_limits[j, 1]
+                )
+
+            # --- Track min distance for this waypoint ---
+            checkpoints = fk_checkpoints(deformed[i])
+            for _, pt in checkpoints:
+                for obs_center, obs_radius in obstacles:
+                    d = np.linalg.norm(pt - obs_center) - obs_radius
+                    if d < min_dist_this_iter:
+                        min_dist_this_iter = d
+
+        # Re-pin endpoints
+        deformed[0] = q_start
+        deformed[-1] = q_goal
+
+        history_min_dist.append(min_dist_this_iter)
+
+        if verbose and (it % 20 == 0 or it == n_iterations - 1):
+            print(f"  [Elastic iter {it:3d}/{n_iterations}] "
+                  f"min_dist={min_dist_this_iter:.4f}m")
+
+    return deformed, history_min_dist
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  Visualization & Analysis
+# ═══════════════════════════════════════════════════════════════════
+
+def plot_elastic_comparison(original_traj, deformed_traj, obstacles, history,
+                            save_path="output_graphs/elastic_strips_analysis.png"):
+    """Generate a 3-panel analysis comparing original vs deformed trajectories."""
+    import matplotlib.pyplot as plt
+
+    fig, axs = plt.subplots(1, 3, figsize=(18, 5))
+
+    N = len(original_traj)
+    steps = np.arange(1, N + 1)
+
+    # ── Panel 1: Joint Angle Comparison ──
+    ax = axs[0]
+    j_labels = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6']
+    colors = plt.cm.tab10(np.linspace(0, 1, 6))
+    for j in range(6):
+        ax.plot(steps, original_traj[:, j], '--', color=colors[j], alpha=0.4,
+                label=f'{j_labels[j]} (STOMP)')
+        ax.plot(steps, deformed_traj[:, j], '-', color=colors[j], linewidth=2,
+                label=f'{j_labels[j]} (Elastic)')
+    ax.set_title("Joint Angles: STOMP vs Elastic", fontweight='bold')
+    ax.set_xlabel("Waypoint")
+    ax.set_ylabel("Radians")
+    ax.grid(True, alpha=0.3)
+    # Only show elastic legend entries to avoid clutter
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles[6:], [l.replace(' (Elastic)', '') for l in labels[6:]],
+              fontsize=8, loc='upper right', title='Elastic')
+
+    # ── Panel 2: Min Distance to Obstacle Over Iterations ──
+    ax = axs[1]
+    ax.plot(history, 'b-', linewidth=2)
+    ax.axhline(0, color='r', linestyle=':', linewidth=1.5, label='Collision Surface')
+    ax.fill_between(range(len(history)), history, 0,
+                     where=(np.array(history) < 0), color='red', alpha=0.3)
+    ax.set_title("Elastic Convergence: Min Distance to Obstacle", fontweight='bold')
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Distance (m)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+
+    # ── Panel 3: 3D Cartesian Path Comparison ──
+    ax = fig.add_subplot(1, 3, 3, projection='3d')
+    # Remove the flat axes[2] and replace with 3D
+    axs[2].remove()
+
+    orig_ee = []
+    deform_ee = []
+    for i in range(N):
+        _, p_orig = ik.fwd_kinematics(original_traj[i])
+        _, p_def = ik.fwd_kinematics(deformed_traj[i])
+        orig_ee.append(p_orig)
+        deform_ee.append(p_def)
+    orig_ee = np.array(orig_ee)
+    deform_ee = np.array(deform_ee)
+
+    ax.plot(orig_ee[:, 0], orig_ee[:, 1], orig_ee[:, 2],
+            'r--', linewidth=1.5, alpha=0.5, label='STOMP (Original)')
+    ax.plot(deform_ee[:, 0], deform_ee[:, 1], deform_ee[:, 2],
+            'b-', linewidth=2.5, label='Elastic (Deformed)')
+
+    # Draw obstacle spheres
+    for center, radius in obstacles:
+        u = np.linspace(0, 2 * np.pi, 20)
+        v = np.linspace(0, np.pi, 15)
+        x = center[0] + radius * np.outer(np.cos(u), np.sin(v))
+        y = center[1] + radius * np.outer(np.sin(u), np.sin(v))
+        z = center[2] + radius * np.outer(np.ones_like(u), np.cos(v))
+        ax.plot_surface(x, y, z, alpha=0.25, color='red')
+
+    ax.set_title("3D EE Path", fontweight='bold')
+    ax.set_xlabel("X (m)")
+    ax.set_ylabel("Y (m)")
+    ax.set_zlabel("Z (m)")
+    ax.legend(fontsize=8)
+
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=200)
+    print(f"\n📊 Elastic Strips analysis saved to {save_path}")
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  Standalone Test
+# ═══════════════════════════════════════════════════════════════════
+
+if __name__ == "__main__":
+    print("=" * 65)
+    print("  Elastic Strips — Standalone Test")
+    print("  Brock & Khatib (2002) + KR6 R700 FK + Jacobian Transpose")
+    print("=" * 65)
+
+    # ── Define a straight C-Space LERP as the "base trajectory" ──
+    Q_START = np.array([0.785, -0.94, 0.94, 0.0, 0.0, 0.0])    # YELLOW
+    Q_GOAL = np.array([-0.4911, -0.7409, 0.9101, -0.0578, 1.5099, -0.4844])  # RED
+
+    N_WP = 30
+    base_traj = np.zeros((N_WP, 6))
+    for i in range(N_WP):
+        t = i / (N_WP - 1)
+        base_traj[i] = Q_START + t * (Q_GOAL - Q_START)
+
+    # ── Define an obstacle right in the middle of the path ──
+    obstacles = [
+        (np.array([0.52, 0.05, 0.45]), 0.12),  # Blue sphere
+    ]
+
+    print(f"\n[Setup] Base trajectory: {N_WP} waypoints (C-Space LERP)")
+    print(f"[Setup] Obstacle: center={obstacles[0][0]}, radius={obstacles[0][1]}")
+
+    # ── Check initial collision ──
+    print("\n[Pre-Deform] Checking initial trajectory collisions...")
+    initial_collisions = 0
+    for i, q in enumerate(base_traj):
+        for _, pt in fk_checkpoints(q):
+            for center, radius in obstacles:
+                if np.linalg.norm(pt - center) - radius < 0:
+                    initial_collisions += 1
+                    break
+    print(f"  ⚠️  {initial_collisions}/{N_WP} waypoints have collisions BEFORE elastic deformation")
+
+    # ── Run Elastic Strips ──
+    print("\n[Elastic Strips] Running reactive deformation...")
+    deformed, history = elastic_strip_deform(
+        base_traj,
+        obstacles,
+        n_iterations=150,
+        alpha=0.015,
+        k_contraction=2.0,
+        k_repulsion=8.0,
+        safety_margin=0.20,
+        damping=0.92,
+        verbose=True,
+    )
+
+    # ── Check post-deform collisions ──
+    print("\n[Post-Deform] Checking deformed trajectory collisions...")
+    post_collisions = 0
+    for i, q in enumerate(deformed):
+        for _, pt in fk_checkpoints(q):
+            for center, radius in obstacles:
+                if np.linalg.norm(pt - center) - radius < 0:
+                    post_collisions += 1
+                    break
+    print(f"  ✅ {post_collisions}/{N_WP} waypoints have collisions AFTER elastic deformation")
+
+    # ── Plot comparison ──
+    plot_elastic_comparison(base_traj, deformed, obstacles, history)
+
+    print("\n" + "=" * 65)
+    print("  Elastic Strips test complete!")
+    print("=" * 65)
