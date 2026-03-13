@@ -40,8 +40,10 @@ REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-lef
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
 # ── Obstacles (UNKNOWN to the planner — simulates sensor detection) ──
-# Temporarily empty to verify baseline path logic
-SIMPLE_OBSTACLES = []
+# Placed exactly at the mid-point of the REST→RED swing (t=0.5)
+SIMPLE_OBSTACLES = [
+    (np.array([0.49, 0.13, 0.96]), 0.10)  # Blue sphere floating mid-path
+]
 
 # ── EE Orientation ──────────────────────────────────────────────
 # Tool pointing forward (same as test_ik_wave.py)
