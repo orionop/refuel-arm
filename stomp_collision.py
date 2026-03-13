@@ -119,6 +119,38 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Grid3D, margin: float = 0.3) ->
                 cost[i] += ((margin - d) / margin) ** 2
     return cost
 
+def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: list, margin: float = 0.3) -> np.ndarray:
+    """Euclidean distance penalty against simple spherical obstacles."""
+    cost = np.zeros(len(trajectory))
+    if not obstacles: return cost
+
+    kin = ik.KIN_KR6_R700
+    H, P = kin['H'], kin['P']
+    for i, q in enumerate(trajectory):
+        R = np.eye(3); p = P[:, 0].copy()
+        
+        # Test key locations on the arm (Elbow, Wrist, End-Effector)
+        check_points = []
+        for j in range(6):
+            R = R @ ik.rot(H[:, j], q[j])
+            p = p + R @ P[:, j + 1]
+            if j in [2, 4, 5]: check_points.append(p.copy())
+            
+        # Interpolate a few points down the "forearm" Link 3 to Link 4/5
+        if len(check_points) >= 3:
+            elbow, wrist, tool = check_points[0], check_points[1], check_points[2]
+            forearm_mid = elbow + 0.5 * (wrist - elbow)
+            check_points.append(forearm_mid)
+
+        for pt in check_points:
+            for obs in obstacles:
+                # obs is (center_xyz, radius)
+                center, radius = obs
+                d = np.linalg.norm(pt - center) - radius
+                if d < margin:
+                    cost[i] += ((margin - d) / margin) ** 2
+    return cost
+
 import matplotlib.pyplot as plt
 
 def visualize_stomp_results(trajectory, costs, grid, pc):
@@ -173,6 +205,7 @@ def stomp_optimize(
     q_goal: np.ndarray,
     joint_limits: np.ndarray,
     grid: Grid3D = None,
+    simple_obstacles: list = None,
     n_waypoints: int = 30,
     n_iterations: int = 80,
     n_rollouts: int = 15,
@@ -184,6 +217,7 @@ def stomp_optimize(
     w_obs: float = 1000.0,
     safety_margin: float = 0.2,
     verbose: bool = True,
+    return_cost_history: bool = False,
 ):
     """STOMP Optimizer with 2.5D Grid Avoidance."""
     ndof = len(q_start)
@@ -217,16 +251,18 @@ def stomp_optimize(
             c_limit = w_limit * np.sum(_joint_limit_cost(candidate, joint_limits))
             c_vel = w_vel * np.sum(_velocity_cost(candidate))
             c_obs = w_obs * np.sum(_obstacle_cost(candidate, grid, safety_margin))
+            c_simp = w_obs * np.sum(_simple_obstacle_cost(candidate, simple_obstacles, safety_margin))
 
             candidates.append(candidate)
-            costs.append(c_smooth + c_limit + c_vel + c_obs)
+            costs.append(c_smooth + c_limit + c_vel + c_obs + c_simp)
 
         # Eval current trajectory
         c_smooth = w_smooth * _smoothness_cost(trajectory, A)
         c_limit = w_limit * np.sum(_joint_limit_cost(trajectory, joint_limits))
         c_vel = w_vel * np.sum(_velocity_cost(trajectory))
         c_obs = w_obs * np.sum(_obstacle_cost(trajectory, grid, safety_margin))
-        current_cost = c_smooth + c_limit + c_vel + c_obs
+        c_simp = w_obs * np.sum(_simple_obstacle_cost(trajectory, simple_obstacles, safety_margin))
+        current_cost = c_smooth + c_limit + c_vel + c_obs + c_simp
         candidates.append(trajectory.copy()); costs.append(current_cost)
 
         # Prob update
@@ -248,7 +284,9 @@ def stomp_optimize(
 
     for j in range(ndof): trajectory[:, j] = np.clip(trajectory[:, j], joint_limits[j, 0], joint_limits[j, 1])
     trajectory[0] = q_start; trajectory[-1] = q_goal
-    return trajectory, cost_history
+    if return_cost_history:
+        return trajectory, cost_history
+    return trajectory
 
 
 if __name__ == "__main__":
@@ -271,7 +309,7 @@ if __name__ == "__main__":
     grid.build_from_point_cloud(np.array(pc))
     
     print("\nRunning Collision-Aware STOMP Optimizer...")
-    traj, history = stomp_optimize(q_home, q_goal, limits, grid=grid, n_iterations=100, verbose=True)
+    traj, history = stomp_optimize(q_home, q_goal, limits, grid=grid, n_iterations=100, verbose=True, return_cost_history=True)
 
     print("\n✅ Valid trajectory generated resolving obstacles.")
     

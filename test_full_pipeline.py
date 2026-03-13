@@ -39,6 +39,12 @@ Q_NOZZLE = np.array([0.785, -0.94, 0.94, 0.0, 0.0, 0.0])     # YELLOW dot (Tall,
 REFUEL_TARGET_XYZ = np.array([0.55, 0.3, 0.5])              # RED dot (front-left, height=0.5m)
 DWELL_TIME = 10.0                                             # Seconds to hold at refuel position
 
+# ── Obstacles ────────────────────────────────────────────────────
+# A spherical obstacle directly in the path from YELLOW to RED
+SIMPLE_OBSTACLES = [
+    (np.array([0.52, 0.05, 0.45]), 0.12)  # (Center XYZ, Radius) - A Blue floating sphere
+]
+
 # ── Dynamic Orientation (Wave-Style Tangent Pitching) ───────────
 # Base EE orientation: tool pointing forward (same as test_ik_wave.py)
 R_START = np.array([
@@ -101,13 +107,14 @@ def filter_solutions(Q, q_prev=None, max_jump=0.5):
     return valid
 
 
-def plan_segment(q_start, q_goal, name, n_waypoints=30):
+def plan_segment(q_start, q_goal, name, n_waypoints=30, simple_obstacles=None):
     """Plan a STOMP-optimized trajectory between two joint configs."""
     print(f"\n  📍 Planning: {name}")
     trajectory = stomp_optimize(
         q_start=q_start,
         q_goal=q_goal,
         joint_limits=JOINT_LIMITS,
+        simple_obstacles=simple_obstacles,
         n_waypoints=n_waypoints,
         n_iterations=80,
         n_rollouts=10,
@@ -159,8 +166,8 @@ def send_trajectory_ros(trajectory, dt=0.15):
     return client.get_result()
 
 
-def spawn_gazebo_markers(p_nozzle, p_refuel):
-    """Dynamically spawn the Yellow nozzle and Red refuel target in Gazebo."""
+def spawn_gazebo_markers(p_nozzle, p_refuel, simple_obstacles=None):
+    """Dynamically spawn the Yellow nozzle, Red refuel target, and Blue obstacles in Gazebo."""
     import rospy
     from gazebo_msgs.srv import SpawnModel
     from geometry_msgs.msg import Pose
@@ -209,6 +216,91 @@ def spawn_gazebo_markers(p_nozzle, p_refuel):
     pose_r.orientation.w = 1.0
     try: spawn_srv("car_refuel_inlet", red_sdf, "/", pose_r, "world")
     except Exception: pass
+
+    # 3. Obstacles (Blue Spheres)
+    if simple_obstacles:
+        for i, obs in enumerate(simple_obstacles):
+            center, radius = obs
+            obs_sdf = f"""<?xml version="1.0" ?>
+            <sdf version="1.5">
+              <model name="stomp_obstacle_{i}">
+                <static>true</static>
+                <link name="link">
+                  <visual name="visual">
+                    <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+                    <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+                  </visual>
+                </link>
+              </model>
+            </sdf>"""
+            pose_obs = Pose()
+            pose_obs.position.x = center[0]
+            pose_obs.position.y = center[1]
+            pose_obs.position.z = center[2]
+            pose_obs.orientation.w = 1.0
+            try: spawn_srv(f"stomp_obstacle_{i}", obs_sdf, "/", pose_obs, "world")
+            except Exception: pass
+
+def plot_stomp_vs_cspace(q_start, q_goal, stomp_traj, obstacles):
+    """Generate a graph comparing STOMP (W-Space cost) vs pure C-Space LERP."""
+    import matplotlib.pyplot as plt
+    import os
+    
+    n_wp = len(stomp_traj)
+    cspace_traj = np.zeros_like(stomp_traj)
+    for i in range(n_wp):
+        t = i / (n_wp - 1)
+        cspace_traj[i] = q_start + t * (q_goal - q_start)
+        
+    stomp_dist = []
+    cspace_dist = []
+    
+    kin = KIN_KR6_R700
+    H, P = kin['H'], kin['P']
+    
+    def min_dist_to_obs(q):
+        R = np.eye(3); p = P[:, 0].copy()
+        check_points = []
+        for j in range(6):
+            R = R @ rot(H[:, j], q[j])
+            p = p + R @ P[:, j + 1]
+            if j in [2, 4, 5]: check_points.append(p.copy())
+        if len(check_points) >= 3:
+            elbow, wrist, tool = check_points[0], check_points[1], check_points[2]
+            check_points.append(elbow + 0.5 * (wrist - elbow))
+            
+        min_d = float('inf')
+        for pt in check_points:
+            for obs in obstacles:
+                center, radius = obs
+                d = np.linalg.norm(pt - center) - radius
+                if d < min_d: min_d = d
+        return min_d
+
+    for i in range(n_wp):
+        stomp_dist.append(min_dist_to_obs(stomp_traj[i]))
+        cspace_dist.append(min_dist_to_obs(cspace_traj[i]))
+        
+    fig, ax = plt.subplots(figsize=(10, 6))
+    steps = np.arange(1, n_wp + 1)
+    
+    ax.plot(steps, cspace_dist, 'r--', label='Pure C-Space LERP (Ignore Obstacles)', linewidth=2)
+    ax.plot(steps, stomp_dist, 'b-', label='STOMP Optimized (Avoid Obstacles)', linewidth=2)
+    ax.axhline(0, color='k', linestyle=':', label='Obstacle Surface (Collision=0)')
+    
+    # Fill red where C-Space collides
+    ax.fill_between(steps, cspace_dist, 0, where=(np.array(cspace_dist) < 0), color='red', alpha=0.3, label='Collision Zone')
+    
+    ax.set_title("Obstacle Avoidance: C-Space LERP vs STOMP", fontweight='bold')
+    ax.set_xlabel("Waypoint")
+    ax.set_ylabel("Minimum Distance to Obstacle (Meters)")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc='lower right')
+    
+    os.makedirs("output_graphs", exist_ok=True)
+    save_path = "output_graphs/stomp_vs_cspace_avoidance.png"
+    plt.savefig(save_path, dpi=200)
+    print(f"\n📊 Avoidance comparison graph saved to {save_path}")
 
 
 def send_trajectory_rviz(trajectory, dt=0.15):
@@ -282,7 +374,11 @@ def main():
     n_wp = args.waypoints
 
     seg1 = plan_segment(Q_HOME,    Q_NOZZLE, "REST → YELLOW (pick up nozzle)",  n_wp)
-    seg2 = plan_segment(Q_NOZZLE,  q_refuel, "YELLOW → RED (approach refuel)",  n_wp)
+    seg2 = plan_segment(Q_NOZZLE,  q_refuel, "YELLOW → RED (approach refuel)",  n_wp, simple_obstacles=SIMPLE_OBSTACLES)
+        
+    # Plot performance for seg2
+    plot_stomp_vs_cspace(Q_NOZZLE, q_refuel, seg2, SIMPLE_OBSTACLES)
+
     seg3 = plan_segment(q_refuel,  Q_NOZZLE, "RED → YELLOW (return nozzle)",    n_wp)
     seg4 = plan_segment(Q_NOZZLE,  Q_HOME,   "YELLOW → REST (mission complete)",n_wp)
 
@@ -308,7 +404,7 @@ def main():
             rospy.init_node('refuel_mission', anonymous=True)
 
             if args.ros:
-                spawn_gazebo_markers(p_nozzle, REFUEL_TARGET_XYZ)
+                spawn_gazebo_markers(p_nozzle, REFUEL_TARGET_XYZ, SIMPLE_OBSTACLES)
                 
             if args.rviz:
                 # Publish static markers for RViz
@@ -350,6 +446,25 @@ def main():
                 m_r.scale.z = 0.1
                 m_r.color.r = 1.0; m_r.color.g = 0.0; m_r.color.b = 0.0; m_r.color.a = 0.8
                 ma.markers.append(m_r)
+
+                if SIMPLE_OBSTACLES:
+                    for idx, obs in enumerate(SIMPLE_OBSTACLES):
+                        center, radius = obs
+                        m_obs = Marker()
+                        m_obs.header.frame_id = "world"
+                        m_obs.ns = "stations"
+                        m_obs.id = 2 + idx
+                        m_obs.type = Marker.SPHERE
+                        m_obs.action = Marker.ADD
+                        m_obs.pose.position.x = center[0]
+                        m_obs.pose.position.y = center[1]
+                        m_obs.pose.position.z = center[2]
+                        m_obs.pose.orientation.w = 1.0
+                        m_obs.scale.x = radius * 2
+                        m_obs.scale.y = radius * 2
+                        m_obs.scale.z = radius * 2
+                        m_obs.color.r = 0.0; m_obs.color.g = 0.0; m_obs.color.b = 1.0; m_obs.color.a = 0.6
+                        ma.markers.append(m_obs)
 
                 marker_pub.publish(ma)
 
