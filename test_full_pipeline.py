@@ -429,6 +429,30 @@ def main():
                         m_obs.color.r = 0.0; m_obs.color.g = 0.0; m_obs.color.b = 1.0; m_obs.color.a = 0.6
                         ma.markers.append(m_obs)
 
+                # --- Trace the full planned trajectory with a white line ---
+                from geometry_msgs.msg import Point
+                
+                m_path = Marker()
+                m_path.header.frame_id = "world"
+                m_path.ns = "trajectory_path"
+                m_path.id = 100
+                m_path.type = Marker.LINE_STRIP
+                m_path.action = Marker.ADD
+                m_path.pose.orientation.w = 1.0
+                m_path.scale.x = 0.008  # Line thickness
+                m_path.color.r = 1.0; m_path.color.g = 1.0; m_path.color.b = 1.0; m_path.color.a = 0.8
+                
+                for _, traj, dwell, _ in all_segments:
+                    if dwell is None and traj is not None:
+                        for q_wp in traj:
+                            _, p_wp = fwd_kinematics(q_wp)
+                            pt = Point()
+                            pt.x = p_wp[0]; pt.y = p_wp[1]; pt.z = p_wp[2]
+                            m_path.points.append(pt)
+                            
+                ma.markers.append(m_path)
+
+                # Only publish once it's all assembled
                 marker_pub.publish(ma)
 
             for i, (name, traj, dwell, dt) in enumerate(all_segments, 1):
