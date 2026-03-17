@@ -17,3 +17,6 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# Third-party templates
+ros2-claude-code-template/
