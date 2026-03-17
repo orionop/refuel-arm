@@ -3,12 +3,16 @@
 KUKA KR6 R700 — Autonomous Refueling Mission
 ==============================================
 
-For a given EE target pose (green marker), a random obstacle (blue sphere)
-is spawned somewhere along the arm's planned path. The arm must:
-  1. IK-Geo  → solve exact joint angles for the target
-  2. STOMP   → plan a smooth trajectory
-  3. Elastic Strips → reactively avoid the obstacle
-  4. Refuel (dwell 5 s) → return to HOME
+Hybrid C-Space / W-Space 4-phase mission architecture:
+
+  Phase 1  HOME → Pre-approach     (C-Space: STOMP + Elastic Strips)
+  Phase 2  Pre-approach → Target   (W-Space: Cartesian straight-line + IK)
+  Phase 3  Target → Pre-approach   (W-Space: Cartesian straight-line + IK)
+  Phase 4  Pre-approach → HOME     (C-Space: STOMP + Elastic Strips)
+
+Random obstacles (blue spheres) are placed along the gross-motion path.
+STOMP + Elastic Strips avoid them. Fine insertion/extraction use Cartesian
+interpolation with fixed orientation to guarantee a straight-line nozzle path.
 
 Outputs two graphs:
   - EE workspace trajectory (3D)
@@ -186,6 +190,34 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
             safety_margin=0.20, damping=0.90, verbose=False,
         )
         print(f"     Elastic Strips: deformed around {len(obstacles)} obstacle(s)")
+    return traj
+
+
+def plan_cartesian(pos_start, pos_goal, R_fixed, q_seed, name, n_wp=20):
+    """Straight-line Cartesian interpolation with IK at every point.
+
+    Interpolates linearly in XYZ while keeping orientation fixed.
+    Each waypoint is solved with IK-Geo, selecting the solution closest
+    to the previous waypoint (``q_seed`` for the first) to prevent flips.
+    """
+    print(f"\n  Planning: {name} (Cartesian, {n_wp} wp)")
+    traj = np.zeros((n_wp, 6))
+    q_prev = q_seed.copy()
+    for i in range(n_wp):
+        alpha = i / (n_wp - 1)
+        p_i = (1 - alpha) * pos_start + alpha * pos_goal
+        Q = IK_spherical_2_parallel(R_fixed, p_i)
+        Q_valid = filter_solutions(Q, q_prev)
+        if Q_valid.size == 0:
+            # Fallback: C-space lerp from last good config toward seed goal
+            print(f"     WARNING: no IK at wp {i}, falling back to C-space lerp")
+            traj[i] = q_prev
+        else:
+            traj[i] = Q_valid[:, 0]
+            q_prev = traj[i]
+    _, p_end = fwd_kinematics(traj[-1])
+    err = np.linalg.norm(p_end - pos_goal)
+    print(f"     Cartesian: {n_wp} wp, endpoint FK error: {err:.2e} m")
     return traj
 
 
@@ -406,21 +438,29 @@ def main():
           f"{preapproach_xyz[2]:.3f}]")
 
     print("\n[IK-Geo] Solving for target pose...")
-    Q = IK_spherical_2_parallel(inlet_R, inlet_xyz)
-    Q_valid = filter_solutions(Q, Q_HOME)
-    if Q_valid.size == 0:
-        print("  No valid IK solution!")
+    Q_target = IK_spherical_2_parallel(inlet_R, inlet_xyz)
+    Q_valid_target = filter_solutions(Q_target, Q_HOME)
+    if Q_valid_target.size == 0:
+        print("  No valid IK solution for Target!")
         return
-    q_target = Q_valid[:, 0]
+    q_target = Q_valid_target[:, 0]
+    
+    print("\n[IK-Geo] Solving for pre-approach pose...")
+    Q_pre = IK_spherical_2_parallel(inlet_R, preapproach_xyz)
+    Q_valid_pre = filter_solutions(Q_pre, Q_HOME)
+    if Q_valid_pre.size == 0:
+        print("  No valid IK solution for Pre-approach!")
+        return
+    q_pre = Q_valid_pre[:, 0]
+
     _, p_chk = fwd_kinematics(q_target)
-    print(f"     {Q.shape[1]} solutions, {Q_valid.shape[1]} valid")
-    print(f"     Selected: {np.round(np.degrees(q_target), 1)} deg")
-    print(f"     FK error: {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
+    print(f"     Target Selected: {np.round(np.degrees(q_target), 1)} deg")
+    print(f"     Target FK error: {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
 
     # ── Step 2: Blind STOMP to find the path, then place obstacle ─
-    print("\n[STOMP] Blind plan HOME -> Target (to determine path)...")
+    print("\n[STOMP] Blind plan HOME -> Pre-approach (to determine path)...")
     seg_blind = stomp_optimize(
-        q_start=Q_HOME, q_goal=q_target,
+        q_start=Q_HOME, q_goal=q_pre,
         joint_limits=JOINT_LIMITS, simple_obstacles=None,
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False)
@@ -428,22 +468,36 @@ def main():
     print("\n[Obstacles] Spawning 2 random obstacles on the path...")
     obs_list = random_obstacles_on_path(seg_blind, n_obs=NUM_OBSTACLES, rng=rng)
 
-    # ── Step 3: Re-plan with obstacle knowledge ───────────────────
-    seg_go = plan_stomp(Q_HOME, q_target, obs_list,
-                        "HOME -> Target (obstacle-aware)", n_wp)
+    # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
+    
+    # Phase 1: Gross Approach (C-Space)
+    seg_approach = plan_stomp(Q_HOME, q_pre, obs_list,
+                              "Phase 1: HOME -> Pre-approach", n_wp)
 
-    seg_insert = plan_fine(q_target, q_target, n_wp=5)  # hold at target
+    # Phase 2: Fine Insertion (W-Space)
+    seg_insert = plan_cartesian(preapproach_xyz, inlet_xyz, inlet_R, 
+                                q_pre, "Phase 2: Pre-approach -> Target", n_wp=20)
+                                
+    # Dwell at target
+    seg_dwell = plan_fine(q_target, q_target, n_wp=5)
 
-    seg_return = plan_stomp(q_target, Q_HOME, obs_list,
-                            "Target -> HOME (obstacle-aware)", n_wp)
+    # Phase 3: Fine Extraction (W-Space)
+    seg_extract = plan_cartesian(inlet_xyz, preapproach_xyz, inlet_R,
+                                 q_target, "Phase 3: Target -> Pre-approach", n_wp=20)
+
+    # Phase 4: Gross Return (C-Space)
+    seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
+                            "Phase 4: Pre-approach -> HOME", n_wp)
 
     # ── Step 4: Concatenate full trajectory for graphs ────────────
-    full_traj = np.vstack([seg_go, seg_insert, seg_return])
+    full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])
 
     segments = [
-        ("HOME -> Target",  seg_go,      0.15),
-        ("Refueling",       None,        DWELL_TIME),
-        ("Target -> HOME",  seg_return,  0.15),
+        ("Gross Approach",  seg_approach, 0.15),
+        ("Fine Insertion",  seg_insert,   0.05),
+        ("Refueling",       None,         DWELL_TIME),
+        ("Fine Extraction", seg_extract,  0.05),
+        ("Gross Return",    seg_return,   0.15),
     ]
 
     # ── Step 5: Spawn in Gazebo / RViz FIRST ──────────────────────
