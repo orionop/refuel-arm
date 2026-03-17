@@ -108,8 +108,9 @@ def random_obstacle_on_path(trajectory, rng=None):
     _, ee_pos = fwd_kinematics(trajectory[idx])
     # Offset slightly so it's in the path but not exactly on the waypoint
     offset = rng.uniform(-0.04, 0.04, size=3)
-    offset[2] = abs(offset[2])  # keep above ground
+    offset[2] = -abs(offset[2])  # nudge below the EE path
     center = ee_pos + offset
+    center[2] = max(center[2], 0.05)  # keep above ground
     print(f"  Obstacle placed near waypoint {idx}/{n} at "
           f"[{center[0]:.3f}, {center[1]:.3f}, {center[2]:.3f}]")
     return (center, OBS_RADIUS)
