@@ -26,9 +26,9 @@ from elastic_strips import fk_checkpoints
 KNOWN_MODELS = {
     'ground_plane', 'sun',
     'kr6_r700',             # the robot itself
-    'refuel_car',           # car model
-    'refuel_platform',      # elevated stand
-    'fuel_inlet_marker',    # green inlet overlay
+    'refuel_target',        # green target marker
+    'refuel_car',           # car model (if used)
+    'refuel_platform',      # elevated stand (if used)
 }
 
 SENSOR_RANGE     = 0.6     # metres — detection radius

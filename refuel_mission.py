@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-KUKA KR6 R700 — Autonomous Refueling Mission (Consolidated)
-=============================================================
+KUKA KR6 R700 — Autonomous Refueling Mission
+==============================================
 
-Mission sequence:
-  HOME → Pre-approach → Inlet (slow insert, 5 s dwell) → Pre-approach → HOME
+For a given EE target pose (green marker), a random obstacle (blue sphere)
+is spawned somewhere along the arm's planned path. The arm must:
+  1. IK-Geo  → solve exact joint angles for the target
+  2. STOMP   → plan a smooth trajectory
+  3. Elastic Strips → reactively avoid the obstacle
+  4. Refuel (dwell 5 s) → return to HOME
 
-Components:
-  1. IK-Geo          → exact closed-form IK  (10^-16 precision)
-  2. STOMP            → smooth trajectory optimisation  (Kalakrishnan, ICRA 2011)
-  3. Elastic Strips   → reactive obstacle deformation   (Brock & Khatib, 2002)
-  4. Car Model        → elevated platform + car SDF with fuel inlet
-  5. Obstacle Detector→ simulated sensor via /gazebo/model_states
+Outputs two graphs:
+  - EE workspace trajectory (3D)
+  - Joint angle trajectories (degrees) over the full mission
 
 Run locally:   python3 refuel_mission.py
 Run in Gazebo: python3 refuel_mission.py --ros
@@ -30,19 +31,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 
 from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, rot
 from stomp_collision import stomp_optimize
-from elastic_strips import elastic_strip_deform, plot_elastic_comparison
+from elastic_strips import elastic_strip_deform
 from car_model import (
-    get_inlet_pose, get_preapproach_pose,
-    spawn_car_gazebo, get_car_rviz_markers,
-    CAR_POSITION_DEFAULT, CAR_YAW_DEFAULT,
-    CAR_MODEL_DEFAULT, CAR_SCALE_DEFAULT,
-)
-from obstacle_detector import (
-    ObstacleDetector, DummyDetector,
-    spawn_default_obstacle,
+    get_inlet_pose, get_preapproach_pose, spawn_target_marker,
+    TARGET_XYZ_DEFAULT,
 )
 
-# ── Official KUKA KR6 R700-2 Joint Limits (from URDF) ────────────
+# ── KUKA KR6 R700-2 Joint Limits (URDF) ──────────────────────────
 JOINT_LIMITS = np.array([
     [-2.967059725,  2.967059725],   # joint_1: +/-170 deg
     [-3.316125575,  0.785398163],   # joint_2: -190 to +45 deg
@@ -53,10 +48,11 @@ JOINT_LIMITS = np.array([
 ])
 
 Q_HOME     = np.array([0.0, -np.pi / 2, 0.0, 0.0, 0.0, 0.0])
-DWELL_TIME = 5.0   # seconds at refuel position
+DWELL_TIME = 5.0
+OBS_RADIUS = 0.05
 
 
-# ── Utility (from test_full_pipeline.py, unchanged) ──────────────
+# ── Utility ───────────────────────────────────────────────────────
 
 def within_joint_limits(q):
     for i in range(6):
@@ -92,21 +88,77 @@ def filter_solutions(Q, q_prev=None):
     return valid
 
 
-# ── Trajectory helpers ────────────────────────────────────────────
+def ee_positions(trajectory):
+    """Compute EE XYZ for every waypoint."""
+    pts = np.zeros((len(trajectory), 3))
+    for i, q in enumerate(trajectory):
+        _, p = fwd_kinematics(q)
+        pts[i] = p
+    return pts
 
-def plan_coarse(q_start, q_goal, obstacles, name, n_wp=30):
-    """STOMP plan (informed with obstacles) + Elastic Strips refinement."""
+
+# ── Random obstacle along the path ───────────────────────────────
+
+def random_obstacle_on_path(trajectory, rng=None):
+    """Pick a random waypoint (30-70% along the path) and place an obstacle near it."""
+    if rng is None:
+        rng = np.random.default_rng()
+    n = len(trajectory)
+    idx = rng.integers(int(n * 0.3), int(n * 0.7))
+    _, ee_pos = fwd_kinematics(trajectory[idx])
+    # Offset slightly so it's in the path but not exactly on the waypoint
+    offset = rng.uniform(-0.04, 0.04, size=3)
+    offset[2] = abs(offset[2])  # keep above ground
+    center = ee_pos + offset
+    print(f"  Obstacle placed near waypoint {idx}/{n} at "
+          f"[{center[0]:.3f}, {center[1]:.3f}, {center[2]:.3f}]")
+    return (center, OBS_RADIUS)
+
+
+def spawn_obstacle_gazebo(center, radius):
+    """Spawn a blue sphere obstacle in Gazebo."""
+    import rospy
+    from gazebo_msgs.srv import SpawnModel
+    from geometry_msgs.msg import Pose
+
+    sdf = f"""<?xml version="1.0" ?>
+    <sdf version="1.5">
+      <model name="random_obstacle">
+        <static>true</static>
+        <link name="link">
+          <visual name="vis">
+            <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+            <material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material>
+          </visual>
+          <collision name="col">
+            <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+          </collision>
+        </link>
+      </model>
+    </sdf>"""
+
+    rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
+    spawn = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    p = Pose()
+    p.position.x, p.position.y, p.position.z = center
+    p.orientation.w = 1.0
+    try:
+        spawn("random_obstacle", sdf, "/", p, "world")
+    except Exception:
+        pass
+
+
+# ── Trajectory planning ──────────────────────────────────────────
+
+def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
+    """STOMP + Elastic Strips."""
     print(f"\n  Planning: {name}")
     traj = stomp_optimize(
-        q_start=q_start,
-        q_goal=q_goal,
+        q_start=q_start, q_goal=q_goal,
         joint_limits=JOINT_LIMITS,
         simple_obstacles=obstacles or None,
-        n_waypoints=n_wp,
-        n_iterations=80,
-        n_rollouts=10,
-        noise_stddev=0.08,
-        verbose=False,
+        n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
+        noise_stddev=0.08, verbose=False,
     )
     diffs = np.diff(traj, axis=0)
     max_jump = np.max(np.abs(diffs))
@@ -119,11 +171,9 @@ def plan_coarse(q_start, q_goal, obstacles, name, n_wp=30):
             traj, obstacles,
             n_iterations=200, alpha=0.02,
             k_contraction=1.5, k_repulsion=10.0,
-            safety_margin=0.20, damping=0.90,
-            verbose=False,
+            safety_margin=0.20, damping=0.90, verbose=False,
         )
         print(f"     Elastic Strips: deformed around {len(obstacles)} obstacle(s)")
-
     return traj
 
 
@@ -136,7 +186,7 @@ def plan_fine(q_start, q_goal, n_wp=20):
     return traj
 
 
-# ── ROS trajectory execution ─────────────────────────────────────
+# ── ROS execution ─────────────────────────────────────────────────
 
 def _ensure_ros_path():
     ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
@@ -146,8 +196,7 @@ def _ensure_ros_path():
 
 def send_trajectory_ros(trajectory, dt=0.15):
     _ensure_ros_path()
-    import rospy
-    import actionlib
+    import rospy, actionlib
     from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
     from trajectory_msgs.msg import JointTrajectoryPoint
 
@@ -157,16 +206,13 @@ def send_trajectory_ros(trajectory, dt=0.15):
     client.wait_for_server(timeout=rospy.Duration(5.0))
 
     goal = FollowJointTrajectoryGoal()
-    goal.trajectory.joint_names = [
-        'joint_1', 'joint_2', 'joint_3',
-        'joint_4', 'joint_5', 'joint_6']
+    goal.trajectory.joint_names = [f'joint_{i}' for i in range(1, 7)]
     for i, q in enumerate(trajectory):
         pt = JointTrajectoryPoint()
         pt.positions = q.tolist()
         pt.velocities = [0.0] * 6
         pt.time_from_start = rospy.Duration.from_sec(i * dt)
         goal.trajectory.points.append(pt)
-
     client.send_goal(goal)
     client.wait_for_result(timeout=rospy.Duration(len(trajectory) * dt + 10.0))
     return client.get_result()
@@ -176,15 +222,11 @@ def send_trajectory_rviz(trajectory, dt=0.15):
     _ensure_ros_path()
     import rospy
     from sensor_msgs.msg import JointState
-
     if not hasattr(send_trajectory_rviz, "pub"):
-        send_trajectory_rviz.pub = rospy.Publisher(
-            '/joint_states', JointState, queue_size=10)
+        send_trajectory_rviz.pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
         rospy.sleep(0.5)
-
     msg = JointState()
-    msg.name = ['joint_1', 'joint_2', 'joint_3',
-                'joint_4', 'joint_5', 'joint_6']
+    msg.name = [f'joint_{i}' for i in range(1, 7)]
     rate = rospy.Rate(1.0 / dt)
     for q in trajectory:
         msg.header.stamp = rospy.Time.now()
@@ -194,73 +236,9 @@ def send_trajectory_rviz(trajectory, dt=0.15):
     return True
 
 
-# ── Analysis graphs (--analyze) ───────────────────────────────────
+# ── RViz markers ──────────────────────────────────────────────────
 
-def run_analysis(q_start, q_goal, stomp_traj, elastic_traj, obstacles,
-                 elastic_history):
-    """Generate comparison graphs to output_graphs/."""
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-    from ik_geometric import KIN_KR6_R700
-
-    kin = KIN_KR6_R700
-    H, P = kin['H'], kin['P']
-
-    def min_dist(q):
-        R = np.eye(3); p = P[:, 0].copy()
-        pts = []
-        for j in range(6):
-            R = R @ rot(H[:, j], q[j])
-            p = p + R @ P[:, j + 1]
-            if j in [2, 4, 5]:
-                pts.append(p.copy())
-        if len(pts) >= 3:
-            pts.append(pts[0] + 0.5 * (pts[1] - pts[0]))
-        md = float('inf')
-        for pt in pts:
-            for c, r in obstacles:
-                d = np.linalg.norm(pt - c) - r
-                if d < md:
-                    md = d
-        return md
-
-    n_wp = len(stomp_traj)
-    cspace = np.array([q_start + t / (n_wp - 1) * (q_goal - q_start)
-                        for t in range(n_wp)])
-
-    stomp_d = [min_dist(stomp_traj[i]) for i in range(n_wp)]
-    cspace_d = [min_dist(cspace[i]) for i in range(n_wp)]
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    steps = np.arange(1, n_wp + 1)
-    ax.plot(steps, cspace_d, 'r--', lw=2, label='Pure C-Space LERP')
-    ax.plot(steps, stomp_d, 'b-', lw=2, label='STOMP Optimised')
-    ax.axhline(0, color='k', ls=':', label='Collision Surface')
-    ax.fill_between(steps, cspace_d, 0,
-                    where=(np.array(cspace_d) < 0),
-                    color='red', alpha=0.3, label='Collision Zone')
-    ax.set_title("Obstacle Avoidance: C-Space LERP vs STOMP", fontweight='bold')
-    ax.set_xlabel("Waypoint")
-    ax.set_ylabel("Min Distance to Obstacle (m)")
-    ax.grid(True, alpha=0.3)
-    ax.legend(loc='lower right')
-    os.makedirs("output_graphs", exist_ok=True)
-    plt.savefig("output_graphs/stomp_vs_cspace_avoidance.png", dpi=200)
-    plt.close()
-    print("\n  Graph saved: output_graphs/stomp_vs_cspace_avoidance.png")
-
-    if elastic_traj is not None and elastic_history is not None:
-        plot_elastic_comparison(
-            stomp_traj, elastic_traj, obstacles, elastic_history,
-            save_path="output_graphs/elastic_strips_analysis.png")
-        print("  Graph saved: output_graphs/elastic_strips_analysis.png")
-
-
-# ── RViz marker publishing ────────────────────────────────────────
-
-def publish_markers(car_pos, car_yaw, obstacles, segments):
-    """Publish car, obstacles, and trajectory markers to RViz."""
+def publish_markers(target_xyz, obstacle, segments):
     _ensure_ros_path()
     import rospy
     from visualization_msgs.msg import Marker, MarkerArray
@@ -268,39 +246,37 @@ def publish_markers(car_pos, car_yaw, obstacles, segments):
 
     pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
     rospy.sleep(0.5)
-
     ma = MarkerArray()
 
-    # Car + platform + inlet markers
-    ma.markers.extend(get_car_rviz_markers(car_pos, car_yaw))
+    # Green target
+    m = Marker()
+    m.header.frame_id = "world"; m.ns = "mission"; m.id = 1
+    m.type = Marker.CUBE; m.action = Marker.ADD
+    m.pose.position.x, m.pose.position.y, m.pose.position.z = target_xyz
+    m.pose.orientation.w = 1.0
+    m.scale.x = 0.06; m.scale.y = 0.06; m.scale.z = 0.06
+    m.color.r = 0; m.color.g = 0.9; m.color.b = 0; m.color.a = 1.0
+    ma.markers.append(m)
 
-    # Obstacle spheres (blue, semi-transparent)
-    for idx, (center, radius) in enumerate(obstacles):
-        m = Marker()
-        m.header.frame_id = "world"
-        m.ns = "obstacles"
-        m.id = 50 + idx
-        m.type = Marker.SPHERE
-        m.action = Marker.ADD
-        m.pose.position.x = center[0]
-        m.pose.position.y = center[1]
-        m.pose.position.z = center[2]
-        m.pose.orientation.w = 1.0
-        m.scale.x = m.scale.y = m.scale.z = radius * 2
-        m.color.r = 0.0; m.color.g = 0.0; m.color.b = 1.0; m.color.a = 0.6
-        ma.markers.append(m)
+    # Blue obstacle
+    if obstacle:
+        c, r = obstacle
+        m2 = Marker()
+        m2.header.frame_id = "world"; m2.ns = "mission"; m2.id = 2
+        m2.type = Marker.SPHERE; m2.action = Marker.ADD
+        m2.pose.position.x, m2.pose.position.y, m2.pose.position.z = c
+        m2.pose.orientation.w = 1.0
+        m2.scale.x = m2.scale.y = m2.scale.z = r * 2
+        m2.color.r = 0; m2.color.g = 0; m2.color.b = 1.0; m2.color.a = 0.7
+        ma.markers.append(m2)
 
-    # Full trajectory trace (white LINE_STRIP)
+    # Trajectory trace (white)
     m_path = Marker()
-    m_path.header.frame_id = "world"
-    m_path.ns = "trajectory"
-    m_path.id = 100
-    m_path.type = Marker.LINE_STRIP
-    m_path.action = Marker.ADD
+    m_path.header.frame_id = "world"; m_path.ns = "trajectory"; m_path.id = 100
+    m_path.type = Marker.LINE_STRIP; m_path.action = Marker.ADD
     m_path.pose.orientation.w = 1.0
     m_path.scale.x = 0.008
-    m_path.color.r = 1.0; m_path.color.g = 1.0; m_path.color.b = 1.0; m_path.color.a = 0.8
-
+    m_path.color.r = 1; m_path.color.g = 1; m_path.color.b = 1; m_path.color.a = 0.8
     for label, traj, _ in segments:
         if traj is not None:
             for q in traj:
@@ -308,28 +284,83 @@ def publish_markers(car_pos, car_yaw, obstacles, segments):
                 m_path.points.append(Point(x=p[0], y=p[1], z=p[2]))
     ma.markers.append(m_path)
 
-    # Fine insertion segment (green LINE_STRIP)
-    for label, traj, _ in segments:
-        if 'Insert' in label and traj is not None:
-            m_ins = Marker()
-            m_ins.header.frame_id = "world"
-            m_ins.ns = "trajectory"
-            m_ins.id = 101
-            m_ins.type = Marker.LINE_STRIP
-            m_ins.action = Marker.ADD
-            m_ins.pose.orientation.w = 1.0
-            m_ins.scale.x = 0.012
-            m_ins.color.r = 0.0; m_ins.color.g = 1.0; m_ins.color.b = 0.3; m_ins.color.a = 0.9
-            for q in traj:
-                _, p = fwd_kinematics(q)
-                m_ins.points.append(Point(x=p[0], y=p[1], z=p[2]))
-            ma.markers.append(m_ins)
-
     pub.publish(ma)
-    print("  RViz markers published")
 
 
-# ── Main Mission ──────────────────────────────────────────────────
+# ── Graphs ────────────────────────────────────────────────────────
+
+def plot_trajectory_3d(all_traj, target_xyz, obstacle, save_path):
+    """Plot 3D EE workspace trajectory with target and obstacle."""
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
+    pts = ee_positions(all_traj)
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot(pts[:, 0], pts[:, 1], pts[:, 2], 'k-', lw=1.5, label='EE Trajectory')
+    ax.scatter(*pts[0], color='blue', s=80, marker='^', label='HOME (start)', zorder=5)
+    ax.scatter(*target_xyz, color='green', s=100, marker='s', label='Target (refuel)', zorder=5)
+    ax.scatter(*pts[-1], color='blue', s=80, marker='v', label='HOME (return)', zorder=5)
+
+    if obstacle:
+        c, r = obstacle
+        # Draw obstacle sphere wireframe
+        u = np.linspace(0, 2 * np.pi, 20)
+        v = np.linspace(0, np.pi, 15)
+        xs = c[0] + r * np.outer(np.cos(u), np.sin(v))
+        ys = c[1] + r * np.outer(np.sin(u), np.sin(v))
+        zs = c[2] + r * np.outer(np.ones_like(u), np.cos(v))
+        ax.plot_surface(xs, ys, zs, alpha=0.25, color='blue')
+        ax.scatter(*c, color='red', s=40, marker='x', label='Obstacle center', zorder=5)
+
+    ax.set_xlabel('X (m)')
+    ax.set_ylabel('Y (m)')
+    ax.set_zlabel('Z (m)')
+    ax.set_title('End-Effector Trajectory — IK-Geo + STOMP + Elastic Strips',
+                 fontweight='bold')
+    ax.legend(loc='upper left', fontsize=8)
+    ax.set_box_aspect(None)
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {save_path}")
+
+
+def plot_joint_angles(all_traj, save_path):
+    """Plot joint angles (degrees) over the full mission trajectory."""
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
+    n = len(all_traj)
+    angles_deg = np.degrees(all_traj)
+    waypoints = np.arange(n)
+
+    colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#a65628']
+    labels = [f'Joint {i+1}' for i in range(6)]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for j in range(6):
+        ax.plot(waypoints, angles_deg[:, j], color=colors[j], lw=1.5,
+                label=labels[j])
+
+    ax.set_xlabel('Waypoint Index')
+    ax.set_ylabel('Joint Angle (degrees)')
+    ax.set_title('Joint Angle Trajectories — Full Mission', fontweight='bold')
+    ax.legend(loc='best', fontsize=9, ncol=2)
+    ax.grid(True, alpha=0.3)
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {save_path}")
+
+
+# ── Main ──────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(
@@ -338,154 +369,108 @@ def main():
                         help="Execute on ROS Noetic + Gazebo")
     parser.add_argument("--rviz", action="store_true",
                         help="Visualise in RViz only (no Gazebo physics)")
-    parser.add_argument("--analyze", action="store_true",
-                        help="Generate comparison graphs to output_graphs/")
     parser.add_argument("--waypoints", type=int, default=30,
                         help="Waypoints per coarse segment")
-    parser.add_argument("--car-x", type=float, default=CAR_POSITION_DEFAULT[0])
-    parser.add_argument("--car-y", type=float, default=CAR_POSITION_DEFAULT[1])
-    parser.add_argument("--car-yaw", type=float, default=CAR_YAW_DEFAULT)
-    parser.add_argument("--car-model", type=str, default=CAR_MODEL_DEFAULT,
-                        help="Car mesh model name from gazebo_cars (e.g. car_golf, car_beetle)")
-    parser.add_argument("--car-scale", type=float, default=CAR_SCALE_DEFAULT,
-                        help="Scale factor for the car mesh (default: 0.10)")
+    parser.add_argument("--target-x", type=float, default=TARGET_XYZ_DEFAULT[0])
+    parser.add_argument("--target-y", type=float, default=TARGET_XYZ_DEFAULT[1])
+    parser.add_argument("--target-z", type=float, default=TARGET_XYZ_DEFAULT[2])
+    parser.add_argument("--seed", type=int, default=None,
+                        help="Random seed for obstacle placement (default: random)")
     args = parser.parse_args()
 
-    car_pos = np.array([args.car_x, args.car_y, CAR_POSITION_DEFAULT[2]])
-    car_yaw = args.car_yaw
+    target_xyz = np.array([args.target_x, args.target_y, args.target_z])
     n_wp = args.waypoints
+    rng = np.random.default_rng(args.seed)
 
     print("=" * 65)
     print("  KUKA KR6 R700 — Autonomous Refueling Mission")
-    print("  IK-Geo + STOMP (Informed) + Elastic Strips (Reactive)")
+    print("  IK-Geo + STOMP + Elastic Strips")
     print("=" * 65)
 
-    # ── Step 0: Compute inlet target from car pose ────────────────
-    inlet_xyz, inlet_R = get_inlet_pose(car_pos, car_yaw)
+    # ── Step 1: IK-Geo ────────────────────────────────────────────
+    inlet_xyz, inlet_R = get_inlet_pose(target_xyz)
     preapproach_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R)
 
-    print(f"\n[Car]  Position: [{car_pos[0]:.2f}, {car_pos[1]:.2f}, {car_pos[2]:.2f}]")
-    print(f"[Inlet] Position: [{inlet_xyz[0]:.3f}, {inlet_xyz[1]:.3f}, {inlet_xyz[2]:.3f}]")
-    print(f"[Pre-approach]  : [{preapproach_xyz[0]:.3f}, {preapproach_xyz[1]:.3f}, "
+    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}]")
+    print(f"[Pre-approach] [{preapproach_xyz[0]:.3f}, {preapproach_xyz[1]:.3f}, "
           f"{preapproach_xyz[2]:.3f}]")
 
-    # ── Step 1: IK-Geo for pre-approach and insertion ─────────────
-    print("\n[IK-Geo] Solving for pre-approach pose...")
-    Q_pre = IK_spherical_2_parallel(inlet_R, preapproach_xyz)
-    Q_pre_valid = filter_solutions(Q_pre, Q_HOME)
-    if Q_pre_valid.size == 0:
-        print("  No valid IK solution for pre-approach!")
+    print("\n[IK-Geo] Solving for target pose...")
+    Q = IK_spherical_2_parallel(inlet_R, inlet_xyz)
+    Q_valid = filter_solutions(Q, Q_HOME)
+    if Q_valid.size == 0:
+        print("  No valid IK solution!")
         return
-    q_preapproach = Q_pre_valid[:, 0]
-
-    R_chk, p_chk = fwd_kinematics(q_preapproach)
-    print(f"     {Q_pre.shape[1]} solutions, {Q_pre_valid.shape[1]} valid")
-    print(f"     Selected: {np.round(q_preapproach, 4)}")
-    print(f"     FK error: {np.linalg.norm(p_chk - preapproach_xyz):.2e} m")
-
-    print("\n[IK-Geo] Solving for insertion pose...")
-    Q_ins = IK_spherical_2_parallel(inlet_R, inlet_xyz)
-    Q_ins_valid = filter_solutions(Q_ins, q_preapproach)   # branch-consistent
-    if Q_ins_valid.size == 0:
-        print("  No valid IK solution for insertion!")
-        return
-    q_insertion = Q_ins_valid[:, 0]
-
-    R_chk, p_chk = fwd_kinematics(q_insertion)
-    print(f"     {Q_ins.shape[1]} solutions, {Q_ins_valid.shape[1]} valid")
-    print(f"     Selected: {np.round(q_insertion, 4)}")
+    q_target = Q_valid[:, 0]
+    _, p_chk = fwd_kinematics(q_target)
+    print(f"     {Q.shape[1]} solutions, {Q_valid.shape[1]} valid")
+    print(f"     Selected: {np.round(np.degrees(q_target), 1)} deg")
     print(f"     FK error: {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
 
-    # ── Step 2: Obstacle detector setup ───────────────────────────
+    # ── Step 2: Blind STOMP to find the path, then place obstacle ─
+    print("\n[STOMP] Blind plan HOME -> Target (to determine path)...")
+    seg_blind = stomp_optimize(
+        q_start=Q_HOME, q_goal=q_target,
+        joint_limits=JOINT_LIMITS, simple_obstacles=None,
+        n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
+        noise_stddev=0.08, verbose=False)
+
+    print("\n[Obstacle] Spawning random obstacle on the path...")
+    obstacle = random_obstacle_on_path(seg_blind, rng)
+    obs_list = [obstacle]
+
+    # ── Step 3: Re-plan with obstacle knowledge ───────────────────
+    seg_go = plan_stomp(Q_HOME, q_target, obs_list,
+                        "HOME -> Target (obstacle-aware)", n_wp)
+
+    seg_insert = plan_fine(q_target, q_target, n_wp=5)  # hold at target
+
+    seg_return = plan_stomp(q_target, Q_HOME, obs_list,
+                            "Target -> HOME (obstacle-aware)", n_wp)
+
+    # ── Step 4: Concatenate full trajectory for graphs ────────────
+    full_traj = np.vstack([seg_go, seg_insert, seg_return])
+
+    # ── Step 5: Generate graphs ───────────────────────────────────
+    print("\n[Graphs]")
+    plot_trajectory_3d(full_traj, target_xyz, obstacle,
+                       "output_graphs/ee_trajectory_3d.png")
+    plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
+
+    # ── Step 6: Execute in simulation ─────────────────────────────
+    segments = [
+        ("HOME -> Target",  seg_go,      0.15),
+        ("Refueling",       None,        DWELL_TIME),
+        ("Target -> HOME",  seg_return,  0.15),
+    ]
+
     use_ros = args.ros or args.rviz
     if use_ros:
         _ensure_ros_path()
         import rospy
         rospy.init_node('refuel_mission', anonymous=True)
 
-    if args.ros:
-        spawn_car_gazebo(car_pos, car_yaw, args.car_model, args.car_scale)
-        spawn_default_obstacle()
-        detector = ObstacleDetector()
-        rospy.sleep(1.0)  # let model_states populate
-    else:
-        detector = DummyDetector()
+        if args.ros:
+            spawn_target_marker(target_xyz)
+            spawn_obstacle_gazebo(obstacle[0], obstacle[1])
 
-    # Initial detection pass from HOME
-    detector.update(Q_HOME)
-
-    # ── Step 3: Plan trajectories ─────────────────────────────────
-    # Seg A: HOME → Pre-approach (coarse, obstacle-informed)
-    obs = detector.get_obstacles()
-    print(f"\n[Plan] {len(obs)} obstacle(s) known at planning time")
-
-    seg_approach = plan_coarse(Q_HOME, q_preapproach, obs,
-                               "HOME -> Pre-approach", n_wp)
-
-    # Seg B: Pre-approach → Insertion (fine, slow)
-    seg_insert = plan_fine(q_preapproach, q_insertion)
-    print(f"\n  Fine insertion: {len(seg_insert)} wp, dt=0.40s (slow approach)")
-
-    # Seg C: Withdrawal (reverse of insertion)
-    seg_withdraw = plan_fine(q_insertion, q_preapproach)
-
-    # Update detections from pre-approach position
-    detector.update(q_preapproach)
-    obs = detector.get_obstacles()
-
-    # Seg D: Pre-approach → HOME (coarse, obstacle-informed)
-    seg_return = plan_coarse(q_preapproach, Q_HOME, obs,
-                              "Pre-approach -> HOME", n_wp)
-
-    # ── Analysis graphs (after all planning, obstacles now known) ──
-    if args.analyze and obs:
-        # Run STOMP blind for comparison
-        seg_blind = stomp_optimize(
-            q_start=Q_HOME, q_goal=q_preapproach,
-            joint_limits=JOINT_LIMITS, simple_obstacles=None,
-            n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
-            noise_stddev=0.08, verbose=False)
-        seg_deformed, elastic_history = elastic_strip_deform(
-            seg_blind, obs,
-            n_iterations=200, alpha=0.02,
-            k_contraction=1.5, k_repulsion=10.0,
-            safety_margin=0.20, damping=0.90, verbose=False)
-        run_analysis(Q_HOME, q_preapproach,
-                     seg_blind, seg_deformed, obs, elastic_history)
-
-    # ── Step 4: Execute ───────────────────────────────────────────
-    segments = [
-        ("HOME -> Pre-approach",  seg_approach,  0.15),
-        ("Insert (slow)",         seg_insert,    0.40),
-        ("Dwell",                 None,          DWELL_TIME),
-        ("Withdraw (slow)",       seg_withdraw,  0.40),
-        ("Pre-approach -> HOME",  seg_return,    0.15),
-    ]
-
-    if use_ros:
-        # Publish RViz markers
-        publish_markers(car_pos, car_yaw, obs, segments)
+        publish_markers(target_xyz, obstacle, segments)
 
         for i, (label, traj, dt) in enumerate(segments, 1):
             print(f"\n  Step {i}/{len(segments)}: {label}")
             if traj is None:
                 print(f"     Refueling: holding for {dt:.0f}s...")
-                if args.ros:
-                    import rospy
-                    rospy.sleep(dt)
-                else:
-                    time.sleep(dt)
+                rospy.sleep(dt)
                 print(f"     Dwell complete")
             else:
                 if args.ros:
                     result = send_trajectory_ros(traj, dt=dt)
                 else:
                     result = send_trajectory_rviz(traj, dt=dt)
-                status = "done" if result else "timeout/fail"
-                print(f"     Segment {status}")
+                print(f"     {'done' if result else 'timeout/fail'}")
     else:
         # Dry-run preview
-        print(f"\n[Preview] Mission trajectory summary")
+        print(f"\n[Preview]")
         total_wp = 0
         for i, (label, traj, dt) in enumerate(segments, 1):
             if traj is None:
@@ -493,8 +478,8 @@ def main():
             else:
                 total_wp += len(traj)
                 print(f"  Step {i}: {label}  ({len(traj)} wp, dt={dt}s)")
-                print(f"           start={np.round(traj[0], 3)}")
-                print(f"           end  ={np.round(traj[-1], 3)}")
+                print(f"           start={np.round(np.degrees(traj[0]), 1)} deg")
+                print(f"           end  ={np.round(np.degrees(traj[-1]), 1)} deg")
         print(f"\n  Total waypoints: {total_wp}")
 
     print(f"\n{'=' * 65}")
