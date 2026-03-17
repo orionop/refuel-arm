@@ -35,6 +35,7 @@ from car_model import (
     get_inlet_pose, get_preapproach_pose,
     spawn_car_gazebo, get_car_rviz_markers,
     CAR_POSITION_DEFAULT, CAR_YAW_DEFAULT,
+    CAR_MODEL_DEFAULT, CAR_SCALE_DEFAULT,
 )
 from obstacle_detector import (
     ObstacleDetector, DummyDetector,
@@ -344,6 +345,10 @@ def main():
     parser.add_argument("--car-x", type=float, default=CAR_POSITION_DEFAULT[0])
     parser.add_argument("--car-y", type=float, default=CAR_POSITION_DEFAULT[1])
     parser.add_argument("--car-yaw", type=float, default=CAR_YAW_DEFAULT)
+    parser.add_argument("--car-model", type=str, default=CAR_MODEL_DEFAULT,
+                        help="Car mesh model name from gazebo_cars (e.g. car_golf, car_beetle)")
+    parser.add_argument("--car-scale", type=float, default=CAR_SCALE_DEFAULT,
+                        help="Scale factor for the car mesh (default: 0.10)")
     args = parser.parse_args()
 
     car_pos = np.array([args.car_x, args.car_y, CAR_POSITION_DEFAULT[2]])
@@ -399,7 +404,7 @@ def main():
         rospy.init_node('refuel_mission', anonymous=True)
 
     if args.ros:
-        spawn_car_gazebo(car_pos, car_yaw)
+        spawn_car_gazebo(car_pos, car_yaw, args.car_model, args.car_scale)
         spawn_default_obstacle()
         detector = ObstacleDetector()
         rospy.sleep(1.0)  # let model_states populate

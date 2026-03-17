@@ -28,6 +28,7 @@ KNOWN_MODELS = {
     'kr6_r700',             # the robot itself
     'refuel_car',           # car model
     'refuel_platform',      # elevated stand
+    'fuel_inlet_marker',    # green inlet overlay
 }
 
 SENSOR_RANGE     = 0.6     # metres — detection radius

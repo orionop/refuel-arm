@@ -20,3 +20,6 @@ __pycache__/
 
 # Third-party templates
 ros2-claude-code-template/
+
+# Third-party car meshes (clone separately: git clone https://github.com/ayushgaud/gazebo_cars.git)
+gazebo_cars/
