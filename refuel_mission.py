@@ -323,7 +323,6 @@ def plot_trajectory_3d(all_traj, target_xyz, obstacle, save_path):
     ax.set_title('End-Effector Trajectory — IK-Geo + STOMP + Elastic Strips',
                  fontweight='bold')
     ax.legend(loc='upper left', fontsize=8)
-    ax.set_box_aspect(None)
 
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
