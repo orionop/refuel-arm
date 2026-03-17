@@ -97,56 +97,67 @@ def ee_positions(trajectory):
     return pts
 
 
-# ── Random obstacle along the path ───────────────────────────────
+# ── Random obstacles along the path ──────────────────────────────
+NUM_OBSTACLES = 2
 
-def random_obstacle_on_path(trajectory, rng=None):
-    """Pick a random waypoint (30-70% along the path) and place an obstacle near it."""
+def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None):
+    """Place n_obs obstacles in non-overlapping zones along the path."""
     if rng is None:
         rng = np.random.default_rng()
     n = len(trajectory)
-    idx = rng.integers(int(n * 0.3), int(n * 0.7))
-    _, ee_pos = fwd_kinematics(trajectory[idx])
-    # Offset slightly so it's in the path but not exactly on the waypoint
-    offset = rng.uniform(-0.04, 0.04, size=3)
-    offset[2] = -abs(offset[2])  # nudge below the EE path
-    center = ee_pos + offset
-    center[2] = max(center[2], 0.05)  # keep above ground
-    print(f"  Obstacle placed near waypoint {idx}/{n} at "
-          f"[{center[0]:.3f}, {center[1]:.3f}, {center[2]:.3f}]")
-    return (center, OBS_RADIUS)
+    # Split the 25-75% range into n_obs equal zones
+    zone_lo = 0.25
+    zone_hi = 0.75
+    zone_width = (zone_hi - zone_lo) / n_obs
+    obstacles = []
+    for k in range(n_obs):
+        lo = int(n * (zone_lo + k * zone_width))
+        hi = int(n * (zone_lo + (k + 1) * zone_width))
+        hi = max(hi, lo + 1)
+        idx = rng.integers(lo, hi)
+        _, ee_pos = fwd_kinematics(trajectory[idx])
+        offset = rng.uniform(-0.04, 0.04, size=3)
+        offset[2] = -abs(offset[2])
+        center = ee_pos + offset
+        center[2] = max(center[2], 0.05)
+        obstacles.append((center, OBS_RADIUS))
+        print(f"  Obstacle {k+1}/{n_obs} near waypoint {idx}/{n} at "
+              f"[{center[0]:.3f}, {center[1]:.3f}, {center[2]:.3f}]")
+    return obstacles
 
 
-def spawn_obstacle_gazebo(center, radius):
-    """Spawn a blue sphere obstacle in Gazebo."""
+def spawn_obstacles_gazebo(obs_list):
+    """Spawn blue sphere obstacles in Gazebo."""
     import rospy
     from gazebo_msgs.srv import SpawnModel
     from geometry_msgs.msg import Pose
 
-    sdf = f"""<?xml version="1.0" ?>
-    <sdf version="1.5">
-      <model name="random_obstacle">
-        <static>true</static>
-        <link name="link">
-          <visual name="vis">
-            <geometry><sphere><radius>{radius}</radius></sphere></geometry>
-            <material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material>
-          </visual>
-          <collision name="col">
-            <geometry><sphere><radius>{radius}</radius></sphere></geometry>
-          </collision>
-        </link>
-      </model>
-    </sdf>"""
-
     rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
     spawn = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-    p = Pose()
-    p.position.x, p.position.y, p.position.z = center
-    p.orientation.w = 1.0
-    try:
-        spawn("random_obstacle", sdf, "/", p, "world")
-    except Exception:
-        pass
+
+    for k, (center, radius) in enumerate(obs_list):
+        sdf = f"""<?xml version="1.0" ?>
+        <sdf version="1.5">
+          <model name="random_obstacle_{k}">
+            <static>true</static>
+            <link name="link">
+              <visual name="vis">
+                <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+                <material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material>
+              </visual>
+              <collision name="col">
+                <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+              </collision>
+            </link>
+          </model>
+        </sdf>"""
+        p = Pose()
+        p.position.x, p.position.y, p.position.z = center
+        p.orientation.w = 1.0
+        try:
+            spawn(f"random_obstacle_{k}", sdf, "/", p, "world")
+        except Exception:
+            pass
 
 
 # ── Trajectory planning ──────────────────────────────────────────
@@ -239,7 +250,7 @@ def send_trajectory_rviz(trajectory, dt=0.15):
 
 # ── RViz markers ──────────────────────────────────────────────────
 
-def publish_markers(target_xyz, obstacle, segments):
+def publish_markers(target_xyz, obs_list, segments):
     _ensure_ros_path()
     import rospy
     from visualization_msgs.msg import Marker, MarkerArray
@@ -259,11 +270,10 @@ def publish_markers(target_xyz, obstacle, segments):
     m.color.r = 0; m.color.g = 0.9; m.color.b = 0; m.color.a = 1.0
     ma.markers.append(m)
 
-    # Blue obstacle
-    if obstacle:
-        c, r = obstacle
+    # Blue obstacles
+    for k, (c, r) in enumerate(obs_list):
         m2 = Marker()
-        m2.header.frame_id = "world"; m2.ns = "mission"; m2.id = 2
+        m2.header.frame_id = "world"; m2.ns = "mission"; m2.id = 10 + k
         m2.type = Marker.SPHERE; m2.action = Marker.ADD
         m2.pose.position.x, m2.pose.position.y, m2.pose.position.z = c
         m2.pose.orientation.w = 1.0
@@ -290,8 +300,8 @@ def publish_markers(target_xyz, obstacle, segments):
 
 # ── Graphs ────────────────────────────────────────────────────────
 
-def plot_trajectory_3d(all_traj, target_xyz, obstacle, save_path):
-    """Plot 3D EE workspace trajectory with target and obstacle."""
+def plot_trajectory_3d(all_traj, target_xyz, obs_list, save_path):
+    """Plot 3D EE workspace trajectory with target and obstacles."""
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
@@ -307,16 +317,15 @@ def plot_trajectory_3d(all_traj, target_xyz, obstacle, save_path):
     ax.scatter(*target_xyz, color='green', s=100, marker='s', label='Target (refuel)', zorder=5)
     ax.scatter(*pts[-1], color='blue', s=80, marker='v', label='HOME (return)', zorder=5)
 
-    if obstacle:
-        c, r = obstacle
-        # Draw obstacle sphere wireframe
-        u = np.linspace(0, 2 * np.pi, 20)
-        v = np.linspace(0, np.pi, 15)
+    u = np.linspace(0, 2 * np.pi, 20)
+    v = np.linspace(0, np.pi, 15)
+    for k, (c, r) in enumerate(obs_list):
         xs = c[0] + r * np.outer(np.cos(u), np.sin(v))
         ys = c[1] + r * np.outer(np.sin(u), np.sin(v))
         zs = c[2] + r * np.outer(np.ones_like(u), np.cos(v))
         ax.plot_surface(xs, ys, zs, alpha=0.25, color='blue')
-        ax.scatter(*c, color='red', s=40, marker='x', label='Obstacle center', zorder=5)
+        lbl = f'Obstacle {k+1}' if k == 0 else f'Obstacle {k+1}'
+        ax.scatter(*c, color='red', s=40, marker='x', label=lbl, zorder=5)
 
     ax.set_xlabel('X (m)')
     ax.set_ylabel('Y (m)')
@@ -416,9 +425,8 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False)
 
-    print("\n[Obstacle] Spawning random obstacle on the path...")
-    obstacle = random_obstacle_on_path(seg_blind, rng)
-    obs_list = [obstacle]
+    print("\n[Obstacles] Spawning 2 random obstacles on the path...")
+    obs_list = random_obstacles_on_path(seg_blind, n_obs=NUM_OBSTACLES, rng=rng)
 
     # ── Step 3: Re-plan with obstacle knowledge ───────────────────
     seg_go = plan_stomp(Q_HOME, q_target, obs_list,
@@ -447,13 +455,13 @@ def main():
 
         if args.ros:
             spawn_target_marker(target_xyz)
-            spawn_obstacle_gazebo(obstacle[0], obstacle[1])
+            spawn_obstacles_gazebo(obs_list)
 
-        publish_markers(target_xyz, obstacle, segments)
+        publish_markers(target_xyz, obs_list, segments)
 
     # ── Step 6: Generate graphs ───────────────────────────────────
     print("\n[Graphs]")
-    plot_trajectory_3d(full_traj, target_xyz, obstacle,
+    plot_trajectory_3d(full_traj, target_xyz, obs_list,
                        "output_graphs/ee_trajectory_3d.png")
     plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
 
