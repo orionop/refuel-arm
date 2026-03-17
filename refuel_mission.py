@@ -294,6 +294,7 @@ def plot_trajectory_3d(all_traj, target_xyz, obstacle, save_path):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 — registers '3d' projection
 
     pts = ee_positions(all_traj)
 
@@ -431,19 +432,13 @@ def main():
     # ── Step 4: Concatenate full trajectory for graphs ────────────
     full_traj = np.vstack([seg_go, seg_insert, seg_return])
 
-    # ── Step 5: Generate graphs ───────────────────────────────────
-    print("\n[Graphs]")
-    plot_trajectory_3d(full_traj, target_xyz, obstacle,
-                       "output_graphs/ee_trajectory_3d.png")
-    plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
-
-    # ── Step 6: Execute in simulation ─────────────────────────────
     segments = [
         ("HOME -> Target",  seg_go,      0.15),
         ("Refueling",       None,        DWELL_TIME),
         ("Target -> HOME",  seg_return,  0.15),
     ]
 
+    # ── Step 5: Spawn in Gazebo / RViz FIRST ──────────────────────
     use_ros = args.ros or args.rviz
     if use_ros:
         _ensure_ros_path()
@@ -456,6 +451,14 @@ def main():
 
         publish_markers(target_xyz, obstacle, segments)
 
+    # ── Step 6: Generate graphs ───────────────────────────────────
+    print("\n[Graphs]")
+    plot_trajectory_3d(full_traj, target_xyz, obstacle,
+                       "output_graphs/ee_trajectory_3d.png")
+    plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
+
+    # ── Step 7: Execute motion ────────────────────────────────────
+    if use_ros:
         for i, (label, traj, dt) in enumerate(segments, 1):
             print(f"\n  Step {i}/{len(segments)}: {label}")
             if traj is None:
@@ -469,7 +472,6 @@ def main():
                     result = send_trajectory_rviz(traj, dt=dt)
                 print(f"     {'done' if result else 'timeout/fail'}")
     else:
-        # Dry-run preview
         print(f"\n[Preview]")
         total_wp = 0
         for i, (label, traj, dt) in enumerate(segments, 1):
