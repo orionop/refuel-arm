@@ -162,14 +162,14 @@ def spawn_obstacles_gazebo(obs_list):
 
 # ── Trajectory planning ──────────────────────────────────────────
 
-def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
+def plan_stomp(q_start, q_goal, obstacles, name, n_wp=50):
     """STOMP + Elastic Strips."""
     print(f"\n  Planning: {name}")
     traj = stomp_optimize(
         q_start=q_start, q_goal=q_goal,
         joint_limits=JOINT_LIMITS,
         simple_obstacles=obstacles or None,
-        n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
+        n_waypoints=n_wp, n_iterations=150, n_rollouts=15,
         noise_stddev=0.08, verbose=False,
     )
     diffs = np.diff(traj, axis=0)
@@ -182,8 +182,8 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
         traj, _ = elastic_strip_deform(
             traj, obstacles,
             n_iterations=200, alpha=0.02,
-            k_contraction=1.5, k_repulsion=10.0,
-            safety_margin=0.20, damping=0.90, verbose=False,
+            k_contraction=3.0, k_repulsion=6.0,
+            safety_margin=0.12, damping=0.95, verbose=False,
         )
         print(f"     Elastic Strips: deformed around {len(obstacles)} obstacle(s)")
     return traj
@@ -379,7 +379,7 @@ def main():
                         help="Execute on ROS Noetic + Gazebo")
     parser.add_argument("--rviz", action="store_true",
                         help="Visualise in RViz only (no Gazebo physics)")
-    parser.add_argument("--waypoints", type=int, default=30,
+    parser.add_argument("--waypoints", type=int, default=50,
                         help="Waypoints per coarse segment")
     parser.add_argument("--target-x", type=float, default=TARGET_XYZ_DEFAULT[0])
     parser.add_argument("--target-y", type=float, default=TARGET_XYZ_DEFAULT[1])
