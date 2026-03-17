@@ -166,15 +166,39 @@ def spawn_obstacles_gazebo(obs_list):
 
 # ── Trajectory planning ──────────────────────────────────────────
 
+def smooth_trajectory(traj, window=5, passes=2):
+    """Moving-average smoothing with pinned endpoints and joint-limit clamping.
+
+    Applies a centered moving average ``passes`` times. Start and end
+    waypoints are never modified so the trajectory still hits its goals.
+    """
+    smoothed = traj.copy()
+    half = window // 2
+    for _ in range(passes):
+        buf = smoothed.copy()
+        for i in range(1, len(smoothed) - 1):
+            lo = max(0, i - half)
+            hi = min(len(smoothed), i + half + 1)
+            buf[i] = smoothed[lo:hi].mean(axis=0)
+        # Clamp to joint limits
+        for j in range(6):
+            buf[:, j] = np.clip(buf[:, j], JOINT_LIMITS[j, 0], JOINT_LIMITS[j, 1])
+        buf[0] = traj[0]
+        buf[-1] = traj[-1]
+        smoothed = buf
+    return smoothed
+
+
 def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
-    """STOMP + Elastic Strips."""
+    """STOMP + Elastic Strips + post-smoothing."""
     print(f"\n  Planning: {name}")
     traj = stomp_optimize(
         q_start=q_start, q_goal=q_goal,
         joint_limits=JOINT_LIMITS,
         simple_obstacles=obstacles or None,
-        n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
-        noise_stddev=0.08, verbose=False,
+        n_waypoints=n_wp, n_iterations=100, n_rollouts=12,
+        noise_stddev=0.08, w_smooth=20.0, w_vel=15.0,
+        verbose=False,
     )
     diffs = np.diff(traj, axis=0)
     max_jump = np.max(np.abs(diffs))
@@ -190,6 +214,12 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
             safety_margin=0.20, damping=0.90, verbose=False,
         )
         print(f"     Elastic Strips: deformed around {len(obstacles)} obstacle(s)")
+
+    traj = smooth_trajectory(traj, window=5, passes=2)
+    diffs = np.diff(traj, axis=0)
+    max_jump_post = np.max(np.abs(diffs))
+    print(f"     Smoothed: max_jump {np.degrees(max_jump):.1f} -> "
+          f"{np.degrees(max_jump_post):.1f} deg")
     return traj
 
 
@@ -418,6 +448,8 @@ def main():
     parser.add_argument("--target-z", type=float, default=TARGET_XYZ_DEFAULT[2])
     parser.add_argument("--seed", type=int, default=None,
                         help="Random seed for obstacle placement (default: random)")
+    parser.add_argument("--mirror-return", action="store_true",
+                        help="Return along the reversed approach path instead of re-planning")
     args = parser.parse_args()
 
     target_xyz = np.array([args.target_x, args.target_y, args.target_z])
@@ -486,8 +518,13 @@ def main():
                                  q_target, "Phase 3: Target -> Pre-approach", n_wp=20)
 
     # Phase 4: Gross Return (C-Space)
-    seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
-                            "Phase 4: Pre-approach -> HOME", n_wp)
+    if args.mirror_return:
+        seg_return = seg_approach[::-1].copy()
+        print(f"\n  Planning: Phase 4: Pre-approach -> HOME (mirrored approach)")
+        print(f"     Reversed approach trajectory ({len(seg_return)} wp)")
+    else:
+        seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
+                                "Phase 4: Pre-approach -> HOME", n_wp)
 
     # ── Step 4: Concatenate full trajectory for graphs ────────────
     full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])
