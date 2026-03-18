@@ -384,4 +384,41 @@ Here is exactly how IK-Geo is used:
 
 \textit{(In the older version of the code that failed, IK-Geo only calculated the Target pose, and we just guessed the rest in C-Space, which caused the collision/instability issues when squeezing past obstacles!)}
 
+\vspace{0.4cm}
+{\Large\textbf{IK-Geo Solution Selection Algorithm}}
+
+The IK-Geo solver provides the pure algebraic polynomials to find up to 8 theoretical roots (mathematical solutions) for a given pose. However, the original solver is agnostic to how a robot actually moves. It has no concept of "best" or "closest" because it computes pure geometry. The logic for choosing the final safest path is 100\% our own custom implementation.
+
+Here is exactly how our custom selection pipeline whittles 8 mathematical roots down to 1 physical choice:
+
+\begin{enumerate}
+    \item \textbf{Wrap to Limits:} The algebraic solver might return something mathematically equivalent but non-normalized, like $+400^\circ$. We use modular arithmetic to strip away full rotations, converting it into its normalized equivalent of $+40^\circ$ (within the $-180^\circ \dots +180^\circ$ range).
+    \item \textbf{Physical Hardware Filter:} We cross-reference the roots against the KUKA KR6 R700 robotic arm's exact hardware limits. If IK-Geo says Joint 2 needs to bend to $+90^\circ$, but the KUKA URDF specifies a physical hard-stop at $+45^\circ$, we immediately discard that solution. This typically reduces the 8 theoretical roots down to 2–4 physically reachable configurations.
+    \item \textbf{The Shortest Path Selector ($\mathcal{L}_2$ Norm):} We calculate the Euclidean Distance ($\mathcal{L}_2$ Norm) between the robot's current position ($q_{prev}$) and all remaining valid solutions in 6D joint-space. The algorithm simply sorts the valid roots and always selects the one with the absolute lowest $\mathcal{L}_2$ distance. This guarantees smooth, continuous tracking and prevents the robot from violently swinging its joints in a massive circle just to move the tool a few centimeters.
+\end{enumerate}
+
+\vspace{0.2cm}
+\textbf{Mathematical Working Example:}
+
+Assume the robot is currently at rest in its HOME pose, where all joints are roughly zero degrees, except the shoulder which hangs down at $-90^\circ$:
+\begin{equation*}
+    q_{prev} = [0^\circ, -90^\circ, 0^\circ, 0^\circ, 0^\circ, 0^\circ]
+\end{equation*}
+
+The robot receives a command to move its End-Effector 5 centimeters forward. The IK-Geo solver calculates 8 possible solutions. After eliminating complex roots and physics limit violations, 2 valid configurations remain:
+\begin{align*}
+    \text{Solution A (Elbow Up):} \quad & q_A = [2^\circ, -85^\circ, 5^\circ, 0^\circ, 2^\circ, 0^\circ] \\
+    \text{Solution B (Elbow Down):} \quad & q_B = [2^\circ, -5^\circ, -95^\circ, 180^\circ, 2^\circ, -180^\circ]
+\end{align*}
+
+Our algorithm computes the $\mathcal{L}_2$ Norm (Euclidean distance) from $q_{prev}$ to both $q_A$ and $q_B$:
+\begin{align*}
+    \text{Dist}_A &= \sqrt{ (2-0)^2 + (-85 - (-90))^2 + (5-0)^2 + (0)^2 + (2-0)^2 + (0)^2 } \\
+                  &= \sqrt{ 4 + 25 + 25 + 0 + 4 + 0 } = \sqrt{58} \approx 7.6^\circ \text{ total rotation} \\[10pt]
+    \text{Dist}_B &= \sqrt{ (2-0)^2 + (-5 - (-90))^2 + (-95-0)^2 + (180-0)^2 + (2-0)^2 + (-180-0)^2 } \\
+                  &= \sqrt{ 4 + 7225 + 9025 + 32400 + 4 + 32400 } = \sqrt{81058} \approx 284.7^\circ \text{ total rotation}
+\end{align*}
+
+\textbf{Selection:} The algorithm compares $7.6^\circ < 284.7^\circ$ and automatically selects \textbf{Solution A}. This successfully commands a gentle $7.6^\circ$ cumulative nudge across the motors, explicitly preventing the robot from tearing itself apart in a massive $284^\circ$ swing just to move the tool 5 centimeters.
+
 \end{document}
