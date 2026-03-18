@@ -297,4 +297,91 @@ To demystify the error distributions presented in the previous section, the foll
 \textbf{Result:} The total orientational error is \textbf{0.020 radians} (approx $1.15^\circ$). This is the physical twist needed to align the robot's end-effector exactly with the target.
 This $0.020$ radian error ($\approx 1.14^\circ$) geometrically defines the precise rotational misalignment between the theoretical EE target and the algorithm's inverse kinematic output.
 
+\clearpage
+
+% ═══════════════════════════════════════════════════════════════
+% PAGE 7: STOMP Breakdown
+% ═══════════════════════════════════════════════════════════════
+
+{\Large\textbf{Detailed Breakdown of STOMP}}
+
+Here is a detailed breakdown of how STOMP (Stochastic Trajectory Optimization for Motion Planning) works in this project.
+
+\vspace{0.4cm}
+{\large\textbf{1. How are the Waypoints Decided?}}
+
+STOMP does not figure out the path from scratch like an A* or RRT algorithm. It operates via Iterative Refinement.
+
+\begin{itemize}
+    \item \textbf{The Initial Guess:} The algorithm takes the starting joint angles (e.g., HOME) and the target joint angles (e.g., Pre-Approach). It simply connects these two points with a straight line in joint-space (linear interpolation). This is the initial "base trajectory."
+    \item \textbf{Discretization:} This linear trajectory is chopped up into N discrete waypoints (e.g., n\_waypoints = 30). At this stage, this path might violently collide with an obstacle, but that's okay.
+    \item \textbf{Stochastic Rollouts (Noise):} Around this base trajectory, STOMP generates multiple "noisy" alternative paths (rollouts). Think of it like vibrating a string.
+    \item \textbf{Scoring:} It scores each rollout using the Cost Function. Rollouts that hit obstacles or jerk around too much get a high cost. Rollouts in free space get a low cost.
+    \item \textbf{Update:} It updates the "base trajectory" to be a probability-weighted average of the best rollouts.
+    \item \textbf{Repeat:} It repeats this loop (n\_iterations=80) until the path bends around the obstacle perfectly.
+\end{itemize}
+
+\vspace{0.4cm}
+{\large\textbf{2. The STOMP Cost Function}}
+
+To score a trajectory, STOMP calculates the total cost ($J$), which is a weighted sum of three distinct penalty functions:
+
+\begin{equation*}
+J = w_{smooth} \cdot C_{smooth} + w_{limits} \cdot C_{limits} + w_{obs} \cdot C_{obs}
+\end{equation*}
+
+\vspace{0.2cm}
+\textbf{A. Smoothness Cost ($C_{smooth}$)}
+
+This penalizes jerky, erratic movements to ensure the robot motors aren't damaged.
+
+\begin{itemize}
+    \item \textbf{Math:} It calculates the second derivative (acceleration) of the joint angles between consecutive waypoints for all 6 joints.
+    \item \textbf{Implementation:} We use a finite difference matrix ($A$). The cost is essentially $\frac{1}{2} \theta^T R \theta$, where $R = A^T A$. If the angle changes abruptly from waypoint 10 to 11, the acceleration spikes, and this cost function throws a massive penalty. This is what gives the final trajectories their beautiful, overlapping sine-wave shapes.
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{B. Collision Cost ($C_{obs}$) — The most computationally heavy part}
+
+This guarantees the arm doesn't hit the car or spawned objects.
+
+\begin{itemize}
+    \item STOMP operates purely in 6D joint angles, so it has no idea where the arm actually is in 3D space.
+    \item To fix this, for every single waypoint, the algorithm runs Forward Kinematics (FK) to compute the exact X,Y,Z positions of 4 critical collision spheres on the arm:
+    \begin{enumerate}
+        \item The elbow joint
+        \item The forearm midpoint
+        \item The wrist joint
+        \item The End-Effector (nozzle)
+    \end{enumerate}
+    \item \textbf{Penalty Logic:} It measures the Euclidean distance from these 4 points to all obstacle centers. If the distance ($d$) is less than the safety margin (e.g., 0.3m), it applies a quadratic penalty: \\
+    \texttt{Penalty = ((margin - d) / margin)\textsuperscript{2}}
+    \item By squaring the error, points deep inside an obstacle get incredibly high costs, forcing the noisy rollouts to drift away from the object.
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{C. Joint Limit Cost ($C_{limits}$)}
+
+This mathematically enforces the hardware limits defined in the KUKA URDF (e.g., Joint 2 cannot bend past +45 degrees).
+
+\begin{itemize}
+    \item It checks every single joint angle in the rollout. If an angle approaches the hardware limit (within a tiny margin $v$), it applies an exponential penalty function.
+    \item It works like an invisible magnetic wall in software, guaranteeing that even the most extreme noise added during stochastic rollouts will never request a mathematically impossible motor position.
+\end{itemize}
+
+\vspace{0.4cm}
+{\Large\textbf{Hybrid Architecture \& IK-Geo Integration}}
+
+In the new Hybrid Architecture, IK-Geo calculates the joint angles for BOTH the Pre-Approach and Target poses—and actually, it calculates it for a lot more than just those two points!
+
+Here is exactly how IK-Geo is used:
+
+\begin{itemize}
+    \item \textbf{The Pre-Approach Pose:} IK-Geo calculates the 6 joint angles needed to put the nozzle exactly 8cm away from the car, perfectly aligned. STOMP uses this as its destination for the "Gross Approach" phase.
+    \item \textbf{The Target Pose:} IK-Geo calculates the 6 joint angles needed to actually have the nozzle fully inserted into the car's fuel port.
+    \item \textbf{Every Single Waypoint In Between (The Cartesian Phase):} This is the really cool part. To guarantee the arm slides in a perfectly straight 8cm line, we generate 20 microscopic "waypoints" in 3D space between the Pre-Approach coordinates and Target coordinates. IK-Geo runs 20 separate times—once for every single millimeter of movement—to calculate the exact joint angles required to keep the nozzle perfectly straight during insertion.
+\end{itemize}
+
+\textit{(In the older version of the code that failed, IK-Geo only calculated the Target pose, and we just guessed the rest in C-Space, which caused the collision/instability issues when squeezing past obstacles!)}
+
 \end{document}
