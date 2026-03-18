@@ -398,27 +398,29 @@ Here is exactly how our custom selection pipeline whittles 8 mathematical roots 
 \end{enumerate}
 
 \vspace{0.2cm}
-\textbf{Mathematical Working Example:}
+\textbf{Mathematical Working Example (Using Target from Section 6):}
 
-Assume the robot is currently at rest in its HOME pose, where all joints are roughly zero degrees, except the shoulder which hangs down at $-90^\circ$:
+Assume the robot is currently at rest in its HOME pose, where all joints are zero degrees except the shoulder which hangs down at $-90^\circ$:
 \begin{equation*}
-    q_{prev} = [0^\circ, -90^\circ, 0^\circ, 0^\circ, 0^\circ, 0^\circ]
+    q_{prev} = [0.0^\circ, -90.0^\circ, 0.0^\circ, 0.0^\circ, 0.0^\circ, 0.0^\circ]
 \end{equation*}
 
-The robot receives a command to move its End-Effector 5 centimeters forward. The IK-Geo solver calculates 8 possible solutions. After eliminating complex roots and physics limit violations, 2 valid configurations remain:
+The robot receives a command to move exactly to the Target Pose from Section 6: \textbf{coordinates $[0.706, 0.000, 0.413]$ (m) with a pitch angle of $15^\circ$}. The IK-Geo solver calculates 8 possible solutions. After applying the KUKA physical joint limits, exactly 4 valid physical configurations remain:
 \begin{align*}
-    \text{Solution A (Elbow Up):} \quad & q_A = [2^\circ, -85^\circ, 5^\circ, 0^\circ, 2^\circ, 0^\circ] \\
-    \text{Solution B (Elbow Down):} \quad & q_B = [2^\circ, -5^\circ, -95^\circ, 180^\circ, 2^\circ, -180^\circ]
+    \text{Solution A:} \quad & q_A = [\phantom{18}0.0^\circ, -36.97^\circ, \phantom{-}67.74^\circ, \phantom{-18}0.0^\circ, -15.76^\circ, \phantom{-18}0.0^\circ] \\
+    \text{Solution B:} \quad & q_B = [\phantom{18}0.0^\circ, \phantom{-}29.98^\circ, -59.90^\circ, \phantom{-18}0.0^\circ, \phantom{-}44.92^\circ, \phantom{-18}0.0^\circ] \\
+    \text{Solution C:} \quad & q_C = [\phantom{18}0.0^\circ, -36.97^\circ, \phantom{-}67.74^\circ, -180.0^\circ, \phantom{-}15.76^\circ, \phantom{-}180.0^\circ] \\
+    \text{Solution D:} \quad & q_D = [\phantom{18}0.0^\circ, \phantom{-}29.98^\circ, -59.90^\circ, \phantom{-}180.0^\circ, -44.92^\circ, -180.0^\circ]
 \end{align*}
 
-Our algorithm computes the $\mathcal{L}_2$ Norm (Euclidean distance) from $q_{prev}$ to both $q_A$ and $q_B$:
+Our algorithm computes the $\mathcal{L}_2$ Norm (Euclidean distance) from $q_{prev}$ to all 4 solutions. For brevity, let's look at the distance to Solution A (the safest geometry) and Solution D (the most twisted geometry):
 \begin{align*}
-    \text{Dist}_A &= \sqrt{ (2-0)^2 + (-85 - (-90))^2 + (5-0)^2 + (0)^2 + (2-0)^2 + (0)^2 } \\
-                  &= \sqrt{ 4 + 25 + 25 + 0 + 4 + 0 } = \sqrt{58} \approx 7.6^\circ \text{ total rotation} \\[10pt]
-    \text{Dist}_B &= \sqrt{ (2-0)^2 + (-5 - (-90))^2 + (-95-0)^2 + (180-0)^2 + (2-0)^2 + (-180-0)^2 } \\
-                  &= \sqrt{ 4 + 7225 + 9025 + 32400 + 4 + 32400 } = \sqrt{81058} \approx 284.7^\circ \text{ total rotation}
+    \text{Dist}_A &= \sqrt{ (0)^2 + (-36.97 - (-90))^2 + (67.74)^2 + (0)^2 + (-15.76)^2 + (0)^2 } \\
+                  &= \sqrt{ 0 + 2812.2 + 4588.7 + 0 + 248.4 + 0 } = \sqrt{7649.3} \approx 87.45^\circ \text{ total rotation} \\[10pt]
+    \text{Dist}_D &= \sqrt{ (0)^2 + (29.98 - (-90))^2 + (-59.90)^2 + (180)^2 + (-44.92)^2 + (-180)^2 } \\
+                  &= \sqrt{ 0 + 14395.2 + 3588.0 + 32400.0 + 2017.8 + 32400.0 } = \sqrt{84801.0} \approx 291.21^\circ \text{ total rotation}
 \end{align*}
 
-\textbf{Selection:} The algorithm compares $7.6^\circ < 284.7^\circ$ and automatically selects \textbf{Solution A}. This successfully commands a gentle $7.6^\circ$ cumulative nudge across the motors, explicitly preventing the robot from tearing itself apart in a massive $284^\circ$ swing just to move the tool 5 centimeters.
+\textbf{Selection:} $87.45^\circ < 141.43^\circ < 269.16^\circ < 291.21^\circ$. The algorithm automatically selects \textbf{Solution A}. This successfully commands a gentle $87.45^\circ$ cumulative nudge across the motors (mostly raising the shoulder and elbow), explicitly preventing the robot from twisting its wrists up to $360^\circ$ unnecessarily (as would happen in Solution C or D).
 
 \end{document}
