@@ -75,7 +75,12 @@ def wrap_to_limits(q):
     return q_w
 
 
-def filter_solutions(Q, q_prev=None):
+def delta_wrap(d):
+    """Wrap angular delta to [-pi, pi]."""
+    return (d + np.pi) % (2 * np.pi) - np.pi
+
+
+def filter_solutions(Q, history=None):
     if Q.size == 0:
         return np.empty((6, 0))
     valid = []
@@ -86,9 +91,40 @@ def filter_solutions(Q, q_prev=None):
     if not valid:
         return np.empty((6, 0))
     valid = np.array(valid).T
-    if q_prev is not None:
-        dists = np.linalg.norm(valid.T - q_prev, axis=1)
-        valid = valid[:, np.argsort(dists)]
+    
+    # Graceful fallback for single q_prev vs history list
+    if history is not None:
+        if isinstance(history, np.ndarray):
+            history = [history]
+            
+        if len(history) > 0:
+            scores = np.zeros(valid.shape[1])
+            W_v, W_a, W_j = 1.0, 5.0, 10.0
+            
+            for i in range(valid.shape[1]):
+                q = valid[:, i]
+                score = 0.0
+                
+                # Velocity (1st Derivative)
+                v_k = delta_wrap(q - history[-1])
+                score += W_v * np.linalg.norm(v_k)
+                
+                # Acceleration (2nd Derivative)
+                if len(history) >= 2:
+                    v_k_1 = delta_wrap(history[-1] - history[-2])
+                    a_k = v_k - v_k_1
+                    score += W_a * np.linalg.norm(a_k)
+                    
+                    # Jerk (3rd Derivative)
+                    if len(history) >= 3:
+                        v_k_2 = delta_wrap(history[-2] - history[-3])
+                        a_k_1 = v_k_1 - v_k_2
+                        j_k = a_k - a_k_1
+                        score += W_j * np.linalg.norm(j_k)
+                        
+                scores[i] = score
+                
+            valid = valid[:, np.argsort(scores)]
     return valid
 
 
@@ -227,24 +263,26 @@ def plan_cartesian(pos_start, pos_goal, R_fixed, q_seed, name, n_wp=20):
     """Straight-line Cartesian interpolation with IK at every point.
 
     Interpolates linearly in XYZ while keeping orientation fixed.
-    Each waypoint is solved with IK-Geo, selecting the solution closest
-    to the previous waypoint (``q_seed`` for the first) to prevent flips.
+    Each waypoint is solved with IK-Geo, selecting the solution with the
+    smoothest velocity/acceleration/jerk profile via historical derivatives.
     """
     print(f"\n  Planning: {name} (Cartesian, {n_wp} wp)")
     traj = np.zeros((n_wp, 6))
-    q_prev = q_seed.copy()
+    history = [q_seed.copy()]
     for i in range(n_wp):
         alpha = i / (n_wp - 1)
         p_i = (1 - alpha) * pos_start + alpha * pos_goal
         Q = IK_spherical_2_parallel(R_fixed, p_i)
-        Q_valid = filter_solutions(Q, q_prev)
+        Q_valid = filter_solutions(Q, history)
         if Q_valid.size == 0:
             # Fallback: C-space lerp from last good config toward seed goal
             print(f"     WARNING: no IK at wp {i}, falling back to C-space lerp")
-            traj[i] = q_prev
+            traj[i] = history[-1]
         else:
             traj[i] = Q_valid[:, 0]
-            q_prev = traj[i]
+            history.append(traj[i])
+            if len(history) > 3:
+                history.pop(0)
     _, p_end = fwd_kinematics(traj[-1])
     err = np.linalg.norm(p_end - pos_goal)
     print(f"     Cartesian: {n_wp} wp, endpoint FK error: {err:.2e} m")
