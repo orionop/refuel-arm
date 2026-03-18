@@ -398,6 +398,7 @@ Here is exactly how our custom selection pipeline whittles 8 mathematical roots 
 \end{enumerate}
 
 \vspace{0.2cm}
+\vspace{0.2cm}
 \textbf{Mathematical Working Example (Using Target from Section 6):}
 
 Assume the robot is currently at rest in its HOME pose, where all joints are zero degrees except the shoulder which hangs down at $-90^\circ$:
@@ -405,22 +406,31 @@ Assume the robot is currently at rest in its HOME pose, where all joints are zer
     q_{prev} = [0.0^\circ, -90.0^\circ, 0.0^\circ, 0.0^\circ, 0.0^\circ, 0.0^\circ]
 \end{equation*}
 
-The robot receives a command to move exactly to the Target Pose from Section 6: \textbf{coordinates $[0.706, 0.000, 0.413]$ (m) with a pitch angle of $15^\circ$}. The IK-Geo solver calculates 8 possible solutions. After applying the KUKA physical joint limits, exactly 4 valid physical configurations remain:
+The robot receives a command to move exactly to the Target Pose from Section 6: \textbf{coordinates $[0.706, 0.000, 0.413]$ (m) with a pitch angle of $15^\circ$}. The IK-Geo solver calculates 8 theoretical mathematical solutions. We evaluate their physical Forward Kinematics (FK) error and whether they violate the KUKA joint limits:
+
+\begin{itemize}
+    \item \textbf{Sol 1 (Invalid):} FK Error $= 1.82 \times 10^{-16}$ m $|$ $q_1 = [180.0^\circ, 159.1^\circ, 50.0^\circ, -180.0^\circ, 44.1^\circ, 0.0^\circ]$ (\textit{Violates Limits})
+    \item \textbf{Sol 2 (Invalid):} FK Error $= 1.80 \times 10^{-16}$ m $|$ $q_2 = [180.0^\circ, 159.1^\circ, 50.0^\circ, 0.0^\circ, -44.1^\circ, 180.0^\circ]$ (\textit{Violates Limits})
+    \item \textbf{Sol 3 (Invalid):} FK Error $= 1.30 \times 10^{-15}$ m $|$ $q_3 = [180.0^\circ, -152.7^\circ, -42.2^\circ, -180.0^\circ, 0.2^\circ, 0.0^\circ]$ (\textit{Violates Limits})
+    \item \textbf{Sol 4 (Invalid):} FK Error $= 1.30 \times 10^{-15}$ m $|$ $q_4 = [180.0^\circ, -152.7^\circ, -42.2^\circ, 0.0^\circ, -0.2^\circ, 180.0^\circ]$ (\textit{Violates Limits})
+    \item \textbf{Sol 5 (Valid):} \phantom{id}FK Error $= 5.70 \times 10^{-17}$ m $|$ $q_5 = [0.0^\circ, -37.0^\circ, 67.7^\circ, -180.0^\circ, 15.8^\circ, 180.0^\circ]$ 
+    \item \textbf{Sol 6 (Valid):} \phantom{id}FK Error $= 5.72 \times 10^{-17}$ m $|$ $q_6 = [0.0^\circ, -37.0^\circ, 67.7^\circ, 0.0^\circ, -15.8^\circ, 0.0^\circ]$ 
+    \item \textbf{Sol 7 (Valid):} \phantom{id}FK Error $= 5.72 \times 10^{-17}$ m $|$ $q_7 = [0.0^\circ, 30.0^\circ, -59.9^\circ, 0.0^\circ, 44.9^\circ, 0.0^\circ]$ 
+    \item \textbf{Sol 8 (Valid):} \phantom{id}FK Error $= 5.61 \times 10^{-17}$ m $|$ $q_8 = [0.0^\circ, 30.0^\circ, -59.9^\circ, 180.0^\circ, -44.9^\circ, -180.0^\circ]$ 
+\end{itemize}
+
+Exactly 4 valid physical configurations remain. Our algorithm computes the $\mathcal{L}_2$ Norm (Euclidean distance) from $q_{prev}$ to all 4 solutions to find the shortest physical path:
 \begin{align*}
-    \text{Solution A:} \quad & q_A = [\phantom{18}0.0^\circ, -36.97^\circ, \phantom{-}67.74^\circ, \phantom{-18}0.0^\circ, -15.76^\circ, \phantom{-18}0.0^\circ] \\
-    \text{Solution B:} \quad & q_B = [\phantom{18}0.0^\circ, \phantom{-}29.98^\circ, -59.90^\circ, \phantom{-18}0.0^\circ, \phantom{-}44.92^\circ, \phantom{-18}0.0^\circ] \\
-    \text{Solution C:} \quad & q_C = [\phantom{18}0.0^\circ, -36.97^\circ, \phantom{-}67.74^\circ, -180.0^\circ, \phantom{-}15.76^\circ, \phantom{-}180.0^\circ] \\
-    \text{Solution D:} \quad & q_D = [\phantom{18}0.0^\circ, \phantom{-}29.98^\circ, -59.90^\circ, \phantom{-}180.0^\circ, -44.92^\circ, -180.0^\circ]
+    \text{Dist}_5 &= \sqrt{ (0)^2 + (-37.0 - (-90))^2 + (67.7)^2 + (-180)^2 + (15.8)^2 + (180)^2 } \\
+                  &= \sqrt{ 0.0 + 2809.0 + 4583.3 + 32400.0 + 249.6 + 32400.0 } = \sqrt{72441.9} \approx 269.15^\circ \\[10pt]
+    \text{Dist}_6 &= \sqrt{ (0)^2 + (-37.0 - (-90))^2 + (67.7)^2 + (0)^2 + (-15.8)^2 + (0)^2 } \\
+                  &= \sqrt{ 0.0 + 2809.0 + 4583.3 + 0.0 + 249.6 + 0.0 } = \sqrt{7641.9} \approx 87.42^\circ \\[10pt]
+    \text{Dist}_7 &= \sqrt{ (0)^2 + (30.0 - (-90))^2 + (-59.9)^2 + (0)^2 + (44.9)^2 + (0)^2 } \\
+                  &= \sqrt{ 0.0 + 14400.0 + 3588.0 + 0.0 + 2016.0 + 0.0 } = \sqrt{20004.0} \approx 141.44^\circ \\[10pt]
+    \text{Dist}_8 &= \sqrt{ (0)^2 + (30.0 - (-90))^2 + (-59.9)^2 + (180)^2 + (-44.9)^2 + (-180)^2 } \\
+                  &= \sqrt{ 0.0 + 14400.0 + 3588.0 + 32400.0 + 2016.0 + 32400.0 } = \sqrt{84804.0} \approx 291.21^\circ
 \end{align*}
 
-Our algorithm computes the $\mathcal{L}_2$ Norm (Euclidean distance) from $q_{prev}$ to all 4 solutions. For brevity, let's look at the distance to Solution A (the safest geometry) and Solution D (the most twisted geometry):
-\begin{align*}
-    \text{Dist}_A &= \sqrt{ (0)^2 + (-36.97 - (-90))^2 + (67.74)^2 + (0)^2 + (-15.76)^2 + (0)^2 } \\
-                  &= \sqrt{ 0 + 2812.2 + 4588.7 + 0 + 248.4 + 0 } = \sqrt{7649.3} \approx 87.45^\circ \text{ total rotation} \\[10pt]
-    \text{Dist}_D &= \sqrt{ (0)^2 + (29.98 - (-90))^2 + (-59.90)^2 + (180)^2 + (-44.92)^2 + (-180)^2 } \\
-                  &= \sqrt{ 0 + 14395.2 + 3588.0 + 32400.0 + 2017.8 + 32400.0 } = \sqrt{84801.0} \approx 291.21^\circ \text{ total rotation}
-\end{align*}
-
-\textbf{Selection:} $87.45^\circ < 141.43^\circ < 269.16^\circ < 291.21^\circ$. The algorithm automatically selects \textbf{Solution A}. This successfully commands a gentle $87.45^\circ$ cumulative nudge across the motors (mostly raising the shoulder and elbow), explicitly preventing the robot from twisting its wrists up to $360^\circ$ unnecessarily (as would happen in Solution C or D).
+\textbf{Selection:} The algorithm ranks the distances: $87.42^\circ < 141.44^\circ < 269.15^\circ < 291.21^\circ$. It automatically selects the path with the lowest distance, which is \textbf{Solution 6}. This successfully commands a gentle $87^\circ$ cumulative nudge across the motors (mostly raising the shoulder and elbow), explicitly preventing the robot from tearing itself apart in a massive $291^\circ$ cumulative swing (as would happen in Solution 8).
 
 \end{document}
