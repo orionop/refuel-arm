@@ -25,9 +25,9 @@
 \setlength{\intextsep}{8pt}
 
 \title{\vspace{-1.5cm}\textbf{KUKA KR6 R700: Robot Motion Tracking Analysis} \\[4pt]
-\large Mathematical Planning for Complex Movements \\[2pt]
-\normalsize Systems and Control Engineering, IIT Bombay}
-\author{}
+\large Tri-Layered Hybrid Kinematic Architecture for 6-DOF Manipulators \\[2pt]
+\normalsize Systems and Control Engineering, Indian Institute of Technology Bombay (IIT Bombay)}
+\author{\textbf{Anurag Shetye}}
 \date{}
 
 \begin{document}
@@ -379,10 +379,10 @@ Here is exactly how IK-Geo is used:
 \begin{itemize}
     \item \textbf{The Pre-Approach Pose:} IK-Geo calculates the 6 joint angles needed to put the nozzle exactly 8cm away from the car, perfectly aligned. STOMP uses this as its destination for the "Gross Approach" phase.
     \item \textbf{The Target Pose:} IK-Geo calculates the 6 joint angles needed to actually have the nozzle fully inserted into the car's fuel port.
-    \item \textbf{Every Single Waypoint In Between (The Cartesian Phase):} This is the really cool part. To guarantee the arm slides in a perfectly straight 8cm line, we generate 20 microscopic "waypoints" in 3D space between the Pre-Approach coordinates and Target coordinates. IK-Geo runs 20 separate times—once for every single millimeter of movement—to calculate the exact joint angles required to keep the nozzle perfectly straight during insertion.
+    \item \textbf{High-Resolution Cartesian Tracking (The W-Space Phase):} To guarantee the arm slides in a perfectly straight 8cm line, we discretize the path into microscopic waypoints in 3D space between the Pre-Approach coordinates and Target coordinates. IK-Geo solves for every single millimeter of movement to continuously calculate the exact joint angles required to keep the nozzle perfectly straight during insertion.
 \end{itemize}
 
-\textit{(In the older version of the code that failed, IK-Geo only calculated the Target pose, and we just guessed the rest in C-Space, which caused the collision/instability issues when squeezing past obstacles!)}
+\textit{(Naive C-Space interpolation between sparse target coordinates previously subjected the manipulator to unpredictable collision and instability near singularities. The integration of continuous millimeter-scale algebraic inversion alongside real-time elastic reactivity fully resolves this limitation.)}
 
 \vspace{0.4cm}
 {\Large\textbf{IK-Geo Solution Selection Algorithm}}
