@@ -23,3 +23,6 @@ ros2-claude-code-template/
 
 # Third-party car meshes (clone separately: git clone https://github.com/ayushgaud/gazebo_cars.git)
 gazebo_cars/
+
+# Official College Report Template (Do not track in this repo)
+RAIT_CSBS_BE_Internship_LATEX_TEMPLATE_EVEN_2025_26/
