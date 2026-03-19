@@ -17,12 +17,12 @@ Run in Gazebo: python3 test_full_pipeline.py --ros
 import sys
 import time
 import argparse
-import numpy as np
+import numpy as np  # type: ignore
 
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
-from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700, rot
-from stomp_collision import stomp_optimize
-from elastic_strips import elastic_strip_deform, plot_elastic_comparison
+from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, KIN_KR6_R700, rot  # type: ignore
+from stomp_collision import stomp_optimize  # type: ignore
+from elastic_strips import elastic_strip_deform, plot_elastic_comparison  # type: ignore
 
 # ── Official KUKA KR6 R700-2 Joint Limits (from URDF) ───────────
 JOINT_LIMITS = np.array([
@@ -128,10 +128,10 @@ def send_trajectory_ros(trajectory, dt=0.15):
     if ros_python not in sys.path and os.path.isdir(ros_python):
         sys.path.insert(0, ros_python)
 
-    import rospy
-    import actionlib
-    from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
-    from trajectory_msgs.msg import JointTrajectoryPoint
+    import rospy  # type: ignore
+    import actionlib  # type: ignore
+    from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal  # type: ignore
+    from trajectory_msgs.msg import JointTrajectoryPoint  # type: ignore
 
     client = actionlib.SimpleActionClient(
         '/kr6_arm_controller/follow_joint_trajectory',
@@ -159,9 +159,9 @@ def send_trajectory_ros(trajectory, dt=0.15):
 
 def spawn_gazebo_markers(p_refuel, simple_obstacles=None):
     """Dynamically spawn the Red refuel target and Blue obstacles in Gazebo."""
-    import rospy
-    from gazebo_msgs.srv import SpawnModel
-    from geometry_msgs.msg import Pose
+    import rospy  # type: ignore
+    from gazebo_msgs.srv import SpawnModel  # type: ignore
+    from geometry_msgs.msg import Pose  # type: ignore
 
     rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
     spawn_srv = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
@@ -213,7 +213,7 @@ def spawn_gazebo_markers(p_refuel, simple_obstacles=None):
 
 def plot_stomp_vs_cspace(q_start, q_goal, stomp_traj, obstacles):
     """Generate a graph comparing STOMP (W-Space cost) vs pure C-Space LERP."""
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # type: ignore
     import os
     
     n_wp = len(stomp_traj)
@@ -282,12 +282,12 @@ def send_trajectory_rviz(trajectory, dt=0.15):
     if ros_python not in sys.path and os.path.isdir(ros_python):
         sys.path.insert(0, ros_python)
 
-    import rospy
-    from sensor_msgs.msg import JointState
+    import rospy  # type: ignore
+    from sensor_msgs.msg import JointState  # type: ignore
 
     # Create publisher if it doesn't exist yet
     if not hasattr(send_trajectory_rviz, "pub"):
-        send_trajectory_rviz.pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
+        send_trajectory_rviz.pub = rospy.Publisher('/joint_states', JointState, queue_size=10)  # type: ignore
         rospy.sleep(0.5)  # Wait for publisher connection
 
     msg = JointState()
@@ -297,7 +297,7 @@ def send_trajectory_rviz(trajectory, dt=0.15):
     for q in trajectory:
         msg.header.stamp = rospy.Time.now()
         msg.position = q.tolist()
-        send_trajectory_rviz.pub.publish(msg)
+        send_trajectory_rviz.pub.publish(msg)  # type: ignore
         rate.sleep()
     return True
 
@@ -393,8 +393,8 @@ def main():
             ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
             if ros_python not in sys.path and os.path.isdir(ros_python):
                 sys.path.insert(0, ros_python)
-            import rospy
-            from visualization_msgs.msg import Marker, MarkerArray
+            import rospy  # type: ignore
+            from visualization_msgs.msg import Marker, MarkerArray  # type: ignore
             rospy.init_node('refuel_mission', anonymous=True)
 
             if args.ros:
@@ -444,7 +444,7 @@ def main():
                         ma.markers.append(m_obs)
 
                 # --- Trace the full planned trajectory with a white line ---
-                from geometry_msgs.msg import Point
+                from geometry_msgs.msg import Point  # type: ignore
                 
                 m_path = Marker()
                 m_path.header.frame_id = "world"
@@ -496,9 +496,11 @@ def main():
             if dwell is not None:
                 print(f"  Step {i}/{n_steps}: {name} ({dwell:.0f}s dwell)")
             else:
-                total_waypoints += len(traj)
-                start = np.round(traj[0], 3)
-                end = np.round(traj[-1], 3)
+                import numpy as np  # type: ignore
+                traj_arr = np.array(traj)
+                total_waypoints += len(traj_arr)  # type: ignore
+                start = np.round(traj_arr[0], 3)  # type: ignore
+                end = np.round(traj_arr[-1], 3)  # type: ignore
                 print(f"  Step {i}/{n_steps}: {name}")
                 print(f"           start={start}")
                 print(f"           end  ={end}")
