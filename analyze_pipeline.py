@@ -13,18 +13,18 @@ Usage:  python3 analyze_pipeline.py
 """
 import sys
 import os
-import numpy as np
-import matplotlib
+import numpy as np  # type: ignore
+import matplotlib  # type: ignore
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
+import matplotlib.pyplot as plt  # type: ignore
+import matplotlib.ticker as ticker  # type: ignore
 
 # Import everything from the pipeline script without modifying it
 sys.path.insert(0, ".")
 sys.path.insert(0, "kuka_refuel_ws/src/kuka_kr6_gazebo/scripts")
-from ik_geometric import IK_spherical_2_parallel, fwd_kinematics
-from stomp_collision import stomp_optimize
-from test_full_pipeline import (
+from ik_geometric import IK_spherical_2_parallel, fwd_kinematics  # type: ignore
+from stomp_collision import stomp_optimize  # type: ignore
+from test_full_pipeline import (  # type: ignore
     Q_HOME, Q_NOZZLE, REFUEL_TARGET_XYZ, REFUEL_TARGET_R,
     JOINT_LIMITS, filter_solutions, within_joint_limits, plan_segment
 )
