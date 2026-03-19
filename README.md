@@ -1,5 +1,8 @@
 # Tri-Layered Hybrid Kinematic Architecture for 6-DOF Manipulators
 
+**Author:** Anurag Shetye  
+**Affiliation:** Systems and Control Engineering, Indian Institute of Technology Bombay (IIT Bombay)
+
 This repository contains the source code for a novel autonomous motion planning architecture designed for unstructured environments. It overcomes the limitations of traditional iterative Inverse Kinematics (IK) solvers and heavy sampling-based global planners by integrating three deeply specialized algorithms into a single continuous pipeline.
 
 ## System Architecture
