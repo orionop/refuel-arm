@@ -18,8 +18,8 @@ import signal
 import argparse
 import numpy as np
 
-# Import IK-Geo
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
+# Import IK-Geo (fixing relative path for when script is inside ik_trajectories/)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
 import ik_geometric as ik
 
 # ROS
