@@ -1,6 +1,7 @@
 # Project Context: B.Tech Thesis / Major Project
 
-**Proposed Title:** A Tri-Layered Hybrid Kinematic Architecture for 6-DOF Manipulators in Unstructured Environments
+**Official Report Title:** Design of Robotic Arm for Autonomous Refueling Systems
+**Technical Architecture:** A Tri-Layered Hybrid Kinematic Framework for 6-DOF Manipulators
 **Lead Researcher & Architect:** Anurag Shetye (Systems and Control Engineering, IIT Bombay)
 
 ## 1. Project Overview & Core Objective
