@@ -26,3 +26,6 @@ gazebo_cars/
 
 # Official College Report Template (Do not track in this repo)
 RAIT_CSBS_BE_Internship_LATEX_TEMPLATE_EVEN_2025_26/
+
+# KFI research paper workspace (isolated from main codebase)
+paper/
