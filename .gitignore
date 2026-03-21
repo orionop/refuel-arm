@@ -29,3 +29,6 @@ RAIT_CSBS_BE_Internship_LATEX_TEMPLATE_EVEN_2025_26/
 
 # KFI research paper workspace (isolated from main codebase)
 paper/
+
+# Agent Audit
+self_contribution_audit.md
