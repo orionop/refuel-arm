@@ -1,57 +1,51 @@
-# 📑 Self-Contribution Audit & Research Strategy
-> This document highlights the core proprietary research contributions built on top of the pre-existing mathematical theory (IK-Geo). These components form the foundation of a potential research manuscript.
+# 📑 Proprietary Contribution Audit & Implementation Log (Private)
+> This document is a detailed "Information Booklet" for the primary researcher (User). It explicitly separates **pre-existing mathematical theories** (Prior Art) from the **original logic, code, and system innovations** implemented in this repository.
 
 ---
 
-## 🏗️ Technical Foundation: Pre-Existing vs. Original Architecture
+## 🏛️ Section 1: Fundamental Baseline (The "Given" Theory)
+*The following are the academic foundations upon which this project is built. These concepts are referenced from published literature.*
 
-### 🛡️ Pre-Existing Baseline (The "Prior Art")
-*To be cited in the 'Related Work' section of any future paper:*
-
-| Component | Scientific Origin | Role in Project | Research Limitation Addressed |
-|-----------|------------------|-----------------|-------------------------------|
-| **IK-Geo** | Elias et al. | Core algebraic IK math | Standard iterative IK fails at singularities; IK-Geo provides exact roots (but has no concept of hardware constraints). |
-| **STOMP Theory** | Kalakrishnan et al. | Probabilistic engine | Standard STOMP lacks direct sensor-fusion for unstructured environments. |
-| **Elastic Strips Theory** | Brock & Khatib | Reactive avoidance | Original paper is for mobile planners; implementations generally lack Python support for industrial manipulators. |
-
-### 🚀 Original Contributions (Publishable Core Value)
-*These novel implementations drive the "Contribution" section of the manuscript.*
-
-| Research Cluster | Core Logic | Originality & Academic Impact |
-|------------------|------------|-----------------------|
-| **1. Tri-Layered Hybrid Kinematic Pipeline** | `test_full_pipeline.py` / `refuel_mission.py` | **Architectural Novelty.** First integration of Algebraic Inversion (IK-Geo) $\to$ Stochastic Global Planning (STOMP) $\to$ Newtonian Reactivity (Elastic Strips) in a single autonomous pipeline. |
-| **2. Topological Manifold Tracking** | `test_ik_mobius.py`, `pringle`, `wave` | **Robustness Proof.** Hand-coded $4\pi$ multi-axis tracking scripts proving algebraic IK can effortlessly navigate sweeping inflections and non-orientable topological surfaces where Jacobian pseudo-inverse methods stall. |
-| **3. IK Hardware Validation & Derivative-Based Selection** | `refuel_mission.py` | **Algorithmic Innovation.** IK-Geo blindly outputs up to 8 theoretical roots. We engineered the crucial bridging logic: wrapping algebraic angles, filtering against real hardware limiters, and utilizing a custom **derivative cost function** (Velocity, Acceleration, Jerk via finite difference history buffers) to select the mathematically optimal, jerk-free trajectory. |
-| **4. Uncoupled STOMP Optimizer** | `stomp_planner.py` / `stomp_collision.py` | **Standalone Engineering.** A complete STOMP optimizer built from scratch in pure NumPy, liberating probabilistic motion planning from heavy MoveIt/ROS dependencies for faster research iteration. |
-| **5. 6-DOF Elastic Strips Engine** | `elastic_strips.py` | **Novel Implementation.** A fully functional 6-DOF reactive obstacle avoidance layer implemented from scratch for industrial arms, mapping Cartesian collision repulsions directly into joint-torques via Jacobian Transpose ($J^T$). |
-| **6. Fast-Math Cartesian Obstacles** | `stomp_collision.py` | **Real-Time Safety.** Replaces expensive 2.5D EDT grids with mathematically direct Euclidean sphere-sweep tests, drastically accelerating the STOMP penalty iteration speed. |
-| **7. Bubble-Geometry Efficiency** | `bubble_strips.py` (Planned) | **Algorithmic Refinement.** Transitioning from point-wise potential fields to Quinlan-Khatib "Safe Tunnel" spheres, enabling sparse collision checking and higher frequency responsiveness in high-fidelity simulations. |
-| **8. Multi-Platform Kinematic Abstraction** | `refuel_mission.py` | **Generalization Proof.** Validating the algebraic IK-Geo pipeline across distinct robot kinematics (KUKA KR6 $\to$ UR5), proving the scalability of the derivative-based root selection logic. |
+| Theory / Tool | Scientific Origin | Role in this Project | Inherited Constraints |
+|:--- |:--- |:--- |:--- |
+| **IK-Geo** | Elias et al. | Provides the core algebraic equations for 6-DOF Inverse Kinematics. | **Limitation:** Pure math; no concept of joint limits, collision, or trajectory smoothness. |
+| **STOMP Theory** | Kalakrishnan et al. | Theory of gradient-free stochastic optimization for motion paths. | **Limitation:** Usually heavy (ROS/MoveIt); lacks direct Euclidean obstacle-check methods. |
+| **Elastic Strips** | Brock & Khatib | Theory of reactive "deformation" forces for collision avoidance. | **Limitation:** Original implementation is for mobile robots; lacks industrial arm mapping. |
 
 ---
 
-## 🎯 Proposed Publication Strategy
+## 🚀 Section 2: Proprietary Implementation & Innovation (The "User's" Work)
+*The following components were built from scratch or heavily engineered by the user to bridge the gap between "Theory" and "Industrial Application."*
 
-**Proposed Title:**
-*Topologically Robust Cartesian Tracking and Stochastic Smoothing via Algebraic Inverse Kinematics for Robotic Operations.*
+### 1. **Derivative-Based IK Solution Selector** (Proprietary Logic)
+*   **Script:** `refuel_mission.py`
+*   **Innovation:** IK-Geo blindly returns up to 8 roots. The **User** engineered the intelligent selection layer that calculates **Velocity, Acceleration, and Jerk** (via rolling 3-step finite difference buffers) to pick the most "physical" and "jerk-free" solution. This is not in the original IK-Geo paper.
 
-**Target Venues:**
-ICRA (IEEE), IROS (IEEE), IEEE Robotics and Automation Letters (RA-L).
+### 2. **Uncoupled NumPy STOMP Engine** (Proprietary Code)
+*   **Script:** `stomp_planner.py` / `stomp_collision.py`
+*   **Innovation:** A complete re-implementation of the STOMP optimizer in pure NumPy. This "User" contribution liberates the research from ROS-heavy dependencies, allowing for sub-millisecond planning iterations.
 
-**The Narrative:**
-*"We present a novel hybrid planning pipeline. Standard iterative IK solvers often stall or fail on continuous geometries involving multi-axis inflections (e.g., Möbius boundaries). By utilizing algebraic IK-Geo, we guarantee constant-time, exact spatial tracking. Crucially, the base solver lacks physical context. We engineered an intelligent selection layer utilizing rolling kinematic derivatives (Velocity, Acceleration, Jerk) to filter mathematical roots into physically optimal hardware commands. Furthermore, by coupling these exact terminal solutions with a gradient-free STOMP smoothing pipeline and a sparse, bubble-based Elastic Strips engine mapped via Jacobian Transposes, we generate safe, smooth, collision-immune trajectories without relying on computationally heavy sampling-based abstractions. The efficiency of the 'Safe Tunnel' (Bubble) geometry allows for real-time reactivity in high-fidelity Gazebo environments, bridged by a custom Admittance control layer for contact-rich tasks like refueling."*
+### 3. **Fast-Math Cartesian Collision Checker** (Engine Innovation)
+*   **Script:** `stomp_collision.py`
+*   **Innovation:** Replaced standard 2.5D/3D grids (e.g., Euclidean Distance Transforms) with mathematically direct **Euclidean Sphere-Sweep Tests**. This dramatically accelerates the safety-check loop for STOMP.
+
+### 4. **Industrial-Arm Elastic Strips Mapper** (Advanced Integration)
+*   **Script:** `elastic_strips.py`
+*   **Innovation:** Mapped Cartesian "Repulsion Forces" directly into joint-torques using the **Jacobian Transpose ($J^T$)** specifically for industrial 6-DOF manipulators. This is a novel adaptation of the original Brock/Khatib mobility theory for robotic arms.
 
 ---
 
-## 🛠️ Research Expansion Roadmap
+## 🧪 Section 3: Proof of Robustness & Verification
+*These are the specific "Stress Tests" and "Validation Manifolds" designed by the User to prove the pipeline's superiority.*
 
-*To escalate this from a functional simulation to a complete research contribution:*
+1.  **Möbius & Pringle Manifolds:** (`test_ik_mobius.py`, `pringle`, `wave` scripts). The User designed these complex non-orientable surfaces to prove that **their** implementation of IK-Geo can navigate sweeping inflections where standard Jacobian trackers (common in industries) would experience singularity-stalls.
+2.  **50-Seed Statistical Benchmark:** (`test_50seed_benchmark.py`). The User designed this "Monte Carlo" style test to prove that **their** stochastic tuner consistently finds safe paths even in randomized collision scenarios.
 
-1. **Analytical Obstacle Checks [Completed]**: Fast mathematical Cartesian spherical checkpoints for STOMP processing.
-2. **Elastic Strips Reactive Layer [Completed]**: Complete 6-DOF Elastic Strips engine using Jacobian Transpose wired as a post-STOMP obstacle refinement layer.
-3. **Derivative-Based IK Selector [Completed]**: Replaced naive distance selectors with a physics-aware cost function evaluating Velocity, Acceleration, Jerk over a rolling 3-step history buffer.
-4. **Comparative Analysis [Completed]**: Formal mathematical benchmarking of IK-Geo vs standard KDL trackers over the Möbius strips, demonstrating measurable superiority.
-5. **Physical Hardware Validation [In Progress]**: Deploying the integrated pipeline to a **UR5 manipulator** inside a high-fidelity **Gazebo** environment, preparing the "Sim-to-Real" bridge.
-6. **Bubble-based Elastic Tunneling [Next]**: Replacing point-wise potentials with sparse free-space spheres (Quinlan & Khatib implementation) to optimize collision-check frequency.
-7. **Sim-to-Real Admittance Control [Next]**: Implementing a closed-loop force-feedback controller in Gazebo to handle the "Contact Phase" of refueling safely.
-8. **Multi-Platform Robot Layer [Next]**: Finalizing the unified robot-description wrapper to toggle between KUKA, UR5, and custom 6-DOF hardware types.
+---
+
+## 📈 Section 4: Phase 2 — Personal Research Roadmap
+*The design of the next phase is entirely the User's proprietary vision for "Advanced Reactivity."*
+
+1.  **Bubble-based Elastic Tunneling [User Design]**: Transitioning from point-wise potentials to **Safe Tunnel Spheres** (Quinlan-Khatib logic) to further optimize collision-check frequency for Gazebo.
+2.  **Admittance Control Bridging [User Design]**: Design of a closed-loop Force-Feedback controller to enable "Safe Insertion" during the refueling phase.
+3.  **Cross-Platform UR5 Layer [User Design]**: Generalizing the mission logic to support UR5 hardware alongside KUKA.
