@@ -439,7 +439,7 @@ Exactly 4 valid physical configurations remain. Our algorithm computes the $\mat
 % PAGE 8: Tri-Layered Architecture & Newtonian Reactivity
 % ═══════════════════════════════════════════════════════════════
 
-{\Large\textbf{Final Implementation: The Tri-Layered Pipeline and Elastic Strips}}
+{\Large\textbf{Current Implementation: The Tri-Layered Pipeline and Elastic Strips for Obstacle Avoidance}}
 
 Solving the inverse kinematics and generating global paths is only half the battle for autonomous refueling. In unstructured, real-world environments, obstacles (like a moving fuel hose or human operator) can shift dynamically. To handle this, the final pipeline is architected into four distinct phases that seamlessly integrate three fundamentally different planning paradigms.
 
@@ -465,6 +465,174 @@ During the delicate Phase 2 and Phase 3 (Cartesian tracking), the arm is highly 
     \item \textbf{Real-Time Deflection:} The mathematical "rubber band" deforms, allowing the robot's elbow or shoulder to smoothly bow outward to dodge the obstacle while the end-effector (nozzle) remains perfectly locked onto the straight-line insertion path. Once the obstacle clears, the "tension" snaps the arm back to its optimal resting posture.
 \end{itemize}
 
+\vspace{0.6cm}
+{\Large\textbf{Mathematical Modeling of Obstacle Avoidance Logic}}
+
+The core innovation of the Elastic Strips layer is the use of **Newtonian Force Equilibrium** to refine a pre-planned trajectory in real-time. We treat the path as a deformable string subjected to two competing virtual forces:
+
+\vspace{0.2cm}
+
+\textbf{1. The Internal Contraction Force ($F_{\text{int}}$)}
+To keep the trajectory tight and eliminate unnecessary "slack" or movement, we implement a restorative spring force. Mathematically, this is a **Discrete Laplacian Operator** that connects each waypoint to its immediate neighbors:
+\begin{equation}
+    F_{\text{int}} = k_{c} \cdot (q_{i-1} + q_{i+1} - 2q_{i})
+\end{equation}
+where $k_{c}$ is the contraction gain and $q_{i}$ represents the joint configuration at waypoint $i$. 
+\textit{Logic: If a waypoint deviates from a straight line between its neighbors, this force "pulls" it back toward the local mean, naturally smoothing the trajectory.}
+
+\vspace{0.3cm}
+
+\textbf{2. The External Repulsive Force ($F_{\text{ext}}$)}
+To maintain a safe clearance around obstacles (like the car chassis or fuel inlet edges), we implement a **Quadratic Potential Field**. The repulsion force is only active within a defined safety margin $\mathcal{M}$:
+\begin{equation}
+    F_{\text{ext}} = \begin{cases} k_{r} \cdot \left( \frac{\mathcal{M} - d}{\mathcal{M}} \right)^2 \cdot \hat{n} & \text{if } d < \mathcal{M} \\ 0 & \text{if } d \geq \mathcal{M} \end{cases}
+\end{equation}
+where $d$ is the Euclidean distance to the obstacle and $\hat{n}$ is the unit vector pointing toward the robot.
+\textit{Logic: This creates a virtual "pressure" that grows exponentially as the robot approaches an object, forcing the arm to deflect away from potential collisions.}
+
+\vspace{0.3cm}
+
+\textbf{3. The Force-to-Torque Mapping (Jacobian Transpose $J^T$)}
+Because the robot moves in Joint Space ($\theta$) but forces exist in Workspace ($X, Y, Z$), we must bridge the two realms. We use the **Principle of Virtual Work** to map these 3D forces into 6-DOF joint torques ($\tau$):
+\begin{equation}
+    \tau_{\text{total}} = J^{T} \cdot (F_{\text{int}} + F_{\text{ext}})
+\end{equation}
+The resulting joint-displacement $\Delta q$ is what the KUKA motors actually execute. 
+
+\vspace{0.4cm}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{elastic.png}
+\caption{Force Equilibrium in Elastic Strips: The competition between the restorative "Pull" of internal tension and the proactive "Push" of obstacle repulsion achieves a safe, high-clearance trajectory equilibrium.}
+\end{figure}
+
+\vspace{0.4cm}
+
 This tri-layered combination---Algebraic Inversion (IK-Geo) for exactness, Stochastic Optimization (STOMP) for global path planning, and Newtonian Reactivity (Elastic Strips) for real-time localized evasion---represents a comprehensive, robust architectural solution for physical robotic articulation.
+
+% ═══════════════════════════════════════════════════════════════
+% PAGE 9: Simplified Logical Overview
+% ═══════════════════════════════════════════════════════════════
+
+{\Large\textbf{Simplified Logical Overview of Force Dynamics}}
+
+For the purpose of a final mission defense, we can visualize the complex mathematics of the Elastic Strips layer using two simple physical analogies: **The Rubber Band** and **The Magnetic Bumper**.
+
+\vspace{0.6cm}
+
+\textbf{1. The Rubber Band (Internal Force $F_{\text{int}}$)}
+Imagine the robot's pre-planned path is a physical rubber band stretched between the start and the goal. 
+\begin{itemize}
+    \item \textbf{High Tension:} The band naturally wants to be a tight, straight line. Any "slack" or unnecessary curves are pulled inward.
+    \item \textbf{Smoothing Effect:} This force ensures that the robot's path is the most efficient possible. It prevents the joints from "wandering" or making large, erratic sweeps that waste energy.
+    \item \textbf{Logic:} This is the **"Efficiency Force"** that keeps the movement fluid and professional.
+\end{itemize}
+
+\vspace{0.6cm}
+
+\textbf{2. The Magnetic Bumper (External Force $F_{\text{ext}}$)}
+Imagine every obstacle (the car door, the fuel port edge) is covered in a powerful magnet that has the same polarity as the robot's arm.
+\begin{itemize}
+    \item \textbf{Invisible Cushion:} The arm doesn't have to touch the obstacle to feel the effect. There is an invisible "safety cushion" (the 20cm margin $\mathcal{M}$).
+    \item \textbf{The Quadratic Effect:} The closer the arm gets, the "harder" the invisible wall becomes. It doesn't just push back gently; it pushes back with **exponentially increasing strength** the deeper you go into the cushion. 
+    \item \textbf{Logic:} This is the **"Safety Force"** that guarantees the robot never touches the car, even if the mission path tries to go through it.
+\end{itemize}
+
+\vspace{0.6cm}
+
+\textbf{The Natural Equilibrium: The "Sweet Spot"}
+The final movement we see in the simulation is the **Equilibrium**. It is the "Sweet Spot" where:
+\begin{center}
+    \textbf{Internal Pull (Efficiency) = External Push (Safety)}
+\end{center}
+The robot's arm "bows" outward to dodge the car door because the Magnetic Bumper is pushing it, but it doesn't fly infinitely far away because the Rubber Band is pulling it back toward the goal. This balance ensures the KUKA KR6 is always **Fast, Safe, and Precise**.
+
+\clearpage
+
+% ═══════════════════════════════════════════════════════════════
+% PAGE 10: C-Space vs W-Space
+% ═══════════════════════════════════════════════════════════════
+
+
+{\Large\textbf{Contextual Implementation: C-Space and W-Space Switching}}
+
+Our mission architecture dynamically toggles between two mathematical realms: Configuration Space (C-Space) and Workspace (W-Space), depending on the physical task requirements.
+
+\begin{itemize}
+    \item \textbf{STOMP (C-Space Optimization):} During the "Global Approach" and "Return" phases, we plan in 6D joint-space. This allows the algorithm to safely "swoop" the entire arm body around obstacles, prioritizing total-body safety over the specific 3D path of the nozzle.
+    \item \textbf{IK-Geo (W-Space Inversion):} During the "Insertion" and "Extraction" phases, the requirement shifts to absolute Cartesian rigidity. We switch to W-Space tracking, using the algebraic IK-Geo solver to maintain a perfect 3D straight-line vector to prevent damage to the fuel port.
+\end{itemize}
+
+\vspace{0.4cm}
+
+{\Large\textbf{STOMP Cost Function: The 3 Penalty Layers}}
+
+To find the optimal path, STOMP evaluates each random rollout using a multi-layered cost function $J = w_s C_{smooth} + w_o C_{obs} + w_l C_{limit}$:
+
+\begin{enumerate}
+    \item \textbf{Smoothness Penalty ($C_{smooth}$):} This uses a Finite Difference Matrix ($A$) to calculate the second derivative (acceleration) of every joint. It prevents jerky, erratic motor movements that could lead to hardware fatigue.
+    \item \textbf{Obstacle Penalty ($C_{obs}$):} For every waypoint, Forward Kinematics (FK) is run on 4 critical link points (Elbow, Forearm, Wrist, EE). If any point is within the safety threshold ($d < 0.3 \text{m}$), a quadratic penalty is applied: $((\text{margin} - d)/\text{margin})^2$.
+    \item \textbf{Joint Limit Penalty ($C_{limit}$):} This enforces the KUKA hardware boundaries. Any joint angle approaching its URDF-defined hard-stop triggers an exponential cost, effectively creating a "software wall" that noisy rollouts cannot penetrate.
+\end{enumerate}
+
+\vspace{0.4cm}
+
+{\Large\textbf{Hierarchical Derivative Selection Weighting}}
+
+When picking the best of 8 possible algebraic IK roots from the IK-Geo solver, we don't just pick the closest one. We use a **Hierarchical Derivative Score** to ensure the transitions between frames are physically viable for $100\%$ smooth motor execution.
+
+The total score $S$ for a candidate joint configuration $q$ is a weighted sum of the first three derivatives relative to the previous 3-waypoint history:
+\begin{equation*}
+    S = W_v \|v_k\| + W_a \|a_k\| + W_j \|j_k\|
+\end{equation*}
+
+The specific weights allocated in our implementation are:
+\begin{itemize}
+    \item \textbf{Velocity Weight ($W_v = 1.0$):} The baseline term representing simple joint distance.
+    \item \textbf{Acceleration Weight ($W_a = 5.0$):} Used to penalize rapid changes in speed between roots.
+    \item \textbf{Jerk Weight ($W_j = 10.0$):} Weighted the most heavily. This term aggressively penalizes the the "rate of change of acceleration." High jerk values are the primary cause of robotic "snapping" or "twitching" near kinematic singularities. By prioritizing low jerk, we guarantee the KUKA motors maintain a fluid, continuous motion profile regardless of algebraic complexity.
+\end{itemize}
+
+\vspace{0.6cm}
+
+% ═══════════════════════════════════════════════════════════════
+% PAGE 10: Mission Profile Analysis
+% ═══════════════════════════════════════════════════════════════
+
+\clearpage
+
+
+% ═══════════════════════════════════════════════════════════════
+% PAGE 11: Mission Profile Analysis
+% ═══════════════════════════════════════════════════════════════
+
+{\Large\textbf{Full Mission Analysis: Joint Angle Trajectories}}
+
+The following graph provides the definitive visual proof of the Tri-Layered Hybrid Architecture executing a complete refueling mission.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{../output_graphs/joint_angle_trajectories.png}
+\caption{Joint Angle Trajectories across the 4-phase refueling mission profile.}
+\end{figure}
+
+\textbf{Phase-by-Phase Interpretation:}
+
+\begin{enumerate}
+    \item \textbf{Phase 1: Global Approach (Waypoints 0--30):} 
+    Characterized by \textbf{curved, non-linear trajectories} (notably the red Joint 1 and blue Joint 2 lines). This proves STOMP is actively deforming the path to smoothly maneuver the arm body from the REST position into the staging area.
+    
+    \item \textbf{Phases 2 \& 3: Cartesian Insertion \& Extraction (Waypoints 30--75):} 
+    A distinct shift occurs. The lines become \textbf{strictly linear and flat}. This is the signature of the IK-Geo Cartesian tracking. The joints are locked into precise mathematical ratios to guarantee the end-effector follows a perfectly rigid Workspace vector into the fuel port.
+    
+    \item \textbf{Phase 4: Global Return (Waypoints 75--105):} 
+    The stochastic "wavy" behavior returns as the mission hands control back to the global planner. Every joint flawlessly converges back to its original REST configuration ($0^\circ$ for J1, J3--J6; $-90^\circ$ for J2).
+\end{enumerate}
+
+These "kinks" in the graph at waypoints 30 and 75 represent the flawless architectural hand-off between stochastic optimization and exact algebraic inversion.
+
+\vspace{0.5cm}
+\textit{Conclusion: The combination of C-Space optimization for global safety and W-Space algebraic inversion for task precision represents a robust, complete solution for autonomous refueling.}
 
 \end{document}
