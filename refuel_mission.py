@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 
 from ik_geometric import IK_spherical_2_parallel, fwd_kinematics, rot
 from stomp_collision import stomp_optimize
-from elastic_strips import elastic_strip_deform
+from bubble_strips import bubble_strip_deform
 from car_model import (
     get_inlet_pose, get_preapproach_pose, spawn_target_marker,
     TARGET_XYZ_DEFAULT,
@@ -243,13 +243,14 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30):
           f"limits {'OK' if ok else 'VIOLATED'}")
 
     if obstacles:
-        traj, _ = elastic_strip_deform(
+        traj, _, stats = bubble_strip_deform(
             traj, obstacles,
-            n_iterations=200, alpha=0.02,
-            k_contraction=1.5, k_repulsion=10.0,
-            safety_margin=0.20, damping=0.90, verbose=False,
+            n_iterations=150,
+            k_contraction=0.5, k_repulsion=30.0,
+            rho_0=0.20, damping=0.85, verbose=False,
         )
-        print(f"     Elastic Strips: deformed around {len(obstacles)} obstacle(s)")
+        print(f"     Bubble Strips: {stats['final_waypoints']} wp, "
+              f"min_rho={stats['final_min_clearance']:.4f}m")
 
     traj = smooth_trajectory(traj, window=5, passes=2)
     diffs = np.diff(traj, axis=0)
