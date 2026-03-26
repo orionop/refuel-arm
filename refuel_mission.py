@@ -105,8 +105,11 @@ def filter_solutions(Q, history=None):
                 q = valid[:, i]
                 score = 0.0
                 
+                # Explicitly cast for linter if needed, though logic is same
+                prev_q = history[-1]
+                
                 # Velocity (1st Derivative)
-                v_k = delta_wrap(q - history[-1])
+                v_k = delta_wrap(q - prev_q)
                 score += W_v * np.linalg.norm(v_k)
                 
                 # Acceleration (2nd Derivative)
@@ -156,8 +159,10 @@ def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None):
         hi = max(hi, lo + 1)
         idx = rng.integers(lo, hi)
         _, ee_pos = fwd_kinematics(trajectory[idx])
-        offset = rng.uniform(-0.04, 0.04, size=3)
-        offset[2] = -abs(offset[2])
+        offset = np.array(rng.uniform(-0.04, 0.04, size=3))
+        # Use explicit float logic to satisfy linter
+        z_val = float(offset[2])
+        offset[2] = -abs(z_val)
         center = ee_pos + offset
         center[2] = max(center[2], 0.05)
         obstacles.append((center, OBS_RADIUS))
@@ -331,12 +336,15 @@ def send_trajectory_ros(trajectory, dt=0.15):
     return client.get_result()
 
 
+_RVIZ_PUB = None
+
 def send_trajectory_rviz(trajectory, dt=0.15):
+    global _RVIZ_PUB
     _ensure_ros_path()
     import rospy
     from sensor_msgs.msg import JointState
-    if not hasattr(send_trajectory_rviz, "pub"):
-        send_trajectory_rviz.pub = rospy.Publisher('/joint_states', JointState, queue_size=10)
+    if _RVIZ_PUB is None:
+        _RVIZ_PUB = rospy.Publisher('/joint_states', JointState, queue_size=10)
         rospy.sleep(0.5)
     msg = JointState()
     msg.name = [f'joint_{i}' for i in range(1, 7)]
@@ -344,7 +352,7 @@ def send_trajectory_rviz(trajectory, dt=0.15):
     for q in trajectory:
         msg.header.stamp = rospy.Time.now()
         msg.position = q.tolist()
-        send_trajectory_rviz.pub.publish(msg)
+        _RVIZ_PUB.publish(msg)
         rate.sleep()
     return True
 
@@ -611,16 +619,21 @@ def main():
                 print(f"     {'done' if result else 'timeout/fail'}")
     else:
         print(f"\n[Preview]")
-        total_wp = 0
+        total_wp_list = []
         for i, (label, traj, dt) in enumerate(segments, 1):
             if traj is None:
                 print(f"  Step {i}: {label} ({dt:.0f}s dwell)")
             else:
-                total_wp += len(traj)
-                print(f"  Step {i}: {label}  ({len(traj)} wp, dt={dt}s)")
-                print(f"           start={np.round(np.degrees(traj[0]), 1)} deg")
-                print(f"           end  ={np.round(np.degrees(traj[-1]), 1)} deg")
-        print(f"\n  Total waypoints: {total_wp}")
+                # Local shadow for linter type-inference safety
+                t = traj 
+                if t is not None:
+                    seg_len = int(len(t))
+                    total_wp_list.append(seg_len)
+                    print(f"  Step {i}: {label}  ({seg_len} wp, dt={dt}s)")
+                    if seg_len > 0:
+                        print(f"           start={np.round(np.degrees(t[0]), 1)} deg")
+                        print(f"           end  ={np.round(np.degrees(t[-1]), 1)} deg")
+        print(f"\n  Total waypoints: {sum(total_wp_list)}")
 
     print(f"\n{'=' * 65}")
     print("  Mission complete!")
