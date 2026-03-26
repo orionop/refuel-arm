@@ -30,6 +30,7 @@
 *   **Innovation:** Replaced standard 2.5D/3D grids (e.g., Euclidean Distance Transforms) with mathematically direct **Euclidean Sphere-Sweep Tests**. This dramatically accelerates the safety-check loop for STOMP.
 
 | **4. Industrial-Arm Elastic Strips Mapper** | `elastic_strips.py` | **Novel Integration.** Mapped Cartesian "Repulsion Forces" directly into joint-torques using the **Jacobian Transpose ($J^T$)** specifically for industrial 6-DOF manipulators. This is a novel adaptation of the original Brock/Khatib mobility theory for robotic arms. |
+| **5. Bubble-based Elastic Tunneling** | `bubble_strips.py` | **User Implementation.** Successfully implemented the Quinlan-Khatib "Safe Tunnel" spheres, achieving a 50% reduction in waypoint redundancy while maintaining a consistent $+0.25$m safety margin. |
 
 ### 🛡️ **Theirs vs. Mine: The Elastic Strips Evolution**
 *Comparing the 2002 Brock & Khatib Paper vs. the User's Proprietary Implementation.*
@@ -54,6 +55,5 @@
 ## 📈 Section 4: Phase 2 — Personal Research Roadmap
 *The design of the next phase is entirely the User's proprietary vision for "Advanced Reactivity."*
 
-1.  **Bubble-based Elastic Tunneling [User Design]**: Transitioning from point-wise potentials to **Safe Tunnel Spheres** (Quinlan-Khatib logic) to further optimize collision-check frequency for Gazebo.
-2.  **Admittance Control Bridging [User Design]**: Design of a closed-loop Force-Feedback controller to enable "Safe Insertion" during the refueling phase.
-3.  **Cross-Platform UR5 Layer [User Design]**: Generalizing the mission logic to support UR5 hardware alongside KUKA.
+1.  **Admittance Control Bridging [User Design]**: Design of a closed-loop Force-Feedback controller to enable "Safe Insertion" during the refueling phase.
+2.  **Cross-Platform UR5 Layer [User Design]**: Generalizing the mission logic to support UR5 hardware alongside KUKA.
