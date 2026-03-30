@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import numpy as np
+import numpy as np  # type: ignore
 
 # UR5 Kinematic Parameters (Standard DH)
 # Ref: UR5 documentation and extracted from ur5.xml

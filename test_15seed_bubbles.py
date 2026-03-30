@@ -11,24 +11,27 @@ Outputs:
   3. CSV results for the B.Tech report
 """
 import sys, os
-import numpy as np
-import matplotlib
+import numpy as np  # type: ignore
+import matplotlib  # type: ignore
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.cm as cm
+import matplotlib.pyplot as plt  # type: ignore
+from matplotlib.colors import Normalize  # type: ignore
+from mpl_toolkits.mplot3d import Axes3D  # type: ignore
+import matplotlib.cm as cm  # type: ignore
 
 # ── Path setup ────────────────────────────────────────────────────
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-from refuel_mission import (fwd_kinematics, Q_HOME, JOINT_LIMITS, 
+# Add IK-Geo path
+ik_geo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts'))
+sys.path.insert(0, ik_geo_path)
+from refuel_mission import (fwd_kinematics, Q_HOME, JOINT_LIMITS,   # type: ignore
                             OBS_RADIUS, NUM_OBSTACLES, filter_solutions)
 
 # Import correctly based on refuel_mission structure
-from stomp_collision import stomp_optimize
-from bubble_strips import bubble_strip_deform, clearance
-from ik_geometric import IK_spherical_2_parallel
-from car_model import get_inlet_pose, get_preapproach_pose, TARGET_XYZ_DEFAULT
+from stomp_collision import stomp_optimize  # type: ignore
+from bubble_strips import bubble_strip_deform, clearance  # type: ignore
+from ik_geometric import IK_spherical_2_parallel  # type: ignore
+from car_model import get_inlet_pose, get_preapproach_pose, TARGET_XYZ_DEFAULT  # type: ignore
 
 N_SEEDS = 15
 OUT_DIR = "output_graphs/benchmark_15seed_bubbles"
@@ -45,8 +48,8 @@ def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None):
         hi = max(hi, lo + 1)
         idx = rng.integers(lo, hi)
         _, ee_pos = fwd_kinematics(trajectory[idx])
-        offset = rng.uniform(-0.04, 0.04, size=3)
-        offset[2] = -abs(offset[2])
+        offset = np.array(rng.uniform(-0.04, 0.04, size=3))
+        offset[2] = -abs(offset[2]) # type: ignore
         center = ee_pos + offset
         center[2] = max(center[2], 0.05)
         obstacles.append((center, OBS_RADIUS))
@@ -60,7 +63,6 @@ def run_single_seed_bubbles(seed, target_xyz):
     # Simple C-Space Pre-solver
     q_pre = Q_HOME.copy() # Placeholder or solve IK
     # For benchmark simplicity, we'll just use the first valid IK from mission logic
-    from refuel_mission import filter_solutions, IK_spherical_2_parallel
     Q_pre = IK_spherical_2_parallel(inlet_R, pre_xyz)
     Qv = filter_solutions(Q_pre, Q_HOME)
     if Qv.size == 0: return None

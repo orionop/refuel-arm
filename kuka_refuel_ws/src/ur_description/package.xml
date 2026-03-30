@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ur_description</name>
+  <version>1.2.5</version>
+  <description>UR5 Robot Description (Isolated for Refueling Project)</description>
+  <maintainer email="user@todo.todo">User</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>xacro</build_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>xacro</run_depend>
+
+  <export></export>
+</package>

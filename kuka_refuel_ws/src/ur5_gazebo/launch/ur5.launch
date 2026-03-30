@@ -1,0 +1,22 @@
+<launch>
+  <!-- UR5 Gazebo Simulation for Autonomous Refueling -->
+
+  <!-- Load UR5 robot description from ur_description package -->
+  <param name="robot_description" textfile="$(find ur_description)/urdf/ur5.urdf" />
+
+  <!-- Launch Gazebo with empty world (or refuel world if available) -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="true" />
+    <arg name="gui" value="true" />
+  </include>
+
+  <!-- Spawn UR5 in Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description -urdf -model ur5 -z 0.05 -unpause"
+        output="screen" />
+
+  <!-- Robot State Publisher (for TF and RViz) -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        output="screen" />
+
+</launch>

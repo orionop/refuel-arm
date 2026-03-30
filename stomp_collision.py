@@ -11,19 +11,20 @@ Standalone implementation for 6-DOF robot arms. No GPU, no training.
 """
 import sys
 import os
-import numpy as np
+import numpy as np  # type: ignore
+from typing import Optional
 
 # Import IK-Geo for FK and arm kinematics description
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
 try:
-    import ik_geometric as ik
+    import ik_geometric as ik  # type: ignore
 except ImportError:
     # Try one level up if inside a subdirectory
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'kuka_refuel_ws', 'src', 'kuka_kr6_gazebo', 'scripts')))
-    import ik_geometric as ik
+    import ik_geometric as ik  # type: ignore
 
 try:
-    from scipy.ndimage import distance_transform_edt
+    from scipy.ndimage import distance_transform_edt  # type: ignore
     SCIPY_AVAILABLE = True
 except ImportError:
     SCIPY_AVAILABLE = False
@@ -90,7 +91,7 @@ def _velocity_cost(trajectory: np.ndarray) -> np.ndarray:
     vel = np.sum(diffs ** 2, axis=1)
     return np.concatenate([[0.0], vel])
 
-def _obstacle_cost(trajectory: np.ndarray, grid: Grid3D, margin: float = 0.3) -> np.ndarray:
+def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float = 0.3) -> np.ndarray:
     """Forward Kinematics 2.5D Grid Penalty."""
     cost = np.zeros(len(trajectory))
     if grid is None: return cost
@@ -103,8 +104,8 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Grid3D, margin: float = 0.3) ->
         # Test 4 key locations on the arm (Elbow, Wrist, End-Effector)
         check_points = []
         for j in range(6):
-            R = R @ ik.rot(H[:, j], q[j])
-            p = p + R @ P[:, j + 1]
+            R = R @ ik.rot(H[:, j], q[j]) # type: ignore
+            p = p + R @ P[:, j + 1] # type: ignore
             if j in [2, 4, 5]: check_points.append(p.copy())
             
         # Interpolate a few points down the "forearm" Link 3 to Link 4/5
@@ -116,10 +117,10 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Grid3D, margin: float = 0.3) ->
         for pt in check_points:
             d = grid.get_distance(pt)
             if d < margin:
-                cost[i] += ((margin - d) / margin) ** 2
+                cost[i] += ((margin - d) / margin) ** 2 # type: ignore
     return cost
 
-def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: list, margin: float = 0.3) -> np.ndarray:
+def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], margin: float = 0.3) -> np.ndarray:
     """Euclidean distance penalty against simple spherical obstacles."""
     cost = np.zeros(len(trajectory))
     if not obstacles: return cost
@@ -132,8 +133,8 @@ def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: list, margin: float
         # Test key locations on the arm (Elbow, Wrist, End-Effector)
         check_points = []
         for j in range(6):
-            R = R @ ik.rot(H[:, j], q[j])
-            p = p + R @ P[:, j + 1]
+            R = R @ ik.rot(H[:, j], q[j]) # type: ignore
+            p = p + R @ P[:, j + 1] # type: ignore
             if j in [2, 4, 5]: check_points.append(p.copy())
             
         # Interpolate a few points down the "forearm" Link 3 to Link 4/5
@@ -146,12 +147,13 @@ def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: list, margin: float
             for obs in obstacles:
                 # obs is (center_xyz, radius)
                 center, radius = obs
-                d = np.linalg.norm(pt - center) - radius
+                center = np.array(center)
+                d = np.linalg.norm(pt - center) - radius # type: ignore
                 if d < margin:
-                    cost[i] += ((margin - d) / margin) ** 2
+                    cost[i] += ((margin - d) / margin) ** 2 # type: ignore
     return cost
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore
 
 def visualize_stomp_results(trajectory, costs, grid, pc):
     """Generate a 3-panel analysis graph for the collision-aware planner."""
@@ -204,8 +206,8 @@ def stomp_optimize(
     q_start: np.ndarray,
     q_goal: np.ndarray,
     joint_limits: np.ndarray,
-    grid: Grid3D = None,
-    simple_obstacles: list = None,
+    grid: Optional[Grid3D] = None,
+    simple_obstacles: Optional[list] = None,
     n_waypoints: int = 30,
     n_iterations: int = 80,
     n_rollouts: int = 15,
@@ -240,10 +242,10 @@ def stomp_optimize(
         candidates, costs = [], []
         for _ in range(n_rollouts):
             delta = np.random.randn(n_interior, ndof) * noise
-            candidate = trajectory.copy()
+            candidate = trajectory.copy() # type: ignore
             candidate[interior] += delta
             for j in range(ndof):
-                candidate[:, j] = np.clip(candidate[:, j], joint_limits[j, 0], joint_limits[j, 1])
+                candidate[:, j] = np.clip(candidate[:, j], joint_limits[j, 0], joint_limits[j, 1]) # type: ignore
             candidate[0] = q_start; candidate[-1] = q_goal
 
             # Calculate the various costs
@@ -263,7 +265,7 @@ def stomp_optimize(
         c_obs = w_obs * np.sum(_obstacle_cost(trajectory, grid, safety_margin))
         c_simp = w_obs * np.sum(_simple_obstacle_cost(trajectory, simple_obstacles, safety_margin))
         current_cost = c_smooth + c_limit + c_vel + c_obs + c_simp
-        candidates.append(trajectory.copy()); costs.append(current_cost)
+        candidates.append(trajectory.copy()); costs.append(current_cost) # type: ignore
 
         # Prob update
         costs = np.array(costs); min_cost = np.min(costs)
@@ -276,7 +278,7 @@ def stomp_optimize(
         new_traj[0] = q_start; new_traj[-1] = q_goal
         trajectory = new_traj
         if min_cost < best_cost: best_cost = min_cost
-        noise *= noise_decay
+        noise *= noise_decay # type: ignore
 
         if verbose and (it % 10 == 0 or it == n_iterations - 1):
             cost_history.append(current_cost)
