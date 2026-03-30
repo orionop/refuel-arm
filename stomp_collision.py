@@ -246,6 +246,14 @@ def stomp_optimize(
     """STOMP Optimizer with 2.5D Grid Avoidance."""
     ndof = len(q_start)
     trajectory = np.zeros((n_waypoints, ndof))
+
+    # Fail fast: if EDT-based grid collision costs are requested, SciPy must exist.
+    if grid is not None and not SCIPY_AVAILABLE:
+        raise RuntimeError(
+            "STOMP grid collision avoidance requires scipy.ndimage (Euclidean distance transform). "
+            "Install SciPy or call stomp_optimize with grid=None."
+        )
+
     for i in range(n_waypoints):
         alpha = i / (n_waypoints - 1)
         trajectory[i] = (1 - alpha) * q_start + alpha * q_goal

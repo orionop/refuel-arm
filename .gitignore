@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 .ipynb_checkpoints/
 
+# Experiment / visualization outputs
+output_graphs/
+
 # LaTeX
 *.aux
 *.log

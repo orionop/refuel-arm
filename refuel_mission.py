@@ -52,6 +52,10 @@ JOINT_LIMITS_DEFAULT = np.array([
 # Legacy alias for internal functions
 JOINT_LIMITS = JOINT_LIMITS_DEFAULT
 
+def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
+    """Convert joint limits specified in degrees to radians (for clipping/cost)."""
+    return np.radians(np.asarray(limits_deg, dtype=float))
+
 Q_HOME     = np.array([0.0, -np.pi / 2, 0.0, 0.0, 0.0, 0.0])
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.05
@@ -60,8 +64,10 @@ OBS_RADIUS = 0.05
 # ── Utility ───────────────────────────────────────────────────────
 
 def within_joint_limits(q):
+    # Joint states are in radians; the stored limits are in degrees.
+    q_deg = np.degrees(q)
     for i in range(6):
-        if q[i] < JOINT_LIMITS[i, 0] or q[i] > JOINT_LIMITS[i, 1]:
+        if q_deg[i] < JOINT_LIMITS[i, 0] or q_deg[i] > JOINT_LIMITS[i, 1]:
             return False
     return True
 
@@ -216,12 +222,12 @@ def smooth_trajectory(traj, window=5, passes=2, limits=None):
 def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None):
     """STOMP + Elastic Strips + post-smoothing with platform-specific limits."""
     print(f"\n  Planning: {name}")
-    if limits is None:
-        limits = JOINT_LIMITS
+    limits_deg = JOINT_LIMITS if limits is None else np.asarray(limits, dtype=float)
+    limits_rad = limits_deg_to_rad(limits_deg)
         
     traj = stomp_optimize(
         q_start=q_start, q_goal=q_goal,
-        joint_limits=limits,
+        joint_limits=limits_rad,
         simple_obstacles=obstacles or None,
         n_waypoints=n_wp, n_iterations=100, n_rollouts=12,
         noise_stddev=0.08, w_smooth=20.0, w_vel=15.0,
@@ -235,7 +241,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
     for wp in traj:
         wp_deg = np.degrees(wp)
         for j in range(6):
-            if wp_deg[j] < limits[j][0] or wp_deg[j] > limits[j][1]: # type: ignore
+            if wp_deg[j] < limits_deg[j][0] or wp_deg[j] > limits_deg[j][1]: # type: ignore
                 ok = False
                 break
         if not ok: break
@@ -246,6 +252,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
     if obstacles:
         traj, _, stats = bubble_strip_deform(
             traj, obstacles,
+            joint_limits=limits_rad,
             n_iterations=150,
             k_contraction=0.5, k_repulsion=30.0,
             rho_0=0.20, damping=0.85, verbose=False,
@@ -253,7 +260,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
         print(f"     Bubble Strips: {stats['final_waypoints']} wp, "
               f"min_rho={stats['final_min_clearance']:.4f}m")
 
-    traj = smooth_trajectory(traj, window=5, passes=2, limits=limits)
+    traj = smooth_trajectory(traj, window=5, passes=2, limits=limits_rad)
     diffs_post = np.diff(traj, axis=0)
     max_jump_post = np.max(np.abs(diffs_post)) # type: ignore
     print(f"     Smoothed: max_jump {np.degrees(max_jump):.1f} -> "
@@ -528,10 +535,13 @@ def main():
 
     active_robot = args.robot.lower()
     kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR6_R700
-    joint_limits = np.asarray(kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT))
+    joint_limits_deg = np.asarray(
+        kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT), dtype=float
+    )
+    joint_limits_rad = limits_deg_to_rad(joint_limits_deg)
 
     # Inject active platform parameters into bubble strips
-    bs_set_kinematics(kin_params, joint_limits)
+    bs_set_kinematics(kin_params, joint_limits_rad)
 
     target_xyz = np.array([args.target_x, args.target_y, args.target_z])
     n_wp = args.waypoints
@@ -551,7 +561,7 @@ def main():
 
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} target pose...")
     Q_target = IK_solve(inlet_R, inlet_xyz, robot=active_robot)
-    Q_v_target = filter_solutions(Q_target, Q_HOME, limits=joint_limits)
+    Q_v_target = filter_solutions(Q_target, Q_HOME, limits=joint_limits_deg)
     if Q_v_target.size == 0:
         print(f"  No valid IK solution for {active_robot.upper()} Target!")
         return
@@ -559,7 +569,7 @@ def main():
     
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} pre-approach pose...")
     Q_pre = IK_solve(inlet_R, pre_xyz, robot=active_robot)
-    Q_v_pre = filter_solutions(Q_pre, Q_HOME, limits=joint_limits)
+    Q_v_pre = filter_solutions(Q_pre, Q_HOME, limits=joint_limits_deg)
     if Q_v_pre.size == 0:
         print(f"  No valid IK solution for {active_robot.upper()} Pre-approach!")
         return
@@ -573,7 +583,7 @@ def main():
     print("\n[STOMP] Blind plan HOME -> Pre-approach (to determine path)...")
     seg_blind = stomp_optimize(
         q_start=Q_HOME, q_goal=q_pre,
-        joint_limits=joint_limits, simple_obstacles=None,
+        joint_limits=joint_limits_rad, simple_obstacles=None,
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
@@ -584,7 +594,7 @@ def main():
     
     # Phase 1: Gross Approach (C-Space)
     seg_approach = plan_stomp(Q_HOME, q_pre, obs_list,
-                              "Phase 1: HOME -> Pre-approach", n_wp, limits=joint_limits, kin=kin_params)
+                              "Phase 1: HOME -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # Phase 2: Fine Insertion (W-Space)
     seg_insert = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
@@ -604,7 +614,7 @@ def main():
         print(f"     Reversed approach trajectory ({len(seg_return)} wp)")
     else:
         seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
-                                "Phase 4: Pre-approach -> HOME", n_wp, limits=joint_limits, kin=kin_params)
+                                "Phase 4: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # ── Step 4: Concatenate full trajectory for graphs ────────────
     full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])

@@ -96,6 +96,36 @@ def fk_checkpoints(q):
     return points
 
 
+def fk_segment_endpoints(q):
+    """
+    Forward Kinematics endpoints for continuous collision modeling.
+
+    Returns Cartesian positions at joints in `CHECK_JOINTS` order:
+      [shoulder, elbow, wrist1, wrist2, ee]
+    """
+    R = np.eye(3)
+    p = P_VECS[:, 0].copy()
+    raw_pts = []
+    for j in range(6):
+        R = R @ rot(H_AXES[:, j], q[j])
+        p = p + R @ P_VECS[:, j + 1]
+        if j in CHECK_JOINTS:
+            raw_pts.append(p.copy())
+    return raw_pts
+
+
+def _pt_to_segment_dist(pA: np.ndarray, pB: np.ndarray, pC: np.ndarray) -> float:
+    """Shortest distance between line segment AB and point C."""
+    AB = pB - pA
+    AC = pC - pA
+    ab_sq = np.dot(AB, AB)
+    if ab_sq < 1e-8:
+        return float(np.linalg.norm(AC))
+    t = np.clip(np.dot(AC, AB) / ab_sq, 0.0, 1.0)
+    closest = pA + t * AB
+    return float(np.linalg.norm(pC - closest))
+
+
 def _fk_single_link(q, target_link_idx):
     """FK up to a specific joint index, returning (R, p)."""
     R = np.eye(3)
@@ -110,17 +140,22 @@ def _fk_single_link(q, target_link_idx):
 
 def clearance(q, obstacles):
     """
-    Compute workspace clearance rho(q): minimum distance from any checked
-    link to any obstacle surface.  Positive = free, negative = penetrating.
+    Compute clearance rho(q) using the same *continuous segment-to-sphere*
+    distance model as STOMP's `simple_obstacle_cost`.
+
+    rho(q) = min_{segments,obstacles} (dist(point, segment) - radius)
+      Positive => free, negative => penetrating.
     """
-    pts = fk_checkpoints(q)
-    min_dist = float('inf')
-    for _, pt in pts:
-        for obs_center, obs_radius in obstacles:
-            d = np.linalg.norm(pt - obs_center) - obs_radius
-            if d < min_dist:
-                min_dist = d
-    return min_dist
+    seg_pts = fk_segment_endpoints(q)  # 5 endpoints => 4 continuous segments
+    min_rho = float('inf')
+    for obs_center, obs_radius in obstacles:
+        obs_center = np.asarray(obs_center, dtype=float)
+        for k in range(len(seg_pts) - 1):
+            d = _pt_to_segment_dist(seg_pts[k], seg_pts[k + 1], obs_center)
+            surf_dist = d - float(obs_radius)
+            if surf_dist < min_rho:
+                min_rho = surf_dist
+    return min_rho
 
 
 def clearance_gradient(q, obstacles, h=1e-4):
