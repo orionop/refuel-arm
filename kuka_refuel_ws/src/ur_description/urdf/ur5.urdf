@@ -113,6 +113,13 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
+  <!-- Fix robot to world (prevents falling in Gazebo) -->
+  <link name="world"/>
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
   <!-- links: main serial chain -->
   <link name="base_link"/>
   <link name="base_link_inertia">
