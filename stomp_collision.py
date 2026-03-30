@@ -102,18 +102,18 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float
     for i, q in enumerate(trajectory):
         R = np.eye(3); p = P[:, 0].copy()
         
-        # Test 4 key locations on the arm (Elbow, Wrist, End-Effector)
+        # Test universally covering locations on the arm
         check_points = []
         for j in range(6):
             R = R @ ik.rot(H[:, j], q[j]) # type: ignore
             p = p + R @ P[:, j + 1] # type: ignore
-            if j in [1, 2, 5]: check_points.append(p.copy())
+            if j in [0, 1, 2, 3, 5]: check_points.append(p.copy())
             
-        # Interpolate a few points down the "forearm" Link 3 to Link 4/5
-        if len(check_points) >= 3:
-            elbow, wrist, tool = check_points[0], check_points[1], check_points[2]
-            forearm_mid = elbow + 0.5 * (wrist - elbow)
-            check_points.append(forearm_mid)
+        # Add midpoints for all adjacent links to catch long upper/forearms
+        extra_pts = []
+        for k in range(len(check_points) - 1):
+            extra_pts.append(0.5 * (check_points[k] + check_points[k+1]))
+        check_points.extend(extra_pts)
 
         for pt in check_points:
             d = grid.get_distance(pt)
@@ -132,18 +132,18 @@ def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], mar
     for i, q in enumerate(trajectory):
         R = np.eye(3); p = P[:, 0].copy()
         
-        # Test key locations on the arm (Elbow, Wrist, End-Effector)
+        # Test universally covering locations on the arm
         check_points = []
         for j in range(6):
             R = R @ ik.rot(H[:, j], q[j]) # type: ignore
             p = p + R @ P[:, j + 1] # type: ignore
-            if j in [1, 2, 5]: check_points.append(p.copy())
+            if j in [0, 1, 2, 3, 5]: check_points.append(p.copy())
             
-        # Interpolate a few points down the "forearm" Link 3 to Link 4/5
-        if len(check_points) >= 3:
-            elbow, wrist, tool = check_points[0], check_points[1], check_points[2]
-            forearm_mid = elbow + 0.5 * (wrist - elbow)
-            check_points.append(forearm_mid)
+        # Add midpoints for all adjacent links to catch long upper/forearms
+        extra_pts = []
+        for k in range(len(check_points) - 1):
+            extra_pts.append(0.5 * (check_points[k] + check_points[k+1]))
+        check_points.extend(extra_pts)
 
         for pt in check_points:
             for obs in obstacles:
