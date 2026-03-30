@@ -219,7 +219,7 @@ def IK_ur5(R_06, p_0T, kin=None):
         # solve for q5 using SP4
         # d_q5 = h2' * R_01' * R_06 * h6
         d_q5 = float(np.dot(h2, R_01.T @ R_06 @ h6))
-        t5_arr, _ = sp4.sp4_run(h2, h6, h5, d_q5)
+        t5_arr, _ = sp4.sp4_run(h6, h5, h2, d_q5)
         t5_arr = _ensure_iterable(t5_arr)
 
         for q5 in t5_arr:
