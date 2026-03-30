@@ -121,14 +121,27 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float
                 cost[i] += ((margin - d) / margin) ** 2 # type: ignore
     return cost
 
+def _pt_to_segment_dist(pA: np.ndarray, pB: np.ndarray, pC: np.ndarray) -> float:
+    """Shortest distance between line segment AB and point C."""
+    AB = pB - pA
+    AC = pC - pA
+    ab_sq = np.dot(AB, AB)
+    if ab_sq < 1e-8:
+        return float(np.linalg.norm(AC))
+    
+    t = np.clip(np.dot(AC, AB) / ab_sq, 0.0, 1.0)
+    closest = pA + t * AB
+    return float(np.linalg.norm(pC - closest))
+
 def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], margin: float = 0.3, kin=None) -> np.ndarray:
-    """Euclidean distance penalty against simple spherical obstacles."""
+    """Exact line-segment (cylinder) penalty against simple spherical obstacles."""
     cost = np.zeros(len(trajectory))
     if not obstacles: return cost
 
     if kin is None:
         kin = ik.KIN_KR6_R700
     H, P = kin['H'], kin['P']
+    
     for i, q in enumerate(trajectory):
         R = np.eye(3); p = P[:, 0].copy()
         
@@ -139,20 +152,25 @@ def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], mar
             p = p + R @ P[:, j + 1] # type: ignore
             if j in [0, 1, 2, 3, 5]: check_points.append(p.copy())
             
-        # Add midpoints for all adjacent links to catch long upper/forearms
-        extra_pts = []
-        for k in range(len(check_points) - 1):
-            extra_pts.append(0.5 * (check_points[k] + check_points[k+1]))
-        check_points.extend(extra_pts)
-
-        for pt in check_points:
-            for obs in obstacles:
-                # obs is (center_xyz, radius)
-                center, radius = obs
-                center = np.array(center)
-                d = np.linalg.norm(pt - center) - radius # type: ignore
-                if d < margin:
-                    cost[i] += ((margin - d) / margin) ** 2 # type: ignore
+        # check_points corresponds to:
+        # [0]: Shoulder  [1]: Elbow  [2]: Wrist 1  [3]: Wrist 2  [4]: EE
+        # We form 4 continuous line segments connecting these points to model the whole arm as solid cylinders
+        
+        for obs in obstacles:
+            center, radius = obs
+            center = np.array(center)
+            
+            # Find the closest distance from the obstacle to any part of the arm
+            min_dist = float('inf')
+            for k in range(len(check_points) - 1):
+                d = _pt_to_segment_dist(check_points[k], check_points[k+1], center)
+                if d < min_dist:
+                    min_dist = d
+            
+            # The surface distance is the line distance minus the obstacle radius
+            surf_dist = min_dist - radius
+            if surf_dist < margin:
+                cost[i] += ((margin - surf_dist) / margin) ** 2 # type: ignore
     return cost
 
 import matplotlib.pyplot as plt  # type: ignore
