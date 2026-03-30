@@ -57,9 +57,12 @@ JOINT_LIMITS = np.array([
     [-6.108652375,  6.108652375],
 ])
 
-# Links to check for collisions (indices into the 6 joints)
-# 2=elbow, 4=wrist, 5=tool tip
-CHECK_JOINTS = [2, 4, 5]
+# Links to check for collisions (matches STOMP dense segments)
+CHECK_JOINTS = [0, 1, 2, 3, 5]
+
+# Placeholder for precomputed globals
+LEVER_ARMS = None
+L_MAX = 0.0
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -69,25 +72,27 @@ CHECK_JOINTS = [2, 4, 5]
 def fk_checkpoints(q):
     """
     Forward Kinematics for a 6-DOF config. Returns Cartesian positions
-    of key arm checkpoints: elbow, wrist, tool tip, and forearm midpoint.
+    of key arm checkpoints and midpoints, mirroring STOMP collision segments.
     Returns list of (joint_index, position_3d) tuples.
     """
     R = np.eye(3)
     p = P_VECS[:, 0].copy()
-    points = []
+    raw_pts = []
     for j in range(6):
         R = R @ rot(H_AXES[:, j], q[j])
         p = p + R @ P_VECS[:, j + 1]
         if j in CHECK_JOINTS:
-            points.append((j, p.copy()))
+            raw_pts.append((j, p.copy()))
 
-    # Forearm midpoint between elbow and wrist
-    if len(points) >= 2:
-        elbow_p = points[0][1]
-        wrist_p = points[1][1]
-        mid_p = elbow_p + 0.5 * (wrist_p - elbow_p)
-        points.append((3, mid_p))
-
+    points = []
+    for k in range(len(raw_pts) - 1):
+        jA, pA = raw_pts[k]
+        jB, pB = raw_pts[k+1]
+        points.append((jA, pA))
+        # midpoint theoretically belongs to the distal joint jB
+        points.append((jB, 0.5 * (pA + pB)))
+    points.append(raw_pts[-1])
+    
     return points
 
 
@@ -154,9 +159,24 @@ def _compute_lever_arms():
     return L
 
 
-# Precompute at module load
-LEVER_ARMS = _compute_lever_arms()
-L_MAX = float(np.max(LEVER_ARMS))
+    return L
+
+
+# Precompute globals
+def set_kinematics(kin_dict, limits=None):
+    """Inject platform-specific kinematics before running the module."""
+    global KIN, H_AXES, P_VECS, JOINT_LIMITS, LEVER_ARMS, L_MAX
+    KIN = kin_dict
+    H_AXES = KIN['H']
+    P_VECS = KIN['P']
+    if limits is not None:
+        JOINT_LIMITS = np.array(limits)
+        
+    LEVER_ARMS = _compute_lever_arms()
+    L_MAX = float(np.max(LEVER_ARMS))
+
+# Initialize defaults at module load
+set_kinematics(ik.KIN_KR6_R700, JOINT_LIMITS)
 
 
 def cspace_displacement(dq):

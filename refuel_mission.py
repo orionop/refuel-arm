@@ -38,7 +38,7 @@ from ik_geometric import ( # type: ignore
     IK_solve, KIN_UR5, KIN_KR6_R700
 )
 from stomp_collision import stomp_optimize # type: ignore
-from bubble_strips import bubble_strip_deform # type: ignore
+from bubble_strips import bubble_strip_deform, set_kinematics as bs_set_kinematics # type: ignore
 from car_model import ( # type: ignore
     get_inlet_pose, get_preapproach_pose, spawn_target_marker,
     TARGET_XYZ_DEFAULT,
@@ -529,6 +529,9 @@ def main():
     active_robot = args.robot.lower()
     kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR6_R700
     joint_limits = np.asarray(kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT))
+
+    # Inject active platform parameters into bubble strips
+    bs_set_kinematics(kin_params, joint_limits)
 
     target_xyz = np.array([args.target_x, args.target_y, args.target_z])
     n_wp = args.waypoints
