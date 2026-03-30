@@ -112,11 +112,11 @@ def filter_solutions(Q, q_current, limits=None):
     return valid
 
 
-def ee_positions(trajectory):
+def ee_positions(trajectory, kin=None):
     """Compute EE XYZ for every waypoint."""
     pts = np.zeros((len(trajectory), 3))
     for i, q in enumerate(trajectory):
-        _, p = fwd_kinematics(q) # type: ignore
+        _, p = fwd_kinematics(q, kin=kin) # type: ignore
         pts[i] = p
     return pts
 
@@ -124,7 +124,7 @@ def ee_positions(trajectory):
 # ── Random obstacles along the path ──────────────────────────────
 NUM_OBSTACLES = 2
 
-def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None):
+def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None, kin=None):
     """Place n_obs obstacles in non-overlapping zones along the path."""
     if rng is None:
         rng = np.random.default_rng()
@@ -139,7 +139,7 @@ def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None):
         hi = int(n * (zone_lo + (k + 1) * zone_width))
         hi = max(hi, lo + 1)
         idx = rng.integers(lo, hi)
-        _, ee_pos = fwd_kinematics(trajectory[idx]) # type: ignore
+        _, ee_pos = fwd_kinematics(trajectory[idx], kin=kin) # type: ignore
         offset = np.array(rng.uniform(-0.04, 0.04, size=3))
         # Use explicit float logic to satisfy linter
         z_val = float(offset[2])
@@ -382,7 +382,7 @@ def send_trajectory_rviz(trajectory, dt=0.15, robot='kuka'):
 
 # ── RViz markers ──────────────────────────────────────────────────
 
-def publish_markers(target_xyz, obs_list, segments):
+def publish_markers(target_xyz, obs_list, segments, kin=None):
     _ensure_ros_path()
     import rospy # type: ignore
     from visualization_msgs.msg import Marker, MarkerArray # type: ignore
@@ -423,7 +423,7 @@ def publish_markers(target_xyz, obs_list, segments):
     for label, traj, _ in segments:
         if traj is not None:
             for q in traj:
-                _, p = fwd_kinematics(q)
+                _, p = fwd_kinematics(q, kin=kin)
                 m_path.points.append(Point(x=p[0], y=p[1], z=p[2]))
     ma.markers.append(m_path)
 
@@ -432,14 +432,14 @@ def publish_markers(target_xyz, obs_list, segments):
 
 # ── Graphs ────────────────────────────────────────────────────────
 
-def plot_trajectory_3d(all_traj, target_xyz, obs_list, save_path):
+def plot_trajectory_3d(all_traj, target_xyz, obs_list, save_path, kin=None):
     """Plot 3D EE workspace trajectory with target and obstacles."""
     import matplotlib # type: ignore
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt # type: ignore
     from mpl_toolkits.mplot3d import Axes3D  # type: ignore # noqa: F401 — registers '3d' projection
 
-    pts = ee_positions(all_traj)
+    pts = ee_positions(all_traj, kin=kin)
 
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
@@ -573,7 +573,7 @@ def main():
         noise_stddev=0.08, verbose=False)
 
     print("\n[Obstacles] Spawning 2 random obstacles on the path...")
-    obs_list = random_obstacles_on_path(seg_blind, n_obs=NUM_OBSTACLES, rng=rng)
+    obs_list = random_obstacles_on_path(seg_blind, n_obs=NUM_OBSTACLES, rng=rng, kin=kin_params)
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
@@ -623,12 +623,12 @@ def main():
             spawn_target_marker(target_xyz)
             spawn_obstacles_gazebo(obs_list)
 
-        publish_markers(target_xyz, obs_list, segments)
+        publish_markers(target_xyz, obs_list, segments, kin=kin_params)
 
     # ── Step 6: Generate graphs ───────────────────────────────────
     print("\n[Graphs]")
     plot_trajectory_3d(full_traj, target_xyz, obs_list,
-                       "output_graphs/ee_trajectory_3d.png")
+                       "output_graphs/ee_trajectory_3d.png", kin=kin_params)
     plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
 
     # ── Step 7: Execute motion ────────────────────────────────────
