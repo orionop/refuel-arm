@@ -211,7 +211,7 @@ def smooth_trajectory(traj, window=5, passes=2):
     return smoothed
 
 
-def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None):
+def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None):
     """STOMP + Elastic Strips + post-smoothing with platform-specific limits."""
     print(f"\n  Planning: {name}")
     if limits is None:
@@ -223,7 +223,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None):
         simple_obstacles=obstacles or None,
         n_waypoints=n_wp, n_iterations=100, n_rollouts=12,
         noise_stddev=0.08, w_smooth=20.0, w_vel=15.0,
-        verbose=False,
+        verbose=False, kin=kin,
     )
     diffs = np.diff(traj, axis=0)
     max_jump = np.max(np.abs(diffs))
@@ -570,7 +570,7 @@ def main():
         q_start=Q_HOME, q_goal=q_pre,
         joint_limits=joint_limits, simple_obstacles=None,
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
-        noise_stddev=0.08, verbose=False)
+        noise_stddev=0.08, verbose=False, kin=kin_params)
 
     print("\n[Obstacles] Spawning 2 random obstacles on the path...")
     obs_list = random_obstacles_on_path(seg_blind, n_obs=NUM_OBSTACLES, rng=rng, kin=kin_params)
@@ -579,7 +579,7 @@ def main():
     
     # Phase 1: Gross Approach (C-Space)
     seg_approach = plan_stomp(Q_HOME, q_pre, obs_list,
-                              "Phase 1: HOME -> Pre-approach", n_wp, limits=joint_limits)
+                              "Phase 1: HOME -> Pre-approach", n_wp, limits=joint_limits, kin=kin_params)
 
     # Phase 2: Fine Insertion (W-Space)
     seg_insert = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
@@ -599,7 +599,7 @@ def main():
         print(f"     Reversed approach trajectory ({len(seg_return)} wp)")
     else:
         seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
-                                "Phase 4: Pre-approach -> HOME", n_wp, limits=joint_limits)
+                                "Phase 4: Pre-approach -> HOME", n_wp, limits=joint_limits, kin=kin_params)
 
     # ── Step 4: Concatenate full trajectory for graphs ────────────
     full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])

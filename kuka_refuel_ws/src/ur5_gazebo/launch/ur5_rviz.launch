@@ -1,0 +1,12 @@
+<launch>
+  <!-- UR5 RViz Visualization (No Gazebo Physics) -->
+
+  <!-- Load UR5 robot description -->
+  <param name="robot_description" textfile="$(find ur_description)/urdf/ur5.urdf" />
+
+  <!-- Robot State Publisher (publishes TF from /joint_states) -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" required="true" />
+</launch>

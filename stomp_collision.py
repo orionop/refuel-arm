@@ -91,12 +91,13 @@ def _velocity_cost(trajectory: np.ndarray) -> np.ndarray:
     vel = np.sum(diffs ** 2, axis=1)
     return np.concatenate([[0.0], vel])
 
-def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float = 0.3) -> np.ndarray:
+def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float = 0.3, kin=None) -> np.ndarray:
     """Forward Kinematics 2.5D Grid Penalty."""
     cost = np.zeros(len(trajectory))
     if grid is None: return cost
 
-    kin = ik.KIN_KR6_R700
+    if kin is None:
+        kin = ik.KIN_KR6_R700
     H, P = kin['H'], kin['P']
     for i, q in enumerate(trajectory):
         R = np.eye(3); p = P[:, 0].copy()
@@ -120,12 +121,13 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float
                 cost[i] += ((margin - d) / margin) ** 2 # type: ignore
     return cost
 
-def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], margin: float = 0.3) -> np.ndarray:
+def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], margin: float = 0.3, kin=None) -> np.ndarray:
     """Euclidean distance penalty against simple spherical obstacles."""
     cost = np.zeros(len(trajectory))
     if not obstacles: return cost
 
-    kin = ik.KIN_KR6_R700
+    if kin is None:
+        kin = ik.KIN_KR6_R700
     H, P = kin['H'], kin['P']
     for i, q in enumerate(trajectory):
         R = np.eye(3); p = P[:, 0].copy()
@@ -155,7 +157,7 @@ def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], mar
 
 import matplotlib.pyplot as plt  # type: ignore
 
-def visualize_stomp_results(trajectory, costs, grid, pc):
+def visualize_stomp_results(trajectory, costs, grid, pc, kin=None):
     """Generate a 3-panel analysis graph for the collision-aware planner."""
     fig = plt.figure(figsize=(15, 5))
     
@@ -186,7 +188,8 @@ def visualize_stomp_results(trajectory, costs, grid, pc):
     
     # Calculate EE path
     ee_path = []
-    kin = ik.KIN_KR6_R700
+    if kin is None:
+        kin = ik.KIN_KR6_R700
     for q in trajectory:
         _, p = ik.fwd_kinematics(q, kin)
         ee_path.append(p)
@@ -220,6 +223,7 @@ def stomp_optimize(
     safety_margin: float = 0.2,
     verbose: bool = True,
     return_cost_history: bool = False,
+    kin=None,
 ):
     """STOMP Optimizer with 2.5D Grid Avoidance."""
     ndof = len(q_start)
@@ -252,8 +256,8 @@ def stomp_optimize(
             c_smooth = w_smooth * _smoothness_cost(candidate, A)
             c_limit = w_limit * np.sum(_joint_limit_cost(candidate, joint_limits))
             c_vel = w_vel * np.sum(_velocity_cost(candidate))
-            c_obs = w_obs * np.sum(_obstacle_cost(candidate, grid, safety_margin))
-            c_simp = w_obs * np.sum(_simple_obstacle_cost(candidate, simple_obstacles, safety_margin))
+            c_obs = w_obs * np.sum(_obstacle_cost(candidate, grid, safety_margin, kin=kin))
+            c_simp = w_obs * np.sum(_simple_obstacle_cost(candidate, simple_obstacles, safety_margin, kin=kin))
 
             candidates.append(candidate)
             costs.append(c_smooth + c_limit + c_vel + c_obs + c_simp)
@@ -262,8 +266,8 @@ def stomp_optimize(
         c_smooth = w_smooth * _smoothness_cost(trajectory, A)
         c_limit = w_limit * np.sum(_joint_limit_cost(trajectory, joint_limits))
         c_vel = w_vel * np.sum(_velocity_cost(trajectory))
-        c_obs = w_obs * np.sum(_obstacle_cost(trajectory, grid, safety_margin))
-        c_simp = w_obs * np.sum(_simple_obstacle_cost(trajectory, simple_obstacles, safety_margin))
+        c_obs = w_obs * np.sum(_obstacle_cost(trajectory, grid, safety_margin, kin=kin))
+        c_simp = w_obs * np.sum(_simple_obstacle_cost(trajectory, simple_obstacles, safety_margin, kin=kin))
         current_cost = c_smooth + c_limit + c_vel + c_obs + c_simp
         candidates.append(trajectory.copy()); costs.append(current_cost) # type: ignore
 
