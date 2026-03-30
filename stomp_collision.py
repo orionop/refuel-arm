@@ -107,7 +107,7 @@ def _obstacle_cost(trajectory: np.ndarray, grid: Optional[Grid3D], margin: float
         for j in range(6):
             R = R @ ik.rot(H[:, j], q[j]) # type: ignore
             p = p + R @ P[:, j + 1] # type: ignore
-            if j in [2, 4, 5]: check_points.append(p.copy())
+            if j in [1, 2, 5]: check_points.append(p.copy())
             
         # Interpolate a few points down the "forearm" Link 3 to Link 4/5
         if len(check_points) >= 3:
@@ -137,7 +137,7 @@ def _simple_obstacle_cost(trajectory: np.ndarray, obstacles: Optional[list], mar
         for j in range(6):
             R = R @ ik.rot(H[:, j], q[j]) # type: ignore
             p = p + R @ P[:, j + 1] # type: ignore
-            if j in [2, 4, 5]: check_points.append(p.copy())
+            if j in [1, 2, 5]: check_points.append(p.copy())
             
         # Interpolate a few points down the "forearm" Link 3 to Link 4/5
         if len(check_points) >= 3:

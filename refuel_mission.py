@@ -188,12 +188,14 @@ def spawn_obstacles_gazebo(obs_list):
 
 # ── Trajectory planning ──────────────────────────────────────────
 
-def smooth_trajectory(traj, window=5, passes=2):
+def smooth_trajectory(traj, window=5, passes=2, limits=None):
     """Moving-average smoothing with pinned endpoints and joint-limit clamping.
 
     Applies a centered moving average ``passes`` times. Start and end
     waypoints are never modified so the trajectory still hits its goals.
     """
+    if limits is None:
+        limits = JOINT_LIMITS
     smoothed = traj.copy()
     half = window // 2
     for _ in range(passes):
@@ -204,7 +206,7 @@ def smooth_trajectory(traj, window=5, passes=2):
             buf[i] = smoothed[lo:hi].mean(axis=0)
         # Clamp to joint limits
         for j in range(6):
-            buf[:, j] = np.clip(buf[:, j], JOINT_LIMITS[j, 0], JOINT_LIMITS[j, 1])
+            buf[:, j] = np.clip(buf[:, j], limits[j][0], limits[j][1])
         buf[0] = traj[0]
         buf[-1] = traj[-1]
         smoothed = buf
@@ -251,7 +253,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
         print(f"     Bubble Strips: {stats['final_waypoints']} wp, "
               f"min_rho={stats['final_min_clearance']:.4f}m")
 
-    traj = smooth_trajectory(traj, window=5, passes=2)
+    traj = smooth_trajectory(traj, window=5, passes=2, limits=limits)
     diffs_post = np.diff(traj, axis=0)
     max_jump_post = np.max(np.abs(diffs_post)) # type: ignore
     print(f"     Smoothed: max_jump {np.degrees(max_jump):.1f} -> "
@@ -538,8 +540,8 @@ def main():
     print("=" * 65)
 
     # ── Step 1: IK-Geo ────────────────────────────────────────────
-    inlet_xyz, inlet_R = get_inlet_pose(target_xyz)
-    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R)
+    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
+    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, robot=active_robot)
 
     print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}]")
     print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}]")

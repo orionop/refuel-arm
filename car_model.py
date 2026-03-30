@@ -15,10 +15,15 @@ from ik_geometric import rot
 TARGET_XYZ_DEFAULT = np.array([0.55, 0.30, 0.50])
 
 # EE orientation: tool axis pointing +Y (toward the target)
-R_TOOL_INTO_CAR = np.array([
+R_TOOL_INTO_CAR_KUKA = np.array([
     [0.,  0.,  1.],
     [1.,  0.,  0.],
     [0.,  1.,  0.]])
+
+R_TOOL_INTO_CAR_UR5 = np.array([
+    [ 0.,  0., -1.],
+    [ 0.,  1.,  0.],
+    [ 1.,  0.,  0.]])
 
 INLET_SIZE = (0.06, 0.005, 0.06)
 
@@ -37,16 +42,22 @@ TARGET_MARKER_SDF = """<?xml version="1.0" ?>
 </sdf>"""
 
 
-def get_inlet_pose(target_xyz, yaw=0.0):
+def get_inlet_pose(target_xyz, yaw=0.0, robot="kuka"):
     """Compute EE target position and orientation matrix."""
     R_yaw = rot(np.array([0., 0., 1.]), yaw)
-    inlet_R = R_yaw @ R_TOOL_INTO_CAR
+    if robot == "ur5":
+        inlet_R = R_yaw @ R_TOOL_INTO_CAR_UR5
+    else:
+        inlet_R = R_yaw @ R_TOOL_INTO_CAR_KUKA
     return target_xyz.copy(), inlet_R
 
 
-def get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.08):
+def get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.08, robot="kuka"):
     """Pull back from the target along the approach normal."""
-    approach_dir = inlet_R[:, 0]
+    if robot == "ur5":
+        approach_dir = inlet_R[:, 1]  # UR5 flange Y-axis is the tool axis
+    else:
+        approach_dir = inlet_R[:, 0]  # KUKA flange X-axis is the tool axis
     preapproach_xyz = inlet_xyz - standoff * approach_dir
     return preapproach_xyz, inlet_R
 
