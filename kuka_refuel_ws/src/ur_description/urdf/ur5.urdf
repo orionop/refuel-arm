@@ -348,10 +348,32 @@
     <parent link="base_link"/>
     <child link="base"/>
   </joint>
+  <!-- F/T Sensor: 6-axis force/torque sensor at the wrist -->
+  <link name="ft_sensor_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.005"/>
+      </geometry>
+      <material name="FTSensorGrey">
+        <color rgba="0.4 0.4 0.4 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="0.05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+    </inertial>
+  </link>
+  <joint name="ft_sensor_joint" type="fixed">
+    <parent link="wrist_3_link"/>
+    <child link="ft_sensor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
   <!-- ROS-Industrial 'flange' frame: attachment point for EEF models -->
   <link name="flange"/>
   <joint name="wrist_3-flange" type="fixed">
-    <parent link="wrist_3_link"/>
+    <parent link="ft_sensor_link"/>
     <child link="flange"/>
     <origin rpy="0 -1.5707963267948966 -1.5707963267948966" xyz="0 0 0"/>
   </joint>
@@ -368,6 +390,19 @@
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+  <!-- Gazebo F/T sensor plugin: measures forces at wrist_3_joint -->
+  <gazebo reference="ft_sensor_joint">
+    <provideFeedback>true</provideFeedback>
+  </gazebo>
+  <gazebo>
+    <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+      <robotNamespace>/ur5</robotNamespace>
+      <jointName>wrist_3_joint</jointName>
+      <topicName>ft_sensor/raw</topicName>
+      <updateRate>50</updateRate>
+      <gaussianNoise>0.01</gaussianNoise>
     </plugin>
   </gazebo>
 </robot>

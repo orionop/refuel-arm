@@ -367,6 +367,65 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
     return client.get_result()
 
 
+_ADMITTANCE_NODE = None
+
+def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
+    """Send trajectory through the admittance controller for force-compliant execution.
+
+    Used for fine insertion/extraction phases where contact forces must be
+    accommodated. The admittance node yields when external forces exceed
+    15N and aborts if they exceed 50N.
+
+    Returns True on success, False on abort.
+    """
+    global _ADMITTANCE_NODE
+    _ensure_ros_path()
+    import rospy # type: ignore
+
+    if _ADMITTANCE_NODE is None:
+        from admittance_node import AdmittanceNode  # type: ignore
+        # AdmittanceNode.__init__ calls rospy.init_node — but we already
+        # initialized in main().  Pass anonymous=True so it doesn't conflict.
+        # Instead, create the node object without re-initializing ROS.
+        _ADMITTANCE_NODE = object.__new__(AdmittanceNode)
+        # Manual init (skip rospy.init_node since we're already in a node)
+        import threading
+        from geometry_msgs.msg import WrenchStamped  # type: ignore
+        from std_msgs.msg import String  # type: ignore
+        from sensor_msgs.msg import JointState  # type: ignore
+        from admittance_controller import AdmittanceController  # type: ignore
+        from admittance_node import numerical_jacobian, UR5_JOINT_NAMES, KIN_UR5  # type: ignore
+
+        node = _ADMITTANCE_NODE
+        node.mass = rospy.get_param('~admittance_mass', 2.0)
+        node.damping = rospy.get_param('~admittance_damping', 20.0)
+        node.stiffness = rospy.get_param('~admittance_stiffness', 100.0)
+        node.force_threshold = rospy.get_param('~admittance_force_threshold', 15.0)
+        node.force_abort = rospy.get_param('~admittance_force_abort', 50.0)
+        node.update_rate = rospy.get_param('~admittance_update_rate', 50)
+        node.controller = AdmittanceController(
+            mass=node.mass, damping=node.damping, stiffness=node.stiffness)
+        node.latest_wrench = np.zeros(6)
+        node.current_joints = np.zeros(6)
+        node.nominal_joints = None
+        node.mode = 'RIGID'
+        node.aborted = False
+        node._lock = threading.Lock()
+        node.ft_sub = rospy.Subscriber(
+            '/ur5/ft_sensor/raw', WrenchStamped, node._ft_callback)
+        node.joint_sub = rospy.Subscriber(
+            '/joint_states', JointState, node._joint_callback)
+        node.status_pub = rospy.Publisher(
+            '/ur5/admittance/status', String, queue_size=10)
+        node._cmd_pub = None
+        rospy.sleep(0.5)  # Let subscribers connect
+
+        rospy.loginfo(f"[Admittance] Initialized: M={node.mass}, D={node.damping}, "
+                      f"K={node.stiffness}, threshold={node.force_threshold}N")
+
+    return _ADMITTANCE_NODE.execute_trajectory(trajectory, dt=dt)
+
+
 _RVIZ_PUB = None
 
 def send_trajectory_rviz(trajectory, dt=0.15, robot='kuka'):
@@ -531,6 +590,8 @@ def main():
                         help="Return along the reversed approach path instead of re-planning")
     parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5"],
                         help="Target robot platform (default: kuka)")
+    parser.add_argument("--compliant", action="store_true",
+                        help="Use admittance control for fine insertion/extraction (UR5 only)")
     args = parser.parse_args()
 
     active_robot = args.robot.lower()
@@ -619,13 +680,17 @@ def main():
     # ── Step 4: Concatenate full trajectory for graphs ────────────
     full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])
 
+    # compliant_phases: which segments use admittance control
+    use_compliant = args.compliant and active_robot == 'ur5'
     segments = [
-        ("Gross Approach",  seg_approach, 0.15),
-        ("Fine Insertion",  seg_insert,   0.05),
-        ("Refueling",       None,         DWELL_TIME),
-        ("Fine Extraction", seg_extract,  0.05),
-        ("Gross Return",    seg_return,   0.15),
+        ("Gross Approach",  seg_approach, 0.15, False),
+        ("Fine Insertion",  seg_insert,   0.05, use_compliant),
+        ("Refueling",       None,         DWELL_TIME, False),
+        ("Fine Extraction", seg_extract,  0.05, use_compliant),
+        ("Gross Return",    seg_return,   0.15, False),
     ]
+    if use_compliant:
+        print("\n[Admittance] Compliant mode ENABLED for fine insertion/extraction")
 
     # ── Step 5: Spawn in Gazebo / RViz FIRST ──────────────────────
     use_ros = args.ros or args.rviz
@@ -638,7 +703,9 @@ def main():
             spawn_target_marker(target_xyz)
             spawn_obstacles_gazebo(obs_list)
 
-        publish_markers(target_xyz, obs_list, segments, kin=kin_params)
+        # publish_markers expects (label, traj, dt) tuples — strip compliant flag
+        markers_segments = [(l, t, d) for l, t, d, _ in segments]
+        publish_markers(target_xyz, obs_list, markers_segments, kin=kin_params)
 
     # ── Step 6: Generate graphs ───────────────────────────────────
     print("\n[Graphs]")
@@ -648,14 +715,20 @@ def main():
 
     # ── Step 7: Execute motion ────────────────────────────────────
     if use_ros:
-        for i, (label, traj, dt) in enumerate(segments, 1):
-            print(f"\n  Step {i}/{len(segments)}: {label}")
+        for i, (label, traj, dt, compliant) in enumerate(segments, 1):
+            print(f"\n  Step {i}/{len(segments)}: {label}"
+                  f"{' [COMPLIANT]' if compliant else ''}")
             if traj is None:
                 print(f"     Refueling: holding for {dt:.0f}s...")
                 rospy.sleep(dt)
                 print(f"     Dwell complete")
             else:
-                if args.ros:
+                if compliant and args.ros:
+                    result = send_trajectory_compliant(traj, dt=dt, robot=active_robot)
+                    if not result:
+                        print(f"     ADMITTANCE ABORT — mission halted")
+                        break
+                elif args.ros:
                     result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
                 else:
                     result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
@@ -663,16 +736,17 @@ def main():
     else:
         print(f"\n[Preview]")
         total_wp_list = []
-        for i, (label, traj, dt) in enumerate(segments, 1):
+        for i, (label, traj, dt, compliant) in enumerate(segments, 1):
             if traj is None:
                 print(f"  Step {i}: {label} ({dt:.0f}s dwell)")
             else:
                 # Local shadow for linter type-inference safety
-                t = traj 
+                t = traj
                 if t is not None:
                     seg_len = int(len(t))
                     total_wp_list.append(seg_len)
-                    print(f"  Step {i}: {label}  ({seg_len} wp, dt={dt}s)")
+                    mode_tag = " [COMPLIANT]" if compliant else ""
+                    print(f"  Step {i}: {label}{mode_tag}  ({seg_len} wp, dt={dt}s)")
                     if seg_len > 0:
                         print(f"           start={np.round(np.degrees(t[0]), 1)} deg")
                         print(f"           end  ={np.round(np.degrees(t[-1]), 1)} deg")
