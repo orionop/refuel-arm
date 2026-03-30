@@ -317,19 +317,36 @@ def _ensure_ros_path():
         sys.path.insert(0, ros_python)
 
 
-def send_trajectory_ros(trajectory, dt=0.15):
+# ── Robot-specific ROS configuration ──────────────────────────────
+ROS_CONFIG = {
+    'kuka': {
+        'controller': '/kr6_arm_controller/follow_joint_trajectory',
+        'joint_names': [f'joint_{i}' for i in range(1, 7)],
+    },
+    'ur5': {
+        'controller': '/ur5_arm_controller/follow_joint_trajectory',
+        'joint_names': [
+            'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+            'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint',
+        ],
+    },
+}
+
+
+def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
     _ensure_ros_path()
     import rospy, actionlib # type: ignore
     from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal # type: ignore
     from trajectory_msgs.msg import JointTrajectoryPoint # type: ignore
 
+    cfg = ROS_CONFIG[robot]
     client = actionlib.SimpleActionClient(
-        '/kr6_arm_controller/follow_joint_trajectory',
+        cfg['controller'],
         FollowJointTrajectoryAction)
     client.wait_for_server(timeout=rospy.Duration(5.0))
 
     goal = FollowJointTrajectoryGoal()
-    goal.trajectory.joint_names = [f'joint_{i}' for i in range(1, 7)]
+    goal.trajectory.joint_names = cfg['joint_names']
     for i, q in enumerate(trajectory):
         pt = JointTrajectoryPoint()
         pt.positions = q.tolist()
@@ -343,7 +360,7 @@ def send_trajectory_ros(trajectory, dt=0.15):
 
 _RVIZ_PUB = None
 
-def send_trajectory_rviz(trajectory, dt=0.15):
+def send_trajectory_rviz(trajectory, dt=0.15, robot='kuka'):
     global _RVIZ_PUB
     _ensure_ros_path()
     import rospy # type: ignore
@@ -351,8 +368,9 @@ def send_trajectory_rviz(trajectory, dt=0.15):
     if _RVIZ_PUB is None:
         _RVIZ_PUB = rospy.Publisher('/joint_states', JointState, queue_size=10) # type: ignore
         rospy.sleep(0.5)
+    cfg = ROS_CONFIG[robot]
     msg = JointState()
-    msg.name = [f'joint_{i}' for i in range(1, 7)]
+    msg.name = cfg['joint_names']
     rate = rospy.Rate(1.0 / dt)
     for q in trajectory:
         msg.header.stamp = rospy.Time.now()
@@ -623,9 +641,9 @@ def main():
                 print(f"     Dwell complete")
             else:
                 if args.ros:
-                    result = send_trajectory_ros(traj, dt=dt)
+                    result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
                 else:
-                    result = send_trajectory_rviz(traj, dt=dt)
+                    result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
                 print(f"     {'done' if result else 'timeout/fail'}")
     else:
         print(f"\n[Preview]")
