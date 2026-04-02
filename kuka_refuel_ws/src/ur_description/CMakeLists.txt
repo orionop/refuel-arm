@@ -6,6 +6,7 @@ find_package(ament_cmake REQUIRED)
 # Install URDF directory
 install(DIRECTORY
   urdf
+  meshes
   DESTINATION share/${PROJECT_NAME}/
 )
 

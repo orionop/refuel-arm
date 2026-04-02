@@ -9,6 +9,7 @@ Usage:
     ros2 launch ur5_gazebo ur5_refuel.launch.py
 """
 import os
+import tempfile
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
@@ -22,13 +23,19 @@ def generate_launch_description():
     kuka_pkg    = get_package_share_directory('kuka_kr6_gazebo')
     ur5_pkg     = get_package_share_directory('ur5_gazebo')
 
-    # 1. Load UR5 URDF and resolve $(find ur5_gazebo) — plain URDFs don't go
-    #    through xacro so the substitution must be done here in Python.
+    # 1. Load UR5 URDF and resolve $(find ...) substitutions — plain URDFs don't
+    #    go through xacro so the substitution must be done here in Python.
     urdf_path = os.path.join(ur_desc_pkg, 'urdf', 'ur5.urdf')
     with open(urdf_path, 'r') as f:
         urdf_content = f.read()
     urdf_content = urdf_content.replace('$(find ur5_gazebo)', ur5_pkg)
     robot_description = {'robot_description': urdf_content}
+
+    # Write processed URDF to temp file so spawn_entity can load it directly
+    # (using -file instead of -topic ensures Gazebo processes <gazebo><plugin> tags)
+    urdf_file = os.path.join(tempfile.gettempdir(), 'ur5.urdf')
+    with open(urdf_file, 'w') as f:
+        f.write(urdf_content)
 
     # 2. Robot State Publisher
     robot_state_publisher = Node(
@@ -47,12 +54,12 @@ def generate_launch_description():
         launch_arguments={'world': world_path}.items(),
     )
 
-    # 4. Spawn UR5 — shoulder_lift pre-bent to -90 deg (matches ROS1 behaviour)
+    # 4. Spawn UR5 from file (not topic) so Gazebo loads model plugins
     spawn_robot = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
         arguments=[
-            '-topic', 'robot_description',
+            '-file', urdf_file,
             '-entity', 'ur5',
             '-z', '0.05',
         ],

@@ -7,6 +7,7 @@ Usage:
     ros2 launch kuka_kr6_gazebo gazebo.launch.py
 """
 import os
+import tempfile
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -23,12 +24,17 @@ def generate_launch_description():
     #    Pass yaml path as absolute so $(find ...) inside xacro is not needed
     xacro_file = os.path.join(pkg, 'urdf', 'kr6_r700.gazebo.xacro')
     yaml_path = os.path.join(pkg, 'config', 'ros2_controllers.yaml')
-    robot_description = {
-        'robot_description': xacro.process_file(
-            xacro_file,
-            mappings={'ros2_controllers_yaml': yaml_path}
-        ).toxml()
-    }
+    urdf_xml = xacro.process_file(
+        xacro_file,
+        mappings={'ros2_controllers_yaml': yaml_path}
+    ).toxml()
+    robot_description = {'robot_description': urdf_xml}
+
+    # Write processed URDF to temp file so spawn_entity can load it directly
+    # (using -file instead of -topic ensures Gazebo processes <gazebo><plugin> tags)
+    urdf_file = os.path.join(tempfile.gettempdir(), 'kr6_r700.urdf')
+    with open(urdf_file, 'w') as f:
+        f.write(urdf_xml)
 
     # 2. Robot State Publisher
     robot_state_publisher = Node(
@@ -47,12 +53,12 @@ def generate_launch_description():
         launch_arguments={'world': world_path}.items(),
     )
 
-    # 4. Spawn KUKA KR6 R700 — shoulder joint pre-bent to -90 deg
+    # 4. Spawn KUKA KR6 R700 from file (not topic) so Gazebo loads model plugins
     spawn_robot = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
         arguments=[
-            '-topic', 'robot_description',
+            '-file', urdf_file,
             '-entity', 'kr6_r700',
             '-z', '0.05',
         ],
