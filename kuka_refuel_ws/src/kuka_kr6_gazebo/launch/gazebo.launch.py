@@ -10,7 +10,7 @@ import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -65,7 +65,15 @@ def generate_launch_description():
         output='screen',
     )
 
+    # Ensure Gazebo finds gazebo_ros2_control plugin regardless of shell env
+    plugin_path = '/opt/ros/humble/lib'
+    set_plugin_path = SetEnvironmentVariable(
+        name='GAZEBO_PLUGIN_PATH',
+        value=plugin_path + ':' + os.environ.get('GAZEBO_PLUGIN_PATH', ''),
+    )
+
     return LaunchDescription([
+        set_plugin_path,
         # Sequence: spawn → joint_state_broadcaster → arm_controller
         RegisterEventHandler(
             event_handler=OnProcessExit(
