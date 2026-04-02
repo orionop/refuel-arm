@@ -48,7 +48,6 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-entity', 'kr6_r700',
             '-z', '0.05',
-            '-J', 'joint_2', '-1.5707963',
         ],
         output='screen',
     )

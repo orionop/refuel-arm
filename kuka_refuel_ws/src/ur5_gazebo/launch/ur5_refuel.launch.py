@@ -55,7 +55,6 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-entity', 'ur5',
             '-z', '0.05',
-            '-J', 'shoulder_lift_joint', '-1.5707963',
         ],
         output='screen',
     )
