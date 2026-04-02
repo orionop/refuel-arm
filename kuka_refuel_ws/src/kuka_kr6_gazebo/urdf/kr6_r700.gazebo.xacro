@@ -69,9 +69,11 @@
   </ros2_control>
 
   <!-- gazebo_ros2_control plugin (replaces libgazebo_ros_control.so from ROS1) -->
+  <!-- ros2_controllers_yaml arg is passed as absolute path from the launch file -->
+  <xacro:arg name="ros2_controllers_yaml" default=""/>
   <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-      <parameters>$(find kuka_kr6_gazebo)/config/ros2_controllers.yaml</parameters>
+      <parameters>$(arg ros2_controllers_yaml)</parameters>
     </plugin>
   </gazebo>
 

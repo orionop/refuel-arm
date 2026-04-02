@@ -10,7 +10,7 @@ import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -20,8 +20,15 @@ def generate_launch_description():
     pkg = get_package_share_directory('kuka_kr6_gazebo')
 
     # 1. Process xacro → robot_description
+    #    Pass yaml path as absolute so $(find ...) inside xacro is not needed
     xacro_file = os.path.join(pkg, 'urdf', 'kr6_r700.gazebo.xacro')
-    robot_description = {'robot_description': xacro.process_file(xacro_file).toxml()}
+    yaml_path = os.path.join(pkg, 'config', 'ros2_controllers.yaml')
+    robot_description = {
+        'robot_description': xacro.process_file(
+            xacro_file,
+            mappings={'ros2_controllers_yaml': yaml_path}
+        ).toxml()
+    }
 
     # 2. Robot State Publisher
     robot_state_publisher = Node(
@@ -52,16 +59,21 @@ def generate_launch_description():
         output='screen',
     )
 
-    # 5. Controllers (loaded in sequence after spawn completes)
-    load_joint_state_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
+    # 5. Controllers — use spawner nodes (proper ROS2 approach; auto-waits for
+    #    controller_manager which is started by libgazebo_ros2_control.so)
+    load_joint_state_broadcaster = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster',
+                   '--controller-manager', '/controller_manager'],
         output='screen',
     )
 
-    load_arm_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'kr6_arm_controller'],
+    load_arm_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['kr6_arm_controller',
+                   '--controller-manager', '/controller_manager'],
         output='screen',
     )
 

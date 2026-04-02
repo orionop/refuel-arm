@@ -11,7 +11,7 @@ Usage:
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -59,16 +59,21 @@ def generate_launch_description():
         output='screen',
     )
 
-    # 5. Controllers — loaded in sequence after spawn completes
-    load_joint_state_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
+    # 5. Controllers — use spawner nodes (proper ROS2 approach; auto-waits for
+    #    controller_manager which is started by libgazebo_ros2_control.so)
+    load_joint_state_broadcaster = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster',
+                   '--controller-manager', '/controller_manager'],
         output='screen',
     )
 
-    load_arm_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'ur5_arm_controller'],
+    load_arm_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['ur5_arm_controller',
+                   '--controller-manager', '/controller_manager'],
         output='screen',
     )
 
