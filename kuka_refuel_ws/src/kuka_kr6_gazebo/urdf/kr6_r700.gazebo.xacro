@@ -74,6 +74,9 @@
   <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
       <parameters>$(arg ros2_controllers_yaml)</parameters>
+      <ros>
+        <namespace>/</namespace>
+      </ros>
     </plugin>
   </gazebo>
 

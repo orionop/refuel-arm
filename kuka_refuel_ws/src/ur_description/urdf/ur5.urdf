@@ -398,6 +398,9 @@
   <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
       <parameters>$(find ur5_gazebo)/config/ur5_ros2_controllers.yaml</parameters>
+      <ros>
+        <namespace>/</namespace>
+      </ros>
     </plugin>
   </gazebo>
   <!-- Gazebo F/T sensor plugin: measures forces at wrist_3_joint -->

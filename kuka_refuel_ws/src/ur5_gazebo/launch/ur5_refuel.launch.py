@@ -35,7 +35,7 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         output='both',
-        parameters=[robot_description],
+        parameters=[robot_description, {'use_sim_time': True}],
     )
 
     # 3. Gazebo (Classic) with refuel world (shared with KUKA package)
