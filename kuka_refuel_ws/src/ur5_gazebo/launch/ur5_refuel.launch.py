@@ -35,7 +35,25 @@ def generate_launch_description():
     urdf_content = urdf_content.replace('$(find ur5_gazebo)', ur5_pkg)
     robot_description = {'robot_description': urdf_content}
 
-    # 2. Robot State Publisher — MUST start before spawn_entity so that
+    # 2. Gazebo Environment setup
+    plugin_path = '/opt/ros/humble/lib'
+    current_plugin_path = os.environ.get('GAZEBO_PLUGIN_PATH', '')
+    set_plugin_path = SetEnvironmentVariable(
+        name='GAZEBO_PLUGIN_PATH',
+        value=plugin_path + ':' + current_plugin_path,
+    )
+
+    # Gazebo needs to resolve package:// mesh URIs (which spawn_entity.py turns
+    # into model:// URI). Set model path to the share directory's parent
+    # so model://ur_description/... works.
+    share_parent = os.path.dirname(ur_desc_pkg)
+    current_model_path = os.environ.get('GAZEBO_MODEL_PATH', '')
+    set_model_path = SetEnvironmentVariable(
+        name='GAZEBO_MODEL_PATH',
+        value=share_parent + ':' + current_model_path,
+    )
+
+    # 3. Robot State Publisher — MUST start before spawn_entity so that
     #    gazebo_ros2_control can read robot_description from this node
     robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -44,7 +62,7 @@ def generate_launch_description():
         parameters=[robot_description, {'use_sim_time': True}],
     )
 
-    # 3. Gazebo (Classic) with refuel world (shared with KUKA package)
+    # 4. Gazebo (Classic) with refuel world (shared with KUKA package)
     world_path = os.path.join(kuka_pkg, 'worlds', 'refuel_world.world')
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -53,7 +71,7 @@ def generate_launch_description():
         launch_arguments={'world': world_path, 'verbose': 'true'}.items(),
     )
 
-    # 4. Spawn UR5 from the /robot_description topic
+    # 5. Spawn UR5 from the /robot_description topic
     #    Using -topic ensures robot_state_publisher is publishing before we spawn,
     #    and gazebo_ros2_control can read the <ros2_control> tags from it.
     #    Delayed by 5s to let Gazebo fully initialize first.
@@ -73,7 +91,7 @@ def generate_launch_description():
         actions=[spawn_robot],
     )
 
-    # 5. Controllers — use spawner nodes (proper ROS2 approach; auto-waits for
+    # 6. Controllers — use spawner nodes (proper ROS2 approach; auto-waits for
     #    controller_manager which is started by libgazebo_ros2_control.so)
     load_joint_state_broadcaster = Node(
         package='controller_manager',
@@ -89,14 +107,9 @@ def generate_launch_description():
         output='screen',
     )
 
-    plugin_path = '/opt/ros/humble/lib'
-    set_plugin_path = SetEnvironmentVariable(
-        name='GAZEBO_PLUGIN_PATH',
-        value=plugin_path + ':' + os.environ.get('GAZEBO_PLUGIN_PATH', ''),
-    )
-
     return LaunchDescription([
         set_plugin_path,
+        set_model_path,
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=spawn_robot,
