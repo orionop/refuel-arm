@@ -51,7 +51,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([
             os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')
         ]),
-        launch_arguments={'world': world_path}.items(),
+        launch_arguments={'world': world_path, 'verbose': 'true'}.items(),
     )
 
     # 4. Spawn UR5 from file (not topic) so Gazebo loads model plugins
@@ -71,16 +71,14 @@ def generate_launch_description():
     load_joint_state_broadcaster = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['joint_state_broadcaster',
-                   '--controller-manager', '/controller_manager'],
+        arguments=['joint_state_broadcaster'],
         output='screen',
     )
 
     load_arm_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['ur5_arm_controller',
-                   '--controller-manager', '/controller_manager'],
+        arguments=['ur5_arm_controller'],
         output='screen',
     )
 
