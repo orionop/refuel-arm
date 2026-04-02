@@ -37,7 +37,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([
             os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')
         ]),
-        launch_arguments={'world': world_path, 'verbose': 'true'}.items(),
+        launch_arguments={'world': world_path}.items(),
     )
 
     # 4. Spawn KUKA KR6 R700 — shoulder joint pre-bent to -90 deg

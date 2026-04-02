@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="refuel_world">
-    <!-- Load ROS API so Gazebo subscribes to /visualization_marker -->
-    <plugin name="gazebo_ros_api_plugin" filename="libgazebo_ros_api_plugin.so"/>
+    <!-- ROS2: gazebo_ros API is loaded automatically by gazebo_ros launch system.
+         libgazebo_ros_api_plugin.so does not exist in ROS2 Humble — removed. -->
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
