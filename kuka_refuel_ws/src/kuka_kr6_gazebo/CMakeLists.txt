@@ -1,26 +1,23 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.8)
 project(kuka_kr6_gazebo)
 
-find_package(catkin REQUIRED COMPONENTS
-  rospy
-  std_msgs
-  sensor_msgs
-  trajectory_msgs
-  control_msgs
-  actionlib
-  gazebo_ros
-)
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
-catkin_package()
-
-# Install launch, urdf, worlds, config directories
-install(DIRECTORY launch urdf worlds config
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# Install directories (launch, urdf, worlds, config, models)
+install(DIRECTORY
+  launch
+  urdf
+  worlds
+  config
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 # Install Python scripts
-catkin_install_python(PROGRAMS
+install(PROGRAMS
   scripts/ik_geometric.py
   scripts/refuel_mission_commander.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  DESTINATION lib/${PROJECT_NAME}
 )
+
+ament_package()

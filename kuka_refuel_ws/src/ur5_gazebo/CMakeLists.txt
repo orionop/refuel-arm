@@ -1,15 +1,13 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.8)
 project(ur5_gazebo)
 
-find_package(catkin REQUIRED COMPONENTS
-  gazebo_ros
-  robot_state_publisher
-  controller_manager
-  ur_description
+find_package(ament_cmake REQUIRED)
+
+# Install directories
+install(DIRECTORY
+  launch
+  config
+  DESTINATION share/${PROJECT_NAME}/
 )
 
-catkin_package()
-
-install(DIRECTORY launch config worlds
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+ament_package()

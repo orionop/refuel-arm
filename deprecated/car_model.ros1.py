@@ -62,52 +62,23 @@ def get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.08, robot="kuka"):
     return preapproach_xyz, inlet_R
 
 
-def spawn_target_marker(target_xyz, ros2_node=None):
-    """Spawn a green square marker at the target pose in Gazebo (ROS2).
-
-    Parameters
-    ----------
-    target_xyz : array-like
-        [x, y, z] position for the marker in world frame.
-    ros2_node : rclpy.node.Node
-        Active rclpy node used to call the /spawn_entity service.
-        Callers must pass their node reference; this function does not
-        call rclpy.init() or create a node itself.
-
-    ROS1 equivalent: rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-    Deprecated ROS1 version: deprecated/car_model.ros1.py
-    """
-    import rclpy
-    from gazebo_msgs.srv import SpawnEntity
+def spawn_target_marker(target_xyz):
+    """Spawn a green square marker at the target pose in Gazebo."""
+    import rospy
+    from gazebo_msgs.srv import SpawnModel
     from geometry_msgs.msg import Pose
 
-    if ros2_node is None:
-        print("  [car_model] spawn_target_marker: ros2_node is required in ROS2 mode")
-        return
+    rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
+    spawn = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 
-    client = ros2_node.create_client(SpawnEntity, '/spawn_entity')
-    if not client.wait_for_service(timeout_sec=5.0):
-        print("  [car_model] /spawn_entity service not available")
-        return
-
-    req = SpawnEntity.Request()
-    req.name = "refuel_target"
-    req.xml = TARGET_MARKER_SDF
-    req.reference_frame = "world"
-    req.initial_pose = Pose()
-    req.initial_pose.position.x = float(target_xyz[0])
-    req.initial_pose.position.y = float(target_xyz[1])
-    req.initial_pose.position.z = float(target_xyz[2])
-    req.initial_pose.orientation.w = 1.0
-
-    future = client.call_async(req)
-    rclpy.spin_until_future_complete(ros2_node, future)
+    p = Pose()
+    p.position.x = target_xyz[0]
+    p.position.y = target_xyz[1]
+    p.position.z = target_xyz[2]
+    p.orientation.w = 1.0
     try:
-        result = future.result()
-        if result.success:
-            print(f"  Green target marker at [{target_xyz[0]:.2f}, "
-                  f"{target_xyz[1]:.2f}, {target_xyz[2]:.2f}]")
-        else:
-            print(f"  Target marker spawn note: {result.status_message}")
+        spawn("refuel_target", TARGET_MARKER_SDF, "/", p, "world")
+        print(f"  Green target marker at [{target_xyz[0]:.2f}, "
+              f"{target_xyz[1]:.2f}, {target_xyz[2]:.2f}]")
     except Exception as e:
         print(f"  Target marker spawn note: {e}")

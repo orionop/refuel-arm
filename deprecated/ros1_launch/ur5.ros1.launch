@@ -1,0 +1,31 @@
+<launch>
+  <!-- UR5 Gazebo Simulation for Autonomous Refueling -->
+
+  <!-- Load UR5 robot description -->
+  <param name="robot_description" textfile="$(find ur_description)/urdf/ur5.urdf" />
+
+  <!-- Launch Gazebo with the refuel world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find kuka_kr6_gazebo)/worlds/refuel_world.world" />
+    <arg name="paused" value="true" />
+    <arg name="gui" value="true" />
+  </include>
+
+  <!-- Spawn UR5 in Gazebo upright (shoulder_lift at -90deg like KUKA) -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description -urdf -model ur5 -z 0.05 -J shoulder_lift_joint -1.570796326 -unpause"
+        output="screen" />
+
+  <!-- Robot State Publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        output="screen" />
+
+  <!-- Load UR5 controller configurations -->
+  <rosparam file="$(find ur5_gazebo)/config/ur5_controllers.yaml" command="load" />
+
+  <!-- Spawn controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        args="joint_state_controller ur5_arm_controller"
+        output="screen" />
+
+</launch>

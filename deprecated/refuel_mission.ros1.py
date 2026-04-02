@@ -21,9 +21,6 @@ Outputs two graphs:
 Run locally:   python3 refuel_mission.py
 Run in Gazebo: python3 refuel_mission.py --ros
 Run in RViz:   python3 refuel_mission.py --rviz
-
-ROS2 migration: ROS1 (rospy/actionlib) → ROS2 (rclpy/action)
-ROS1 version:   deprecated/refuel_mission.ros1.py
 """
 import sys
 import os
@@ -161,20 +158,14 @@ def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None, kin=None
     return obstacles
 
 
-def spawn_obstacles_gazebo(obs_list, ros2_node):
-    """Spawn blue sphere obstacles in Gazebo (ROS2).
-
-    ROS1 equivalent used rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel).
-    ROS2 uses SpawnEntity on /spawn_entity.
-    """
-    import rclpy # type: ignore
-    from gazebo_msgs.srv import SpawnEntity # type: ignore
+def spawn_obstacles_gazebo(obs_list):
+    """Spawn blue sphere obstacles in Gazebo."""
+    import rospy # type: ignore
+    from gazebo_msgs.srv import SpawnModel # type: ignore
     from geometry_msgs.msg import Pose # type: ignore
 
-    client = ros2_node.create_client(SpawnEntity, '/spawn_entity')
-    if not client.wait_for_service(timeout_sec=5.0):
-        print("  [spawn_obstacles] /spawn_entity service not available")
-        return
+    rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=5.0)
+    spawn = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 
     for k, (center, radius) in enumerate(obs_list):
         sdf = f"""<?xml version="1.0" ?>
@@ -192,18 +183,11 @@ def spawn_obstacles_gazebo(obs_list, ros2_node):
             </link>
           </model>
         </sdf>"""
-        req = SpawnEntity.Request()
-        req.name            = f"random_obstacle_{k}"
-        req.xml             = sdf
-        req.reference_frame = "world"
-        req.initial_pose    = Pose()
-        req.initial_pose.position.x = float(center[0])
-        req.initial_pose.position.y = float(center[1])
-        req.initial_pose.position.z = float(center[2])
-        req.initial_pose.orientation.w = 1.0
+        p = Pose()
+        p.position.x, p.position.y, p.position.z = center
+        p.orientation.w = 1.0
         try:
-            future = client.call_async(req)
-            rclpy.spin_until_future_complete(ros2_node, future)
+            spawn(f"random_obstacle_{k}", sdf, "/", p, "world")
         except Exception:
             pass
 
@@ -337,7 +321,7 @@ def plan_fine(q_start, q_goal, n_wp=20):
 # ── ROS execution ─────────────────────────────────────────────────
 
 def _ensure_ros_path():
-    ros_python = '/opt/ros/humble/lib/python3/dist-packages'
+    ros_python = '/opt/ros/noetic/lib/python3/dist-packages'
     if ros_python not in sys.path and os.path.isdir(ros_python):
         sys.path.insert(0, ros_python)
 
@@ -359,51 +343,30 @@ ROS_CONFIG = {
 
 
 def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
-    """Send a joint trajectory via ROS2 FollowJointTrajectory action.
-
-    ROS1 equivalent used actionlib.SimpleActionClient + FollowJointTrajectoryGoal.
-    ROS2 uses rclpy.action.ActionClient (matches refuel_mission_commander.py pattern).
-    """
     _ensure_ros_path()
-    import rclpy # type: ignore
-    from rclpy.action import ActionClient # type: ignore
-    from control_msgs.action import FollowJointTrajectory # type: ignore
+    import rospy, actionlib # type: ignore
+    from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal # type: ignore
     from trajectory_msgs.msg import JointTrajectoryPoint # type: ignore
-    from builtin_interfaces.msg import Duration as BuiltinDuration # type: ignore
 
-    cfg    = ROS_CONFIG[robot]
-    client = ActionClient(_ROS_NODE, FollowJointTrajectory, cfg['controller'])
-    if not client.wait_for_server(timeout_sec=5.0):
-        print(f"  [send_trajectory_ros] Action server not available: {cfg['controller']}")
-        return None
+    cfg = ROS_CONFIG[robot]
+    client = actionlib.SimpleActionClient(
+        cfg['controller'],
+        FollowJointTrajectoryAction)
+    client.wait_for_server(timeout=rospy.Duration(5.0))
 
-    goal_msg = FollowJointTrajectory.Goal()
-    goal_msg.trajectory.joint_names = cfg['joint_names']
-
+    goal = FollowJointTrajectoryGoal()
+    goal.trajectory.joint_names = cfg['joint_names']
     for i, q in enumerate(trajectory):
         pt = JointTrajectoryPoint()
-        pt.positions  = q.tolist()
+        pt.positions = q.tolist()
         pt.velocities = [0.0] * 6
-        t = i * dt
-        pt.time_from_start = BuiltinDuration(
-            sec=int(t),
-            nanosec=int((t % 1) * 1_000_000_000))
-        goal_msg.trajectory.points.append(pt)
-
-    send_future = client.send_goal_async(goal_msg)
-    rclpy.spin_until_future_complete(_ROS_NODE, send_future)
-    goal_handle = send_future.result()
-
-    if not goal_handle.accepted:
-        print("  [send_trajectory_ros] Goal rejected")
-        return None
-
-    result_future = goal_handle.get_result_async()
-    rclpy.spin_until_future_complete(_ROS_NODE, result_future)
-    return result_future.result().result
+        pt.time_from_start = rospy.Duration.from_sec(i * dt)
+        goal.trajectory.points.append(pt)
+    client.send_goal(goal)
+    client.wait_for_result(timeout=rospy.Duration(len(trajectory) * dt + 10.0))
+    return client.get_result()
 
 
-_ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
 _ADMITTANCE_NODE = None
 
 def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
@@ -417,14 +380,48 @@ def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
     """
     global _ADMITTANCE_NODE
     _ensure_ros_path()
+    import rospy # type: ignore
 
     if _ADMITTANCE_NODE is None:
-        # AdmittanceNode is now a proper rclpy.Node subclass — just instantiate it.
-        # rclpy.init() has already been called in main() before we get here.
         from admittance_node import AdmittanceNode  # type: ignore
-        _ADMITTANCE_NODE = AdmittanceNode()
-        import time
-        time.sleep(0.5)  # Let subscribers connect
+        # AdmittanceNode.__init__ calls rospy.init_node — but we already
+        # initialized in main().  Pass anonymous=True so it doesn't conflict.
+        # Instead, create the node object without re-initializing ROS.
+        _ADMITTANCE_NODE = object.__new__(AdmittanceNode)
+        # Manual init (skip rospy.init_node since we're already in a node)
+        import threading
+        from geometry_msgs.msg import WrenchStamped  # type: ignore
+        from std_msgs.msg import String  # type: ignore
+        from sensor_msgs.msg import JointState  # type: ignore
+        from admittance_controller import AdmittanceController  # type: ignore
+        from admittance_node import numerical_jacobian, UR5_JOINT_NAMES, KIN_UR5  # type: ignore
+
+        node = _ADMITTANCE_NODE
+        node.mass = rospy.get_param('~admittance_mass', 2.0)
+        node.damping = rospy.get_param('~admittance_damping', 20.0)
+        node.stiffness = rospy.get_param('~admittance_stiffness', 100.0)
+        node.force_threshold = rospy.get_param('~admittance_force_threshold', 15.0)
+        node.force_abort = rospy.get_param('~admittance_force_abort', 50.0)
+        node.update_rate = rospy.get_param('~admittance_update_rate', 50)
+        node.controller = AdmittanceController(
+            mass=node.mass, damping=node.damping, stiffness=node.stiffness)
+        node.latest_wrench = np.zeros(6)
+        node.current_joints = np.zeros(6)
+        node.nominal_joints = None
+        node.mode = 'RIGID'
+        node.aborted = False
+        node._lock = threading.Lock()
+        node.ft_sub = rospy.Subscriber(
+            '/ur5/ft_sensor/raw', WrenchStamped, node._ft_callback)
+        node.joint_sub = rospy.Subscriber(
+            '/joint_states', JointState, node._joint_callback)
+        node.status_pub = rospy.Publisher(
+            '/ur5/admittance/status', String, queue_size=10)
+        node._cmd_pub = None
+        rospy.sleep(0.5)  # Let subscribers connect
+
+        rospy.loginfo(f"[Admittance] Initialized: M={node.mass}, D={node.damping}, "
+                      f"K={node.stiffness}, threshold={node.force_threshold}N")
 
     return _ADMITTANCE_NODE.execute_trajectory(trajectory, dt=dt)
 
@@ -432,30 +429,22 @@ def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
 _RVIZ_PUB = None
 
 def send_trajectory_rviz(trajectory, dt=0.15, robot='kuka'):
-    """Publish joint states for RViz visualization (no Gazebo physics).
-
-    ROS1 used rospy.Publisher + rospy.Rate + rospy.Time.now().
-    ROS2 uses _ROS_NODE.create_publisher + time.sleep + node.get_clock().now().
-    """
     global _RVIZ_PUB
     _ensure_ros_path()
-    import time # type: ignore
+    import rospy # type: ignore
     from sensor_msgs.msg import JointState # type: ignore
-
     if _RVIZ_PUB is None:
-        _RVIZ_PUB = _ROS_NODE.create_publisher(JointState, '/joint_states', 10)
-        time.sleep(0.5)
-
+        _RVIZ_PUB = rospy.Publisher('/joint_states', JointState, queue_size=10) # type: ignore
+        rospy.sleep(0.5)
     cfg = ROS_CONFIG[robot]
     msg = JointState()
     msg.name = cfg['joint_names']
-
+    rate = rospy.Rate(1.0 / dt)
     for q in trajectory:
-        msg.header.stamp = _ROS_NODE.get_clock().now().to_msg()
-        msg.position     = q.tolist()
+        msg.header.stamp = rospy.Time.now()
+        msg.position = q.tolist()
         _RVIZ_PUB.publish(msg)
-        time.sleep(dt)
-
+        rate.sleep()
     return True
 
 
@@ -463,12 +452,12 @@ def send_trajectory_rviz(trajectory, dt=0.15, robot='kuka'):
 
 def publish_markers(target_xyz, obs_list, segments, kin=None):
     _ensure_ros_path()
-    import time # type: ignore
+    import rospy # type: ignore
     from visualization_msgs.msg import Marker, MarkerArray # type: ignore
     from geometry_msgs.msg import Point # type: ignore
 
-    pub = _ROS_NODE.create_publisher(MarkerArray, '/visualization_marker_array', 10)
-    time.sleep(0.5)
+    pub = rospy.Publisher('/visualization_marker_array', MarkerArray, queue_size=10)
+    rospy.sleep(0.5)
     ma = MarkerArray()
 
     # Green target
@@ -707,14 +696,12 @@ def main():
     use_ros = args.ros or args.rviz
     if use_ros:
         _ensure_ros_path()
-        import rclpy # type: ignore
-        global _ROS_NODE
-        rclpy.init()
-        _ROS_NODE = rclpy.create_node('refuel_mission')
+        import rospy # type: ignore
+        rospy.init_node('refuel_mission', anonymous=True)
 
         if args.ros:
-            spawn_target_marker(target_xyz, ros2_node=_ROS_NODE)
-            spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
+            spawn_target_marker(target_xyz)
+            spawn_obstacles_gazebo(obs_list)
 
         # publish_markers expects (label, traj, dt) tuples — strip compliant flag
         markers_segments = [(l, t, d) for l, t, d, _ in segments]
@@ -728,33 +715,24 @@ def main():
 
     # ── Step 7: Execute motion ────────────────────────────────────
     if use_ros:
-        import time as _time  # ensure available regardless of ROS state
-        try:
-            for i, (label, traj, dt, compliant) in enumerate(segments, 1):
-                print(f"\n  Step {i}/{len(segments)}: {label}"
-                      f"{' [COMPLIANT]' if compliant else ''}")
-                if traj is None:
-                    print(f"     Refueling: holding for {dt:.0f}s...")
-                    _time.sleep(dt)  # ROS2: plain time.sleep replaces rospy.sleep
-                    print(f"     Dwell complete")
+        for i, (label, traj, dt, compliant) in enumerate(segments, 1):
+            print(f"\n  Step {i}/{len(segments)}: {label}"
+                  f"{' [COMPLIANT]' if compliant else ''}")
+            if traj is None:
+                print(f"     Refueling: holding for {dt:.0f}s...")
+                rospy.sleep(dt)
+                print(f"     Dwell complete")
+            else:
+                if compliant and args.ros:
+                    result = send_trajectory_compliant(traj, dt=dt, robot=active_robot)
+                    if not result:
+                        print(f"     ADMITTANCE ABORT — mission halted")
+                        break
+                elif args.ros:
+                    result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
                 else:
-                    if compliant and args.ros:
-                        result = send_trajectory_compliant(traj, dt=dt, robot=active_robot)
-                        if not result:
-                            print(f"     ADMITTANCE ABORT — mission halted")
-                            break
-                    elif args.ros:
-                        result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
-                    else:
-                        result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
-                    print(f"     {'done' if result else 'timeout/fail'}")
-        finally:
-            # ROS2 cleanup — always shut down cleanly
-            if _ROS_NODE is not None:
-                _ROS_NODE.destroy_node()
-            import rclpy as _rclpy  # type: ignore
-            if _rclpy.ok():
-                _rclpy.shutdown()
+                    result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
+                print(f"     {'done' if result else 'timeout/fail'}")
     else:
         print(f"\n[Preview]")
         total_wp_list = []

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>kuka_kr6_gazebo</name>
+  <version>0.0.0</version>
+  <description>ROS Noetic package for KUKA KR6 R700 Gazebo Refueling Simulation</description>
+  <maintainer email="user@todo.todo">Anurag Shetye</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>control_msgs</depend>
+  <depend>actionlib</depend>
+  <depend>gazebo_ros</depend>
+  <depend>joint_state_controller</depend>
+  <depend>joint_trajectory_controller</depend>
+  <depend>robot_state_publisher</depend>
+
+  <exec_depend>xacro</exec_depend>
+
+  <export>
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+  </export>
+</package>

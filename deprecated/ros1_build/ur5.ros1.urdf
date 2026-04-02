@@ -59,69 +59,60 @@
           package. Users CANNOT rely on this file being available, or stored in
           this location. Nor can they rely on the existence of the macro.
   -->
-  <!-- ================================================================
-       ROS2 Control Hardware Interface (replaces transmission_interface
-       blocks from ROS1 — see deprecated/ros1_build/ur5.ros1.urdf)
-       ================================================================ -->
-  <ros2_control name="GazeboSystem" type="system">
-    <hardware>
-      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-    </hardware>
-
+  <transmission name="shoulder_pan_trans">
+    <type>transmission_interface/SimpleTransmission</type>
     <joint name="shoulder_pan_joint">
-      <command_interface name="position">
-        <param name="min">-6.2832</param>
-        <param name="max">6.2832</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
-
+    <actuator name="shoulder_pan_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="shoulder_lift_trans">
+    <type>transmission_interface/SimpleTransmission</type>
     <joint name="shoulder_lift_joint">
-      <command_interface name="position">
-        <param name="min">-6.2832</param>
-        <param name="max">6.2832</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
-
+    <actuator name="shoulder_lift_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="elbow_trans">
+    <type>transmission_interface/SimpleTransmission</type>
     <joint name="elbow_joint">
-      <command_interface name="position">
-        <param name="min">-3.1416</param>
-        <param name="max">3.1416</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
-
+    <actuator name="elbow_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="wrist_1_trans">
+    <type>transmission_interface/SimpleTransmission</type>
     <joint name="wrist_1_joint">
-      <command_interface name="position">
-        <param name="min">-6.2832</param>
-        <param name="max">6.2832</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
-
+    <actuator name="wrist_1_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="wrist_2_trans">
+    <type>transmission_interface/SimpleTransmission</type>
     <joint name="wrist_2_joint">
-      <command_interface name="position">
-        <param name="min">-6.2832</param>
-        <param name="max">6.2832</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
-
+    <actuator name="wrist_2_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="wrist_3_trans">
+    <type>transmission_interface/SimpleTransmission</type>
     <joint name="wrist_3_joint">
-      <command_interface name="position">
-        <param name="min">-6.2832</param>
-        <param name="max">6.2832</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
-  </ros2_control>
+    <actuator name="wrist_3_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
   <!-- Fix robot to world (prevents falling in Gazebo) -->
   <link name="world"/>
   <joint name="world_joint" type="fixed">
@@ -394,10 +385,11 @@
     <parent link="flange"/>
     <child link="tool0"/>
   </joint>
-  <!-- gazebo_ros2_control plugin (replaces libgazebo_ros_control.so from ROS1) -->
+  <!-- Gazebo ros_control plugin (required for joint actuation) -->
   <gazebo>
-    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-      <parameters>$(find ur5_gazebo)/config/ur5_ros2_controllers.yaml</parameters>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
   </gazebo>
   <!-- Gazebo F/T sensor plugin: measures forces at wrist_3_joint -->

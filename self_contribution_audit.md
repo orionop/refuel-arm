@@ -53,8 +53,37 @@
 
 ---
 
-## 📈 Section 4: Phase 2 — Personal Research Roadmap
-*The design of the next phase is entirely the User's proprietary vision for "Advanced Reactivity."*
+## 📈 Section 4: Phase 2 — Completed Work
 
-1.  **Admittance Control Bridging [User Design]**: Design of a closed-loop Force-Feedback controller to enable "Safe Insertion" during the refueling phase.
-2.  **Cross-Platform UR5 Layer [User Design]**: Generalizing the mission logic to support UR5 hardware alongside KUKA.
+1.  **Admittance Control Bridging [COMPLETE]**: Closed-loop Force-Feedback admittance controller ($M\ddot{x}+D\dot{x}+Kx=F_{ext}$) implemented in `admittance_node.py` + `admittance_controller.py`. Three-mode state machine (RIGID / COMPLIANT / ABORT) with $J^T$ workspace-to-joint mapping. F/T sensor added to UR5 URDF (`libgazebo_ros_ft_sensor.so`, 50Hz).
+2.  **Cross-Platform UR5 Layer [COMPLETE]**: Full UR5 kinematic parameters, joint limits, launch infrastructure, and controller config added. Mission orchestrator (`refuel_mission.py`) dynamically dispatches between KUKA and UR5 with zero hardcoded robot logic in the planner.
+
+---
+
+## 🔧 Section 5: Infrastructure — ROS2 Humble Migration [COMPLETE]
+
+*Full migration from ROS1 Noetic (catkin) to ROS2 Humble (ament_cmake/colcon). All ROS1 files preserved in `deprecated/`—nothing deleted.*
+
+| Component | ROS1 (Noetic) | ROS2 (Humble) | User Contribution |
+|:--- |:--- |:--- |:--- |
+| **Build system** | catkin + `find_package(catkin)` | ament_cmake + colcon | Rewrote all 3 package.xml + CMakeLists.txt |
+| **Hardware interface** | `gazebo_ros_control` + `transmission_interface` | `ros2_control` + `gazebo_ros2_control` | Replaced transmissions with `<ros2_control>` blocks in KUKA xacro + UR5 URDF |
+| **Controller config** | `joint_state_controller/JointStateController` | `joint_state_broadcaster/JointStateBroadcaster` | Wrote `ur5_ros2_controllers.yaml`; updated KUKA config already existed |
+| **Launch system** | XML `.launch` files (`roslaunch`) | Python `.launch.py` files (`ros2 launch`) | Converted 5 XML files → 4 Python launch files |
+| **Mission node** | `rospy.init_node` + `actionlib.SimpleActionClient` | `rclpy.create_node` + `rclpy.action.ActionClient` | Migrated `refuel_mission.py` ROS paths |
+| **Admittance node** | Imperative class with inline `import rospy` | `rclpy.node.Node` subclass | Full rewrite of `admittance_node.py` |
+| **Gazebo spawning** | `SpawnModel` on `/gazebo/spawn_sdf_model` | `SpawnEntity` on `/spawn_entity` | Updated `car_model.py` + `refuel_mission.py` |
+| **F/T sensor** | `libgazebo_ros_ft_sensor.so` (ROS1) | Same plugin — compatible in ROS2 Humble's `gazebo_ros_pkgs` | No change needed |
+
+**Key design decisions (User's):**
+- Stayed on **Gazebo Classic 11** (not Ignition) — confirmed running version, minimal migration risk, world/SDF files unchanged
+- Pure-Python planning path (`python3 refuel_mission.py` without `--ros`) **entirely untouched** throughout migration — IK, STOMP, Bubble Strips run with zero ROS dependency
+- All ROS1 files deprecated to `deprecated/ros1_build/` and `deprecated/ros1_launch/` — project convention maintained
+
+---
+
+## 📐 Section 6: Phase 3 — Upcoming Work Pipeline
+
+1. **Environment Creation** — Build a proper Gazebo world: structured car body geometry, concave fuel port inlet, realistic ground + lighting. No use for obstacle avoidance without a real environment.
+2. **Sensor Suite** — ArUco eye-in-hand camera (dynamic target detection), ToF proximity sensors (forearm safety), integration with admittance pipeline.
+3. **Advanced Reactivity** — Dynamic obstacles, self-collision avoidance, concave obstacle handling.

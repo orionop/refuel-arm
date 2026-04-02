@@ -1,16 +1,23 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>ur5_gazebo</name>
-  <version>1.0.0</version>
-  <description>UR5 Gazebo Simulation for Autonomous Refueling</description>
-  <maintainer email="user@todo.todo">User</maintainer>
+  <version>1.1.0</version>
+  <description>ROS2 Humble — UR5 Gazebo Simulation for Autonomous Refueling</description>
+  <maintainer email="user@todo.todo">Anurag Shetye</maintainer>
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
   <depend>gazebo_ros</depend>
+  <depend>gazebo_ros2_control</depend>
+  <depend>ros2_control</depend>
+  <depend>ros2_controllers</depend>
   <depend>robot_state_publisher</depend>
-  <depend>controller_manager</depend>
+  <depend>joint_state_broadcaster</depend>
+  <depend>joint_trajectory_controller</depend>
   <depend>ur_description</depend>
 
-  <export></export>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

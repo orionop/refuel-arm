@@ -1,0 +1,13 @@
+<launch>
+  <!-- KUKA KR6 R700 RViz Visualization (No Gazebo Physics) -->
+
+  <!-- Load robot description from xacro -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro $(find kuka_kr6_gazebo)/urdf/kr6_r700.gazebo.xacro" />
+
+  <!-- Robot State Publisher (publishes TF from /joint_states) -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- Pre-configured RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find kuka_kr6_gazebo)/config/kuka_rviz.rviz" required="true" />
+</launch>

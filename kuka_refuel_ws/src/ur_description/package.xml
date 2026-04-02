@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>ur_description</name>
-  <version>1.2.5</version>
-  <description>UR5 Robot Description (Isolated for Refueling Project)</description>
-  <maintainer email="user@todo.todo">User</maintainer>
+  <version>1.3.0</version>
+  <description>UR5 Robot Description (ROS2 Humble — Refueling Project)</description>
+  <maintainer email="user@todo.todo">Anurag Shetye</maintainer>
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>urdf</build_depend>
-  <build_depend>xacro</build_depend>
-  <exec_depend>urdf</exec_depend>
-  <exec_depend>xacro</exec_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <export></export>
+  <depend>urdf</depend>
+  <depend>xacro</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

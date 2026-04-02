@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ur5_gazebo</name>
+  <version>1.0.0</version>
+  <description>UR5 Gazebo Simulation for Autonomous Refueling</description>
+  <maintainer email="user@todo.todo">User</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>gazebo_ros</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>controller_manager</depend>
+  <depend>ur_description</depend>
+
+  <export></export>
+</package>

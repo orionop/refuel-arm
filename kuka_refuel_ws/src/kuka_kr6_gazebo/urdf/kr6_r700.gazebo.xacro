@@ -4,34 +4,76 @@
   <!-- Include the raw clean URDF (primitive cylinders/boxes) -->
   <xacro:include filename="$(find kuka_kr6_gazebo)/urdf/kr6_r700_2_clean.urdf" />
 
-  <!-- Gazebo ROS Control Plugin (Noetic) -->
+  <!-- ================================================================
+       ROS2 Control Hardware Interface (replaces gazebo_ros_control +
+       transmission_interface from ROS1 — see deprecated/ros1_build/)
+       ================================================================ -->
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+
+    <joint name="joint_1">
+      <command_interface name="position">
+        <param name="min">-2.9671</param>  <!-- -170 deg -->
+        <param name="max">2.9671</param>   <!--  170 deg -->
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="joint_2">
+      <command_interface name="position">
+        <param name="min">-3.3161</param>  <!-- -190 deg -->
+        <param name="max">0.7854</param>   <!--   45 deg -->
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="joint_3">
+      <command_interface name="position">
+        <param name="min">-2.0944</param>  <!-- -120 deg -->
+        <param name="max">2.7227</param>   <!--  156 deg -->
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="joint_4">
+      <command_interface name="position">
+        <param name="min">-3.2289</param>  <!-- -185 deg -->
+        <param name="max">3.2289</param>   <!--  185 deg -->
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="joint_5">
+      <command_interface name="position">
+        <param name="min">-2.0944</param>  <!-- -120 deg -->
+        <param name="max">2.0944</param>   <!--  120 deg -->
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="joint_6">
+      <command_interface name="position">
+        <param name="min">-6.1087</param>  <!-- -350 deg -->
+        <param name="max">6.1087</param>   <!--  350 deg -->
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <!-- gazebo_ros2_control plugin (replaces libgazebo_ros_control.so from ROS1) -->
   <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <parameters>$(find kuka_kr6_gazebo)/config/ros2_controllers.yaml</parameters>
     </plugin>
   </gazebo>
-
-  <!-- Transmission for each joint (required for gazebo_ros_control) -->
-  <xacro:macro name="kuka_transmission" params="joint_name">
-    <transmission name="${joint_name}_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${joint_name}">
-        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-      </joint>
-      <actuator name="${joint_name}_actuator">
-        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-        <mechanicalReduction>1</mechanicalReduction>
-      </actuator>
-    </transmission>
-  </xacro:macro>
-
-  <xacro:kuka_transmission joint_name="joint_1"/>
-  <xacro:kuka_transmission joint_name="joint_2"/>
-  <xacro:kuka_transmission joint_name="joint_3"/>
-  <xacro:kuka_transmission joint_name="joint_4"/>
-  <xacro:kuka_transmission joint_name="joint_5"/>
-  <xacro:kuka_transmission joint_name="joint_6"/>
 
   <!-- Physics materials -->
   <gazebo reference="base_link">

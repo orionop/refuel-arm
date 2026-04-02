@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Admittance Controller — ROS2 Node for UR5 Force-Compliant Execution
-====================================================================
+Admittance Controller — ROS Node for UR5 Force-Compliant Execution
+===================================================================
 
 Wraps the standalone AdmittanceController math (M*a + D*v + K*x = F_ext)
-in a ROS2 rclpy node that:
+in a ROS node that:
   - Subscribes to /ur5/ft_sensor/raw (WrenchStamped) from Gazebo F/T plugin
   - Receives nominal joint waypoints from the mission planner
   - Computes compliant offsets when external forces exceed a threshold
@@ -15,26 +15,13 @@ Three operating modes:
   COMPLIANT: force_threshold <= ||F_ext|| < force_abort -> yield via admittance
   ABORT:     ||F_ext|| >= force_abort     -> halt and signal safety abort
 
-ROS1 equivalent: deprecated/admittance_node.ros1.py
-
 Run standalone:  python3 admittance_node.py
 Run with mission: launched automatically by refuel_mission.py --compliant
 """
 import sys
 import os
 import threading
-import time
 import numpy as np
-
-import rclpy
-from rclpy.node import Node
-from rclpy.duration import Duration as RosDuration
-
-from geometry_msgs.msg import WrenchStamped
-from sensor_msgs.msg import JointState
-from std_msgs.msg import String
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from builtin_interfaces.msg import Duration as BuiltinDuration
 
 # ── Path setup ────────────────────────────────────────────────────
 sys.path.insert(0, os.path.abspath(os.path.join(
@@ -81,85 +68,72 @@ UR5_JOINT_NAMES = [
 ]
 
 
-# ── Admittance ROS2 Node ─────────────────────────────────────────
+# ── Admittance ROS Node ──────────────────────────────────────────
 
-class AdmittanceNode(Node):
+class AdmittanceNode:
     """
-    ROS2 node that adds force-compliant behavior to UR5 trajectory execution.
+    ROS node that adds force-compliant behavior to UR5 trajectory execution.
 
     Architecture:
       Mission Planner  -->  [nominal waypoints]  -->  AdmittanceNode
       F/T Sensor       -->  [WrenchStamped]      -->  AdmittanceNode
       AdmittanceNode   -->  [modified joints]    -->  ur5_arm_controller
-
-    ROS1→ROS2 changes (vs deprecated/admittance_node.ros1.py):
-      rospy.init_node()        → super().__init__()
-      rospy.get_param()        → self.declare_parameter() + get_parameter()
-      rospy.Subscriber()       → self.create_subscription()
-      rospy.Publisher()        → self.create_publisher()
-      rospy.Rate()             → self.create_rate()
-      rospy.is_shutdown()      → rclpy.ok()
-      rospy.sleep()            → time.sleep()
-      rospy.Duration.from_sec()→ BuiltinDuration(sec=..., nanosec=...)
-      rospy.loginfo/warn()     → self.get_logger().info/warn()
     """
 
-    MODE_RIGID    = 'RIGID'
+    # Operating mode constants
+    MODE_RIGID = 'RIGID'
     MODE_COMPLIANT = 'COMPLIANT'
-    MODE_ABORT    = 'ABORT'
+    MODE_ABORT = 'ABORT'
 
     def __init__(self):
-        super().__init__('admittance_controller')
+        import rospy
+        from geometry_msgs.msg import WrenchStamped
+        from std_msgs.msg import String
+        from sensor_msgs.msg import JointState
 
-        # Parameters (ROS2: declare first, then read)
-        self.declare_parameter('mass',                2.0)
-        self.declare_parameter('damping',            20.0)
-        self.declare_parameter('stiffness',         100.0)
-        self.declare_parameter('force_threshold',    15.0)
-        self.declare_parameter('force_abort',        50.0)
-        self.declare_parameter('update_rate',        50)
+        rospy.init_node('admittance_controller', anonymous=True)
 
-        self.mass            = self.get_parameter('mass').value
-        self.damping         = self.get_parameter('damping').value
-        self.stiffness       = self.get_parameter('stiffness').value
-        self.force_threshold = self.get_parameter('force_threshold').value
-        self.force_abort     = self.get_parameter('force_abort').value
-        self.update_rate     = self.get_parameter('update_rate').value
+        # Parameters
+        self.mass = rospy.get_param('~mass', 2.0)
+        self.damping = rospy.get_param('~damping', 20.0)
+        self.stiffness = rospy.get_param('~stiffness', 100.0)
+        self.force_threshold = rospy.get_param('~force_threshold', 15.0)
+        self.force_abort = rospy.get_param('~force_abort', 50.0)
+        self.update_rate = rospy.get_param('~update_rate', 50)
 
         # Admittance math
         self.controller = AdmittanceController(
             mass=self.mass, damping=self.damping, stiffness=self.stiffness)
 
         # State
-        self.latest_wrench  = np.zeros(6)
+        self.latest_wrench = np.zeros(6)  # [Fx, Fy, Fz, Tx, Ty, Tz]
         self.current_joints = np.zeros(6)
-        self.nominal_joints = None
-        self.mode           = self.MODE_RIGID
-        self.aborted        = False
-        self._lock          = threading.Lock()
+        self.nominal_joints = None  # Set by planner
+        self.mode = self.MODE_RIGID
+        self.aborted = False
+        self._lock = threading.Lock()
 
         # Subscribers
-        self.ft_sub = self.create_subscription(
-            WrenchStamped, '/ur5/ft_sensor/raw', self._ft_callback, 10)
-        self.joint_sub = self.create_subscription(
-            JointState, '/joint_states', self._joint_callback, 10)
+        self.ft_sub = rospy.Subscriber(
+            '/ur5/ft_sensor/raw', WrenchStamped, self._ft_callback)
+        self.joint_sub = rospy.Subscriber(
+            '/joint_states', JointState, self._joint_callback)
 
         # Publishers
-        self.status_pub = self.create_publisher(String, '/ur5/admittance/status', 10)
-        self._cmd_pub   = None  # Lazy-init for trajectory command
+        self.status_pub = rospy.Publisher(
+            '/ur5/admittance/status', String, queue_size=10)
+        self._cmd_pub = None  # Lazy-init for trajectory command
 
-        self.get_logger().info(
+        rospy.loginfo(
             f"[Admittance] Node ready: M={self.mass}, D={self.damping}, "
             f"K={self.stiffness}, threshold={self.force_threshold}N, "
             f"abort={self.force_abort}N, rate={self.update_rate}Hz")
-
-    # ── Callbacks ────────────────────────────────────────────────
 
     def _ft_callback(self, msg):
         """Store latest force/torque measurement."""
         with self._lock:
             self.latest_wrench = np.array([
-                msg.wrench.force.x,  msg.wrench.force.y,  msg.wrench.force.z,
+                msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z,
                 msg.wrench.torque.x, msg.wrench.torque.y, msg.wrench.torque.z,
             ])
 
@@ -171,8 +145,6 @@ class AdmittanceNode(Node):
                 self.current_joints = np.array([msg.position[i] for i in indices])
         except (ValueError, IndexError):
             pass
-
-    # ── Control logic ────────────────────────────────────────────
 
     def set_nominal(self, q_nominal):
         """Set the nominal (planned) joint target for the current waypoint."""
@@ -186,18 +158,19 @@ class AdmittanceNode(Node):
         Returns (q_command, mode_string).
         """
         with self._lock:
-            wrench    = self.latest_wrench.copy()
+            wrench = self.latest_wrench.copy()
             q_nominal = self.nominal_joints.copy() if self.nominal_joints is not None else None
             q_current = self.current_joints.copy()
 
         if q_nominal is None:
             return q_current, self.MODE_RIGID
 
-        force_3d        = wrench[:3]
+        force_3d = wrench[:3]  # Use translational forces only
         force_magnitude = np.linalg.norm(force_3d)
 
+        # Mode selection
         if force_magnitude >= self.force_abort:
-            self.mode    = self.MODE_ABORT
+            self.mode = self.MODE_ABORT
             self.aborted = True
             return q_current, self.MODE_ABORT
 
@@ -206,56 +179,64 @@ class AdmittanceNode(Node):
             self.controller.reset()
             return q_nominal, self.MODE_RIGID
 
-        # COMPLIANT mode
+        # COMPLIANT mode: compute workspace offset, map to joint space
         self.mode = self.MODE_COMPLIANT
         dt = 1.0 / self.update_rate
 
+        # Admittance law: M*a + D*v + K*x = F_ext  ->  workspace offset
         workspace_offset = self.controller.update(force_3d, dt)
 
-        J     = numerical_jacobian(q_current, KIN_UR5)
-        J_pos = J[:3, :]
-        dq    = J_pos.T @ workspace_offset
-        dq    = np.clip(dq, -0.1, 0.1)
+        # Map workspace offset to joint offset via J^T
+        # dq = J^T * dx  (Jacobian transpose mapping)
+        J = numerical_jacobian(q_current, KIN_UR5)
+        J_pos = J[:3, :]  # Position rows only (3x6)
+        dq = J_pos.T @ workspace_offset
 
-        return q_nominal + dq, self.MODE_COMPLIANT
+        # Clamp joint offset to prevent large jumps
+        max_dq = 0.1  # rad, ~5.7 degrees max compliance per joint
+        dq = np.clip(dq, -max_dq, max_dq)
+
+        q_command = q_nominal + dq
+        return q_command, self.MODE_COMPLIANT
 
     def publish_command(self, q_command):
         """Publish joint command to the UR5 trajectory controller."""
+        import rospy
+        from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+
         if self._cmd_pub is None:
-            self._cmd_pub = self.create_publisher(
-                JointTrajectory, '/ur5_arm_controller/command', 10)
-            time.sleep(0.2)
+            self._cmd_pub = rospy.Publisher(
+                '/ur5_arm_controller/command',
+                JointTrajectory, queue_size=10)
+            rospy.sleep(0.2)
 
         msg = JointTrajectory()
         msg.joint_names = UR5_JOINT_NAMES
-
         pt = JointTrajectoryPoint()
-        pt.positions  = q_command.tolist()
+        pt.positions = q_command.tolist()
         pt.velocities = [0.0] * 6
-
-        # ROS2: time_from_start uses builtin_interfaces/Duration
-        dt = 1.0 / self.update_rate
-        pt.time_from_start = BuiltinDuration(
-            sec=int(dt),
-            nanosec=int((dt % 1) * 1_000_000_000))
-
+        pt.time_from_start = rospy.Duration.from_sec(1.0 / self.update_rate)
         msg.points.append(pt)
         self._cmd_pub.publish(msg)
 
     def publish_status(self):
         """Broadcast current mode on /ur5/admittance/status."""
+        from std_msgs.msg import String
         self.status_pub.publish(String(data=self.mode))
-
-    # ── Execution API (used by refuel_mission.py) ─────────────────
 
     def execute_waypoint(self, q_nominal, duration=0.05):
         """
         Execute a single waypoint with admittance compliance.
 
-        Runs the admittance loop for `duration` seconds. Returns final mode.
+        Sets the nominal target and runs the admittance loop for `duration`
+        seconds (default: one timestep). Returns the final mode.
+
+        This is the API used by refuel_mission.py send_trajectory_compliant().
         """
+        import rospy
+
         self.set_nominal(q_nominal)
-        rate    = self.create_rate(self.update_rate)
+        rate = rospy.Rate(self.update_rate)
         n_steps = max(1, int(duration * self.update_rate))
 
         for _ in range(n_steps):
@@ -283,9 +264,10 @@ class AdmittanceNode(Node):
         -------
         success : bool — True if completed, False if aborted
         """
-        self.get_logger().info(
-            f"[Admittance] Executing {len(trajectory)} waypoints "
-            f"(dt={dt}s, compliant)")
+        import rospy
+
+        rospy.loginfo(f"[Admittance] Executing {len(trajectory)} waypoints "
+                      f"(dt={dt}s, compliant)")
         self.controller.reset()
         self.aborted = False
 
@@ -293,62 +275,48 @@ class AdmittanceNode(Node):
             mode = self.execute_waypoint(q_wp, duration=dt)
 
             if mode == self.MODE_ABORT:
-                self.get_logger().warn(
-                    f"[Admittance] ABORT at waypoint {i}/{len(trajectory)} "
-                    f"— force exceeded {self.force_abort}N")
+                rospy.logwarn(f"[Admittance] ABORT at waypoint {i}/{len(trajectory)} "
+                              f"— force exceeded {self.force_abort}N")
                 return False
 
             if mode == self.MODE_COMPLIANT:
                 force_mag = np.linalg.norm(self.latest_wrench[:3])
-                self.get_logger().info(
-                    f"[Admittance] wp {i}: COMPLIANT "
-                    f"(F={force_mag:.1f}N, offset={np.linalg.norm(self.controller.offset):.4f}m)")
+                rospy.loginfo(f"[Admittance] wp {i}: COMPLIANT "
+                              f"(F={force_mag:.1f}N, offset={np.linalg.norm(self.controller.offset):.4f}m)")
 
-        self.get_logger().info("[Admittance] Trajectory complete")
+        rospy.loginfo("[Admittance] Trajectory complete")
         return True
 
 
 # ── Standalone test ───────────────────────────────────────────────
 
 def _standalone_test():
-    """Run admittance node standalone for testing with ros2 topic pub."""
-    rclpy.init()
+    """Run admittance node standalone for testing with rostopic pub."""
+    import rospy
+
     node = AdmittanceNode()
+    rate = rospy.Rate(node.update_rate)
 
-    node.get_logger().info(
-        "[Admittance] Standalone mode — waiting for F/T data on "
-        "/ur5/ft_sensor/raw and joint states on /joint_states")
+    rospy.loginfo("[Admittance] Standalone mode — waiting for F/T data on "
+                  "/ur5/ft_sensor/raw and joint states on /joint_states")
+    rospy.loginfo("[Admittance] Set nominal joints via: "
+                  "rostopic pub /ur5/admittance/target_joints ...")
 
-    time.sleep(1.0)
-    with node._lock:
-        node.set_nominal(node.current_joints.copy())
+    # Use current joint state as nominal target
+    rospy.sleep(1.0)
+    node.set_nominal(node.current_joints.copy())
 
-    _last_log = [0.0]
+    while not rospy.is_shutdown():
+        q_cmd, mode = node.compute_compliant_joints()
+        node.publish_command(q_cmd)
+        node.publish_status()
 
-    def spin_once_loop():
-        while rclpy.ok():
-            rclpy.spin_once(node, timeout_sec=0.0)
-            q_cmd, mode = node.compute_compliant_joints()
-            node.publish_command(q_cmd)
-            node.publish_status()
-
-            force_mag = np.linalg.norm(node.latest_wrench[:3])
-            now = time.monotonic()
-            if force_mag > 0.1 and (now - _last_log[0]) >= 1.0:
-                node.get_logger().info(
-                    f"[Admittance] mode={mode}, ||F||={force_mag:.2f}N, "
-                    f"offset={np.linalg.norm(node.controller.offset):.4f}m")
-                _last_log[0] = now
-
-            time.sleep(1.0 / node.update_rate)
-
-    try:
-        spin_once_loop()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
+        force_mag = np.linalg.norm(node.latest_wrench[:3])
+        if force_mag > 0.1:
+            rospy.loginfo_throttle(1.0,
+                f"[Admittance] mode={mode}, ||F||={force_mag:.2f}N, "
+                f"offset={np.linalg.norm(node.controller.offset):.4f}m")
+        rate.sleep()
 
 
 if __name__ == '__main__':
