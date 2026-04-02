@@ -7,11 +7,15 @@ Usage:
     ros2 launch kuka_kr6_gazebo gazebo.launch.py
 """
 import os
-import tempfile
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
+from launch.actions import (
+    IncludeLaunchDescription,
+    RegisterEventHandler,
+    SetEnvironmentVariable,
+    TimerAction,
+)
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -30,13 +34,8 @@ def generate_launch_description():
     ).toxml()
     robot_description = {'robot_description': urdf_xml}
 
-    # Write processed URDF to temp file so spawn_entity can load it directly
-    # (using -file instead of -topic ensures Gazebo processes <gazebo><plugin> tags)
-    urdf_file = os.path.join(tempfile.gettempdir(), 'kr6_r700.urdf')
-    with open(urdf_file, 'w') as f:
-        f.write(urdf_xml)
-
-    # 2. Robot State Publisher
+    # 2. Robot State Publisher — MUST start before spawn_entity so that
+    #    gazebo_ros2_control can read robot_description from this node
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -53,16 +52,24 @@ def generate_launch_description():
         launch_arguments={'world': world_path, 'verbose': 'true'}.items(),
     )
 
-    # 4. Spawn KUKA KR6 R700 from file (not topic) so Gazebo loads model plugins
+    # 4. Spawn KUKA KR6 R700 from the /robot_description topic
+    #    Using -topic ensures robot_state_publisher is publishing before we spawn,
+    #    and gazebo_ros2_control can read the <ros2_control> tags from it.
+    #    Delayed by 5s to let Gazebo fully initialize first.
     spawn_robot = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
         arguments=[
-            '-file', urdf_file,
+            '-topic', '/robot_description',
             '-entity', 'kr6_r700',
             '-z', '0.05',
         ],
         output='screen',
+    )
+
+    delayed_spawn = TimerAction(
+        period=5.0,
+        actions=[spawn_robot],
     )
 
     # 5. Controllers — use spawner nodes (proper ROS2 approach; auto-waits for
@@ -90,7 +97,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         set_plugin_path,
-        # Sequence: spawn → joint_state_broadcaster → arm_controller
+        # Sequence: spawn completes → joint_state_broadcaster → arm_controller
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=spawn_robot,
@@ -105,5 +112,5 @@ def generate_launch_description():
         ),
         gazebo,
         robot_state_publisher,
-        spawn_robot,
+        delayed_spawn,
     ])

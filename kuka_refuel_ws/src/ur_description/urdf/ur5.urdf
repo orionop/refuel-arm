@@ -396,7 +396,9 @@
   </joint>
   <!-- gazebo_ros2_control plugin (replaces libgazebo_ros_control.so from ROS1) -->
   <gazebo>
-    <plugin name="controller_manager" filename="libgazebo_ros2_control.so">
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
       <parameters>$(find ur5_gazebo)/config/ur5_ros2_controllers.yaml</parameters>
       <ros>
         <namespace>/</namespace>
