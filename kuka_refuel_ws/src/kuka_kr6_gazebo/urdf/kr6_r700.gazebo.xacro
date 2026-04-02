@@ -72,7 +72,7 @@
   <!-- ros2_controllers_yaml arg is passed as absolute path from the launch file -->
   <xacro:arg name="ros2_controllers_yaml" default=""/>
   <gazebo>
-    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+    <plugin name="controller_manager" filename="libgazebo_ros2_control.so">
       <parameters>$(arg ros2_controllers_yaml)</parameters>
       <ros>
         <namespace>/</namespace>
