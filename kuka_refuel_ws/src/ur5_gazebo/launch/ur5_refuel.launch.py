@@ -22,10 +22,13 @@ def generate_launch_description():
     kuka_pkg    = get_package_share_directory('kuka_kr6_gazebo')
     ur5_pkg     = get_package_share_directory('ur5_gazebo')
 
-    # 1. Load UR5 URDF (already processed — no xacro step needed)
+    # 1. Load UR5 URDF and resolve $(find ur5_gazebo) — plain URDFs don't go
+    #    through xacro so the substitution must be done here in Python.
     urdf_path = os.path.join(ur_desc_pkg, 'urdf', 'ur5.urdf')
     with open(urdf_path, 'r') as f:
-        robot_description = {'robot_description': f.read()}
+        urdf_content = f.read()
+    urdf_content = urdf_content.replace('$(find ur5_gazebo)', ur5_pkg)
+    robot_description = {'robot_description': urdf_content}
 
     # 2. Robot State Publisher
     robot_state_publisher = Node(

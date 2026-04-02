@@ -17,10 +17,12 @@ def generate_launch_description():
     ur_desc_pkg = get_package_share_directory('ur_description')
     ur5_pkg     = get_package_share_directory('ur5_gazebo')
 
-    # Load UR5 URDF
+    # Load UR5 URDF and resolve $(find ur5_gazebo) substitution
     urdf_path = os.path.join(ur_desc_pkg, 'urdf', 'ur5.urdf')
     with open(urdf_path, 'r') as f:
-        robot_description = {'robot_description': f.read()}
+        urdf_content = f.read()
+    urdf_content = urdf_content.replace('$(find ur5_gazebo)', ur5_pkg)
+    robot_description = {'robot_description': urdf_content}
 
     # Robot State Publisher
     robot_state_publisher = Node(
