@@ -71,7 +71,7 @@
   <!-- gz_ros2_control plugin for Gz Sim (Gazebo Harmonic) -->
   <xacro:arg name="ros2_controllers_yaml" default=""/>
   <gazebo>
-    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GzRos2ControlPlugin">
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <robot_param>robot_description</robot_param>
       <robot_param_node>robot_state_publisher</robot_param_node>
       <parameters>$(arg ros2_controllers_yaml)</parameters>
