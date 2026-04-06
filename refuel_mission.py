@@ -462,7 +462,7 @@ def publish_markers(target_xyz, obs_list, segments, kin=None):
     m.pose.position.x, m.pose.position.y, m.pose.position.z = target_xyz
     m.pose.orientation.w = 1.0
     m.scale.x = 0.06; m.scale.y = 0.06; m.scale.z = 0.06
-    m.color.r = 0; m.color.g = 0.9; m.color.b = 0; m.color.a = 1.0
+    m.color.r = 0.0; m.color.g = 0.9; m.color.b = 0.0; m.color.a = 1.0
     ma.markers.append(m)
 
     # Blue obstacles
@@ -473,7 +473,7 @@ def publish_markers(target_xyz, obs_list, segments, kin=None):
         m2.pose.position.x, m2.pose.position.y, m2.pose.position.z = c
         m2.pose.orientation.w = 1.0
         m2.scale.x = m2.scale.y = m2.scale.z = r * 2
-        m2.color.r = 0; m2.color.g = 0; m2.color.b = 1.0; m2.color.a = 0.7
+        m2.color.r = 0.0; m2.color.g = 0.0; m2.color.b = 1.0; m2.color.a = 0.7
         ma.markers.append(m2)
 
     # Trajectory trace (white)
@@ -482,7 +482,7 @@ def publish_markers(target_xyz, obs_list, segments, kin=None):
     m_path.type = Marker.LINE_STRIP; m_path.action = Marker.ADD # type: ignore
     m_path.pose.orientation.w = 1.0
     m_path.scale.x = 0.008
-    m_path.color.r = 1; m_path.color.g = 1; m_path.color.b = 1; m_path.color.a = 0.8
+    m_path.color.r = 1.0; m_path.color.g = 1.0; m_path.color.b = 1.0; m_path.color.a = 0.8
     for label, traj, _ in segments:
         if traj is not None:
             for q in traj:
