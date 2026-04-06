@@ -321,7 +321,7 @@ def plan_fine(q_start, q_goal, n_wp=20):
 # ── ROS execution ─────────────────────────────────────────────────
 
 def _ensure_ros_path():
-    ros_python = '/opt/ros/humble/lib/python3/dist-packages'
+    ros_python = '/opt/ros/jazzy/lib/python3/dist-packages'
     if ros_python not in sys.path and os.path.isdir(ros_python):
         sys.path.insert(0, ros_python)
 
