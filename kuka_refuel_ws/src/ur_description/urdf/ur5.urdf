@@ -70,8 +70,8 @@
 
     <joint name="shoulder_pan_joint">
       <param name="initial_value">0.0</param>
-      <param name="position_proportional_gain">5000.0</param>
-      <param name="position_derivative_gain">100.0</param>
+      <param name="position_proportional_gain">100.0</param>
+      <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
         <param name="min">-6.2832</param>
         <param name="max">6.2832</param>
@@ -82,8 +82,8 @@
 
     <joint name="shoulder_lift_joint">
       <param name="initial_value">-1.5708</param>
-      <param name="position_proportional_gain">5000.0</param>
-      <param name="position_derivative_gain">100.0</param>
+      <param name="position_proportional_gain">100.0</param>
+      <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
         <param name="min">-6.2832</param>
         <param name="max">6.2832</param>
@@ -94,8 +94,8 @@
 
     <joint name="elbow_joint">
       <param name="initial_value">0.0</param>
-      <param name="position_proportional_gain">5000.0</param>
-      <param name="position_derivative_gain">100.0</param>
+      <param name="position_proportional_gain">100.0</param>
+      <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
         <param name="min">-3.1416</param>
         <param name="max">3.1416</param>
@@ -106,8 +106,8 @@
 
     <joint name="wrist_1_joint">
       <param name="initial_value">-1.5708</param>
-      <param name="position_proportional_gain">2000.0</param>
-      <param name="position_derivative_gain">50.0</param>
+      <param name="position_proportional_gain">50.0</param>
+      <param name="position_derivative_gain">5.0</param>
       <command_interface name="position">
         <param name="min">-6.2832</param>
         <param name="max">6.2832</param>
@@ -118,8 +118,8 @@
 
     <joint name="wrist_2_joint">
       <param name="initial_value">0.0</param>
-      <param name="position_proportional_gain">2000.0</param>
-      <param name="position_derivative_gain">50.0</param>
+      <param name="position_proportional_gain">50.0</param>
+      <param name="position_derivative_gain">5.0</param>
       <command_interface name="position">
         <param name="min">-6.2832</param>
         <param name="max">6.2832</param>
@@ -130,8 +130,8 @@
 
     <joint name="wrist_3_joint">
       <param name="initial_value">0.0</param>
-      <param name="position_proportional_gain">2000.0</param>
-      <param name="position_derivative_gain">50.0</param>
+      <param name="position_proportional_gain">50.0</param>
+      <param name="position_derivative_gain">5.0</param>
       <command_interface name="position">
         <param name="min">-6.2832</param>
         <param name="max">6.2832</param>
@@ -420,6 +420,30 @@
       <parameters>$(find ur5_gazebo)/config/ur5_ros2_controllers.yaml</parameters>
     </plugin>
   </gazebo>
+  
+  <!-- Explicit Gazebo materials for visual meshes in Gz Sim (fixes white rendering) -->
+  <gazebo reference="base_link_inertia">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+  <gazebo reference="shoulder_link">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+  <gazebo reference="upper_arm_link">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+  <gazebo reference="forearm_link">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+  <gazebo reference="wrist_1_link">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+  <gazebo reference="wrist_2_link">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+  <gazebo reference="wrist_3_link">
+    <visual><material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material></visual>
+  </gazebo>
+
   <!-- TODO: F/T sensor — libgazebo_ros_ft_sensor.so has no Gz Sim equivalent.
        Will be replaced with Gz Sim force-torque sensor plugin in sensor phase.
   <gazebo reference="ft_sensor_joint">

@@ -27,11 +27,11 @@ R_TOOL_INTO_CAR_UR5 = np.array([
 
 INLET_SIZE = (0.06, 0.005, 0.06)
 
-# Green marker SDF
-TARGET_MARKER_SDF = """<?xml version="1.0" ?>
-<sdf version="1.5">
+TARGET_MARKER_SDF_TEMPLATE = """<?xml version="1.0" ?>
+<sdf version="1.9">
   <model name="refuel_target">
     <static>true</static>
+    <pose>{x} {y} {z} 0 0 0</pose>
     <link name="link">
       <visual name="vis">
         <geometry><box><size>0.06 0.005 0.06</size></box></geometry>
@@ -85,11 +85,14 @@ def spawn_target_marker(target_xyz, ros2_node=None):
 
     # Gz Sim: spawn via ros_gz_sim create command (replaces gazebo_msgs SpawnEntity)
     x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
+    
+    # Inject exact pose into SDF to avoid command line argument parsing issues
+    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=z)
+    
     result = subprocess.run(
         ['ros2', 'run', 'ros_gz_sim', 'create',
-         '-string', TARGET_MARKER_SDF,
-         '-name', 'refuel_target',
-         '-x', str(x), '-y', str(y), '-z', str(z)],
+         '-string', sdf_str,
+         '-name', 'refuel_target'],
         capture_output=True, text=True, timeout=15,
     )
     if result.returncode == 0:

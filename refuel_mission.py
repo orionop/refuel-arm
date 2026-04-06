@@ -169,23 +169,23 @@ def spawn_obstacles_gazebo(obs_list, ros2_node):
     import subprocess
 
     for k, (center, radius) in enumerate(obs_list):
+        x, y, z = float(center[0]), float(center[1]), float(center[2])
         sdf = (
             f'<?xml version="1.0" ?>'
             f'<sdf version="1.9">'
             f'<model name="random_obstacle_{k}"><static>true</static>'
+            f'<pose>{x} {y} {z} 0 0 0</pose>'
             f'<link name="link">'
             f'<visual name="vis"><geometry><sphere><radius>{radius}</radius></sphere></geometry>'
             f'<material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material></visual>'
             f'<collision name="col"><geometry><sphere><radius>{radius}</radius></sphere></geometry>'
             f'</collision></link></model></sdf>'
         )
-        x, y, z = float(center[0]), float(center[1]), float(center[2])
         try:
             subprocess.run(
                 ['ros2', 'run', 'ros_gz_sim', 'create',
                  '-string', sdf,
-                 '-name', f'random_obstacle_{k}',
-                 '-x', str(x), '-y', str(y), '-z', str(z)],
+                 '-name', f'random_obstacle_{k}'],
                 capture_output=True, text=True, timeout=10,
             )
         except Exception:
