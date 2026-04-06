@@ -14,6 +14,9 @@
     </hardware>
 
     <joint name="joint_1">
+      <param name="initial_value">0.0</param>
+      <param name="position_proportional_gain">100.0</param>
+      <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
         <param name="min">-2.9671</param>  <!-- -170 deg -->
         <param name="max">2.9671</param>   <!--  170 deg -->
@@ -23,6 +26,9 @@
     </joint>
 
     <joint name="joint_2">
+      <param name="initial_value">-1.5708</param>
+      <param name="position_proportional_gain">100.0</param>
+      <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
         <param name="min">-3.3161</param>  <!-- -190 deg -->
         <param name="max">0.7854</param>   <!--   45 deg -->
@@ -32,6 +38,9 @@
     </joint>
 
     <joint name="joint_3">
+      <param name="initial_value">0.0</param>
+      <param name="position_proportional_gain">100.0</param>
+      <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
         <param name="min">-2.0944</param>  <!-- -120 deg -->
         <param name="max">2.7227</param>   <!--  156 deg -->
@@ -41,6 +50,9 @@
     </joint>
 
     <joint name="joint_4">
+      <param name="initial_value">0.0</param>
+      <param name="position_proportional_gain">50.0</param>
+      <param name="position_derivative_gain">5.0</param>
       <command_interface name="position">
         <param name="min">-3.2289</param>  <!-- -185 deg -->
         <param name="max">3.2289</param>   <!--  185 deg -->
@@ -50,6 +62,9 @@
     </joint>
 
     <joint name="joint_5">
+      <param name="initial_value">0.0</param>
+      <param name="position_proportional_gain">50.0</param>
+      <param name="position_derivative_gain">5.0</param>
       <command_interface name="position">
         <param name="min">-2.0944</param>  <!-- -120 deg -->
         <param name="max">2.0944</param>   <!--  120 deg -->
@@ -59,6 +74,9 @@
     </joint>
 
     <joint name="joint_6">
+      <param name="initial_value">0.0</param>
+      <param name="position_proportional_gain">50.0</param>
+      <param name="position_derivative_gain">5.0</param>
       <command_interface name="position">
         <param name="min">-6.1087</param>  <!-- -350 deg -->
         <param name="max">6.1087</param>   <!--  350 deg -->
