@@ -77,37 +77,22 @@ def spawn_target_marker(target_xyz, ros2_node=None):
     ROS1 equivalent: rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
     Deprecated ROS1 version: deprecated/car_model.ros1.py
     """
-    import rclpy
-    from gazebo_msgs.srv import SpawnEntity
-    from geometry_msgs.msg import Pose
+    import subprocess
 
     if ros2_node is None:
         print("  [car_model] spawn_target_marker: ros2_node is required in ROS2 mode")
         return
 
-    client = ros2_node.create_client(SpawnEntity, '/spawn_entity')
-    if not client.wait_for_service(timeout_sec=5.0):
-        print("  [car_model] /spawn_entity service not available")
-        return
-
-    req = SpawnEntity.Request()
-    req.name = "refuel_target"
-    req.xml = TARGET_MARKER_SDF
-    req.reference_frame = "world"
-    req.initial_pose = Pose()
-    req.initial_pose.position.x = float(target_xyz[0])
-    req.initial_pose.position.y = float(target_xyz[1])
-    req.initial_pose.position.z = float(target_xyz[2])
-    req.initial_pose.orientation.w = 1.0
-
-    future = client.call_async(req)
-    rclpy.spin_until_future_complete(ros2_node, future)
-    try:
-        result = future.result()
-        if result.success:
-            print(f"  Green target marker at [{target_xyz[0]:.2f}, "
-                  f"{target_xyz[1]:.2f}, {target_xyz[2]:.2f}]")
-        else:
-            print(f"  Target marker spawn note: {result.status_message}")
-    except Exception as e:
-        print(f"  Target marker spawn note: {e}")
+    # Gz Sim: spawn via ros_gz_sim create command (replaces gazebo_msgs SpawnEntity)
+    x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
+    result = subprocess.run(
+        ['ros2', 'run', 'ros_gz_sim', 'create',
+         '-string', TARGET_MARKER_SDF,
+         '-name', 'refuel_target',
+         '-x', str(x), '-y', str(y), '-z', str(z)],
+        capture_output=True, text=True, timeout=15,
+    )
+    if result.returncode == 0:
+        print(f"  Green target marker at [{x:.2f}, {y:.2f}, {z:.2f}]")
+    else:
+        print(f"  Target marker spawn note: {result.stderr.strip()}")

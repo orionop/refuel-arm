@@ -1,5 +1,5 @@
 """
-UR5 — Gazebo Simulation Launch for Autonomous Refueling (ROS2 Humble)
+UR5 — Gz Sim Launch for Autonomous Refueling (ROS2 Jazzy + Gazebo Harmonic)
 
 Replaces: ur5_refuel.launch + ur5.launch (ROS1 XML)
   see deprecated/ros1_launch/ur5_refuel.ros1.launch
@@ -24,37 +24,28 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     ur_desc_pkg = get_package_share_directory('ur_description')
-    kuka_pkg    = get_package_share_directory('kuka_kr6_gazebo')
-    ur5_pkg     = get_package_share_directory('ur5_gazebo')
+    kuka_pkg = get_package_share_directory('kuka_kr6_gazebo')
+    ur5_pkg = get_package_share_directory('ur5_gazebo')
 
-    # 1. Load UR5 URDF and resolve $(find ...) substitutions — plain URDFs don't
-    #    go through xacro so the substitution must be done here in Python.
+    # 1. Load UR5 URDF and resolve $(find ...) substitutions
     urdf_path = os.path.join(ur_desc_pkg, 'urdf', 'ur5.urdf')
     with open(urdf_path, 'r') as f:
         urdf_content = f.read()
     urdf_content = urdf_content.replace('$(find ur5_gazebo)', ur5_pkg)
     robot_description = {'robot_description': urdf_content}
 
-    # 2. Gazebo Environment setup
-    plugin_path = '/opt/ros/humble/lib'
-    current_plugin_path = os.environ.get('GAZEBO_PLUGIN_PATH', '')
+    # 2. Environment
     set_plugin_path = SetEnvironmentVariable(
-        name='GAZEBO_PLUGIN_PATH',
-        value=plugin_path + ':' + current_plugin_path,
+        name='GZ_SIM_SYSTEM_PLUGIN_PATH',
+        value='/opt/ros/jazzy/lib:' + os.environ.get('GZ_SIM_SYSTEM_PLUGIN_PATH', ''),
     )
-
-    # Gazebo needs to resolve package:// mesh URIs (which spawn_entity.py turns
-    # into model:// URI). Set model path to the share directory's parent
-    # so model://ur_description/... works.
     share_parent = os.path.dirname(ur_desc_pkg)
-    current_model_path = os.environ.get('GAZEBO_MODEL_PATH', '')
-    set_model_path = SetEnvironmentVariable(
-        name='GAZEBO_MODEL_PATH',
-        value=share_parent + ':' + current_model_path,
+    set_resource_path = SetEnvironmentVariable(
+        name='GZ_SIM_RESOURCE_PATH',
+        value=share_parent + ':' + os.environ.get('GZ_SIM_RESOURCE_PATH', ''),
     )
 
-    # 3. Robot State Publisher — MUST start before spawn_entity so that
-    #    gazebo_ros2_control can read robot_description from this node
+    # 3. Robot State Publisher
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -62,45 +53,38 @@ def generate_launch_description():
         parameters=[robot_description, {'use_sim_time': True}],
     )
 
-    # 4. Gazebo (Classic) with refuel world (shared with KUKA package)
-    world_path = os.path.join(kuka_pkg, 'worlds', 'refuel_world.world')
-    gazebo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')
-        ]),
-        launch_arguments={'world': world_path, 'verbose': 'true'}.items(),
+    # 4. Gz Sim with refuel world (shared with KUKA package)
+    world_path = os.path.join(kuka_pkg, 'worlds', 'refuel_world.sdf')
+    gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('ros_gz_sim'),
+                         'launch', 'gz_sim.launch.py')
+        ),
+        launch_arguments={'gz_args': ['-r ', world_path]}.items(),
     )
 
-    # 5. Spawn UR5 from the /robot_description topic
-    #    Using -topic ensures robot_state_publisher is publishing before we spawn,
-    #    and gazebo_ros2_control can read the <ros2_control> tags from it.
-    #    Delayed by 5s to let Gazebo fully initialize first.
+    # 5. Spawn UR5
     spawn_robot = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
+        package='ros_gz_sim',
+        executable='create',
         arguments=[
             '-topic', '/robot_description',
-            '-entity', 'ur5',
+            '-name', 'ur5',
             '-z', '0.05',
         ],
         output='screen',
     )
 
-    delayed_spawn = TimerAction(
-        period=5.0,
-        actions=[spawn_robot],
-    )
+    delayed_spawn = TimerAction(period=5.0, actions=[spawn_robot])
 
-    # 6. Controllers — use spawner nodes (proper ROS2 approach; auto-waits for
-    #    controller_manager which is started by libgazebo_ros2_control.so)
-    load_joint_state_broadcaster = Node(
+    # 6. Controllers
+    load_jsb = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['joint_state_broadcaster'],
         output='screen',
     )
-
-    load_arm_controller = Node(
+    load_arm = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['ur5_arm_controller'],
@@ -109,20 +93,16 @@ def generate_launch_description():
 
     return LaunchDescription([
         set_plugin_path,
-        set_model_path,
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=spawn_robot,
-                on_exit=[load_joint_state_broadcaster],
-            )
-        ),
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=load_joint_state_broadcaster,
-                on_exit=[load_arm_controller],
-            )
-        ),
-        gazebo,
+        set_resource_path,
         robot_state_publisher,
+        gz_sim,
         delayed_spawn,
+        RegisterEventHandler(OnProcessExit(
+            target_action=spawn_robot,
+            on_exit=[load_jsb],
+        )),
+        RegisterEventHandler(OnProcessExit(
+            target_action=load_jsb,
+            on_exit=[load_arm],
+        )),
     ])

@@ -2,14 +2,14 @@
 <package format="3">
   <name>ur5_gazebo</name>
   <version>1.1.0</version>
-  <description>ROS2 Humble — UR5 Gazebo Simulation for Autonomous Refueling</description>
+  <description>ROS2 Jazzy — UR5 Gz Sim Simulation for Autonomous Refueling</description>
   <maintainer email="user@todo.todo">Anurag Shetye</maintainer>
   <license>BSD</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>gazebo_ros</depend>
-  <depend>gazebo_ros2_control</depend>
+  <depend>ros_gz_sim</depend>
+  <depend>gz_ros2_control</depend>
   <depend>ros2_control</depend>
   <depend>ros2_controllers</depend>
   <depend>robot_state_publisher</depend>

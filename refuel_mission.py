@@ -162,48 +162,32 @@ def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None, kin=None
 
 
 def spawn_obstacles_gazebo(obs_list, ros2_node):
-    """Spawn blue sphere obstacles in Gazebo (ROS2).
+    """Spawn blue sphere obstacles in Gz Sim (ROS2 Jazzy).
 
-    ROS1 equivalent used rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel).
-    ROS2 uses SpawnEntity on /spawn_entity.
+    Uses ros_gz_sim create command (replaces gazebo_msgs SpawnEntity).
     """
-    import rclpy # type: ignore
-    from gazebo_msgs.srv import SpawnEntity # type: ignore
-    from geometry_msgs.msg import Pose # type: ignore
-
-    client = ros2_node.create_client(SpawnEntity, '/spawn_entity')
-    if not client.wait_for_service(timeout_sec=5.0):
-        print("  [spawn_obstacles] /spawn_entity service not available")
-        return
+    import subprocess
 
     for k, (center, radius) in enumerate(obs_list):
-        sdf = f"""<?xml version="1.0" ?>
-        <sdf version="1.5">
-          <model name="random_obstacle_{k}">
-            <static>true</static>
-            <link name="link">
-              <visual name="vis">
-                <geometry><sphere><radius>{radius}</radius></sphere></geometry>
-                <material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material>
-              </visual>
-              <collision name="col">
-                <geometry><sphere><radius>{radius}</radius></sphere></geometry>
-              </collision>
-            </link>
-          </model>
-        </sdf>"""
-        req = SpawnEntity.Request()
-        req.name            = f"random_obstacle_{k}"
-        req.xml             = sdf
-        req.reference_frame = "world"
-        req.initial_pose    = Pose()
-        req.initial_pose.position.x = float(center[0])
-        req.initial_pose.position.y = float(center[1])
-        req.initial_pose.position.z = float(center[2])
-        req.initial_pose.orientation.w = 1.0
+        sdf = (
+            f'<?xml version="1.0" ?>'
+            f'<sdf version="1.9">'
+            f'<model name="random_obstacle_{k}"><static>true</static>'
+            f'<link name="link">'
+            f'<visual name="vis"><geometry><sphere><radius>{radius}</radius></sphere></geometry>'
+            f'<material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material></visual>'
+            f'<collision name="col"><geometry><sphere><radius>{radius}</radius></sphere></geometry>'
+            f'</collision></link></model></sdf>'
+        )
+        x, y, z = float(center[0]), float(center[1]), float(center[2])
         try:
-            future = client.call_async(req)
-            rclpy.spin_until_future_complete(ros2_node, future)
+            subprocess.run(
+                ['ros2', 'run', 'ros_gz_sim', 'create',
+                 '-string', sdf,
+                 '-name', f'random_obstacle_{k}',
+                 '-x', str(x), '-y', str(y), '-z', str(z)],
+                capture_output=True, text=True, timeout=10,
+            )
         except Exception:
             pass
 

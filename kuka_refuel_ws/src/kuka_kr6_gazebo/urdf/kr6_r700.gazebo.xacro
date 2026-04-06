@@ -8,9 +8,9 @@
        ROS2 Control Hardware Interface (replaces gazebo_ros_control +
        transmission_interface from ROS1 — see deprecated/ros1_build/)
        ================================================================ -->
-  <ros2_control name="GazeboSystem" type="system">
+  <ros2_control name="GzSimSystem" type="system">
     <hardware>
-      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+      <plugin>gz_ros2_control/GzSimSystem</plugin>
     </hardware>
 
     <joint name="joint_1">
@@ -68,37 +68,58 @@
     </joint>
   </ros2_control>
 
-  <!-- gazebo_ros2_control plugin (replaces libgazebo_ros_control.so from ROS1) -->
+  <!-- gz_ros2_control plugin for Gz Sim (Gazebo Harmonic) -->
   <xacro:arg name="ros2_controllers_yaml" default=""/>
   <gazebo>
-    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GzRos2ControlPlugin">
       <robot_param>robot_description</robot_param>
       <robot_param_node>robot_state_publisher</robot_param_node>
       <parameters>$(arg ros2_controllers_yaml)</parameters>
     </plugin>
   </gazebo>
 
-  <!-- Physics materials -->
+  <!-- Visual materials (Gz Sim uses explicit RGBA, not named Gazebo/ materials) -->
   <gazebo reference="base_link">
-    <material>Gazebo/Grey</material>
+    <material>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+    </material>
   </gazebo>
   <gazebo reference="link_1">
-    <material>Gazebo/Orange</material>
+    <material>
+      <ambient>0.9 0.5 0.0 1</ambient>
+      <diffuse>1.0 0.6 0.0 1</diffuse>
+    </material>
   </gazebo>
   <gazebo reference="link_2">
-    <material>Gazebo/Orange</material>
+    <material>
+      <ambient>0.9 0.5 0.0 1</ambient>
+      <diffuse>1.0 0.6 0.0 1</diffuse>
+    </material>
   </gazebo>
   <gazebo reference="link_3">
-    <material>Gazebo/Orange</material>
+    <material>
+      <ambient>0.9 0.5 0.0 1</ambient>
+      <diffuse>1.0 0.6 0.0 1</diffuse>
+    </material>
   </gazebo>
   <gazebo reference="link_4">
-    <material>Gazebo/Orange</material>
+    <material>
+      <ambient>0.9 0.5 0.0 1</ambient>
+      <diffuse>1.0 0.6 0.0 1</diffuse>
+    </material>
   </gazebo>
   <gazebo reference="link_5">
-    <material>Gazebo/Orange</material>
+    <material>
+      <ambient>0.9 0.5 0.0 1</ambient>
+      <diffuse>1.0 0.6 0.0 1</diffuse>
+    </material>
   </gazebo>
   <gazebo reference="link_6">
-    <material>Gazebo/Grey</material>
+    <material>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+    </material>
   </gazebo>
 
 </robot>

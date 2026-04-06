@@ -63,9 +63,9 @@
        ROS2 Control Hardware Interface (replaces transmission_interface
        blocks from ROS1 — see deprecated/ros1_build/ur5.ros1.urdf)
        ================================================================ -->
-  <ros2_control name="GazeboSystem" type="system">
+  <ros2_control name="GzSimSystem" type="system">
     <hardware>
-      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+      <plugin>gz_ros2_control/GzSimSystem</plugin>
     </hardware>
 
     <joint name="shoulder_pan_joint">
@@ -394,18 +394,16 @@
     <parent link="flange"/>
     <child link="tool0"/>
   </joint>
-  <!-- gazebo_ros2_control plugin (replaces libgazebo_ros_control.so from ROS1) -->
+  <!-- gz_ros2_control plugin for Gz Sim (Gazebo Harmonic) -->
   <gazebo>
-    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+    <plugin name="gz_ros2_control::GzRos2ControlPlugin" filename="gz_ros2_control-system">
       <robot_param>robot_description</robot_param>
       <robot_param_node>robot_state_publisher</robot_param_node>
       <parameters>$(find ur5_gazebo)/config/ur5_ros2_controllers.yaml</parameters>
-      <ros>
-        <namespace>/</namespace>
-      </ros>
     </plugin>
   </gazebo>
-  <!-- Gazebo F/T sensor plugin: measures forces at wrist_3_joint -->
+  <!-- TODO: F/T sensor — libgazebo_ros_ft_sensor.so has no Gz Sim equivalent.
+       Will be replaced with Gz Sim force-torque sensor plugin in sensor phase.
   <gazebo reference="ft_sensor_joint">
     <provideFeedback>true</provideFeedback>
   </gazebo>
@@ -418,5 +416,6 @@
       <gaussianNoise>0.01</gaussianNoise>
     </plugin>
   </gazebo>
+  -->
 </robot>
 
