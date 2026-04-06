@@ -72,7 +72,15 @@ def generate_launch_description():
 
     delayed_spawn = TimerAction(period=5.0, actions=[spawn_robot])
 
-    # 6. Controllers
+    # 6. Bridge /clock from Gz Sim → ROS2 (required for use_sim_time)
+    clock_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        output='screen',
+    )
+
+    # 7. Controllers
     load_jsb = Node(
         package='controller_manager',
         executable='spawner',
@@ -91,6 +99,7 @@ def generate_launch_description():
         set_resource_path,
         robot_state_publisher,
         gz_sim,
+        clock_bridge,
         delayed_spawn,
         RegisterEventHandler(OnProcessExit(
             target_action=spawn_robot,
