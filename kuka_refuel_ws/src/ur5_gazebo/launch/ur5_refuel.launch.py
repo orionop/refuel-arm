@@ -70,7 +70,7 @@ def generate_launch_description():
         arguments=[
             '-topic', '/robot_description',
             '-name', 'ur5',
-            '-z', '0.05',
+            '-z', '0.0',
         ],
         output='screen',
     )

@@ -29,6 +29,7 @@ import sys
 import os
 import time
 import argparse
+import tempfile
 import numpy as np # type: ignore
 
 # ── Path setup ────────────────────────────────────────────────────
@@ -169,22 +170,36 @@ def spawn_obstacles_gazebo(obs_list, ros2_node):
     import subprocess
 
     for k, (center, radius) in enumerate(obs_list):
-        x, y, z = float(center[0]), float(center[1]), float(center[2])
-        sdf = (
-            f'<?xml version="1.0" ?>'
-            f'<sdf version="1.9">'
-            f'<model name="random_obstacle_{k}"><static>true</static>'
-            f'<pose>{x} {y} {z} 0 0 0</pose>'
-            f'<link name="link">'
-            f'<visual name="vis"><geometry><sphere><radius>{radius}</radius></sphere></geometry>'
-            f'<material><ambient>0 0 1 1</ambient><diffuse>0 0.1 1 1</diffuse></material></visual>'
-            f'<collision name="col"><geometry><sphere><radius>{radius}</radius></sphere></geometry>'
-            f'</collision></link></model></sdf>'
-        )
+        x, y = float(center[0]), float(center[1])
+        # Keep obstacle collision body above ground-plane contact threshold.
+        z = max(float(center[2]), float(radius) + 1e-3)
+        sdf = f"""<?xml version="1.0" ?>
+<sdf version="1.9">
+  <model name="random_obstacle_{k}">
+    <static>true</static>
+    <pose>{x} {y} {z} 0 0 0</pose>
+    <link name="link">
+      <visual name="vis">
+        <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+        <material>
+          <ambient>0 0 1 1</ambient>
+          <diffuse>0 0.1 1 1</diffuse>
+        </material>
+      </visual>
+      <collision name="col">
+        <geometry><sphere><radius>{radius}</radius></sphere></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
+"""
+        sdf_path = os.path.join(tempfile.gettempdir(), f"obstacle_{k}.sdf")
         try:
+            with open(sdf_path, "w", encoding="utf-8") as f:
+                f.write(sdf)
             subprocess.run(
                 ['ros2', 'run', 'ros_gz_sim', 'create',
-                 '-string', sdf,
+                 '-file', sdf_path,
                  '-name', f'random_obstacle_{k}'],
                 capture_output=True, text=True, timeout=10,
             )

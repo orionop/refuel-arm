@@ -45,5 +45,31 @@
         </visual>
       </link>
     </model>
+
+    <!-- Static refueling bay proxy structure (kept separate from dynamic target marker). -->
+    <model name="refuel_bay_proxy">
+      <static>true</static>
+      <pose>0.55 0.30 0.25 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.24 0.10 0.50</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.24 0.10 0.50</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.25 0.25 0.30 1</ambient>
+            <diffuse>0.25 0.25 0.30 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
   </world>
 </sdf>
