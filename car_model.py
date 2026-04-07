@@ -89,14 +89,14 @@ def spawn_target_marker(target_xyz, ros2_node=None):
     x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
 
     # Render exactly at target center (back of the hollow socket)
-    # Position is set only in the SDF <pose> — NOT duplicated in -x/-y/-z args.
     sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=z)
     marker_name = f"refuel_target_{int(_time.time()) % 100000}"
 
     result = subprocess.run(
         ['ros2', 'run', 'ros_gz_sim', 'create',
          '-string', sdf_str,
-         '-name', marker_name],
+         '-name', marker_name,
+         '-x', str(x), '-y', str(y), '-z', str(z)],
         capture_output=True, text=True, timeout=15,
     )
     if result.returncode == 0:
