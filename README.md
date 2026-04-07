@@ -5,7 +5,7 @@
 
 This repository contains the source code for a novel autonomous motion planning architecture designed for unstructured environments. It overcomes the limitations of traditional iterative Inverse Kinematics (IK) solvers and heavy sampling-based global planners by integrating three deeply specialized algorithms into a single continuous pipeline.
 
-> **Status:** ROS2 Humble migration complete. All simulation infrastructure now targets ROS2 Humble + Gazebo Classic 11. ROS1 Noetic code preserved in `deprecated/`.
+> **Status:** ROS 2 Jazzy migration complete. All simulation infrastructure now targets **ROS 2 Jazzy + Gazebo Harmonic (Gz Sim)**. ROS 1 Noetic code preserved in `deprecated/`.
 
 ---
 
@@ -21,22 +21,21 @@ The overarching pipeline seamlessly transitions between Configuration Space (C-S
 
 ---
 
-## ROS Stack (ROS2 Humble)
+## ROS Stack (ROS 2 Jazzy + Gazebo Harmonic)
 
-**Requires:** Ubuntu 22.04, ROS2 Humble, Gazebo Classic 11, Python 3.10+
+**Requires:** Ubuntu 24.04, ROS 2 Jazzy, Gazebo Harmonic (Gz Sim), Python 3.12+
 
 ```bash
-# Source ROS2 and workspace
-source /opt/ros/humble/setup.bash
-source ~/kuka_ws/install/setup.bash
+# Source ROS 2 and workspace
+source /opt/ros/jazzy/setup.bash
+cd ~/Desktop/anurag_ws/refuel-arm/kuka_refuel_ws
+colcon build --symlink-install
+source install/setup.bash
 
-# Build workspace
-cd ~/kuka_ws && colcon build --symlink-install
-
-# Launch KUKA KR6 R700 in Gazebo
+# Launch KUKA KR6 R700 in Gz Sim
 ros2 launch kuka_kr6_gazebo gazebo.launch.py
 
-# Launch UR5 in Gazebo
+# Launch UR5 in Gz Sim
 ros2 launch ur5_gazebo ur5_refuel.launch.py
 
 # Launch RViz (KUKA)
@@ -46,19 +45,19 @@ ros2 launch kuka_kr6_gazebo rviz.launch.py
 ros2 launch ur5_gazebo ur5_rviz.launch.py
 ```
 
-### ROS2 Package Structure
+### ROS 2 Package Structure
 
 ```
 kuka_refuel_ws/src/
 ├── kuka_kr6_gazebo/       # KUKA KR6 R700 — description, worlds, launch, config
-│   ├── urdf/              # kr6_r700.gazebo.xacro  (ros2_control hardware interface)
+│   ├── urdf/              # kr6_r700.gazebo.xacro  (gz_ros2_control hardware interface)
 │   ├── launch/            # gazebo.launch.py, rviz.launch.py, refuel_sim.launch.py
 │   ├── config/            # ros2_controllers.yaml
-│   └── worlds/            # refuel_world.world (Gazebo Classic SDF)
+│   └── worlds/            # refuel_world.sdf (Gz Sim SDF 1.9)
 ├── ur5_gazebo/            # UR5 — launch, config
 │   ├── launch/            # ur5_refuel.launch.py, ur5_rviz.launch.py
 │   └── config/            # ur5_ros2_controllers.yaml
-└── ur_description/        # UR5 URDF (ros2_control hardware interface + F/T sensor)
+└── ur_description/        # UR5 URDF (gz_ros2_control hardware interface + F/T sensor)
 ```
 
 ---
@@ -85,7 +84,7 @@ These modules have **no ROS dependency** and run standalone:
 python3 refuel_mission.py --robot kuka
 python3 refuel_mission.py --robot ur5
 
-# Execute in Gazebo (ROS2)
+# Execute in Gz Sim (ROS 2)
 python3 refuel_mission.py --ros --robot kuka
 python3 refuel_mission.py --ros --robot ur5
 
@@ -96,7 +95,7 @@ python3 refuel_mission.py --ros --robot ur5 --compliant
 python3 refuel_mission.py --rviz --robot kuka
 ```
 
-**`admittance_node.py`** — Standalone ROS2 force-compliant execution node:
+**`admittance_node.py`** — Standalone ROS 2 force-compliant execution node:
 ```bash
 python3 admittance_node.py
 ```
@@ -108,23 +107,17 @@ python3 admittance_node.py
 ```bash
 # 15-seed Bubble Strips robustness benchmark
 python3 test_15seed_bubbles.py
-
-# IK accuracy analysis
-python3 ik_trajectories/analyze_ik_accuracy.py
-
-# Motion planning strategy comparison
-python3 ik_trajectories/compare_cspace_workspace.py
 ```
 
 ---
 
 ## Deprecation Policy
 
-All ROS1 Noetic files (launch XML, catkin build files, rospy nodes) are preserved in `deprecated/` and never deleted:
+All ROS 1 Noetic files (launch XML, catkin build files, rospy nodes) are preserved in `deprecated/` and never deleted:
 
 ```
 deprecated/
-├── ros1_build/    # ROS1 package.xml, CMakeLists.txt, xacro, URDF
+├── ros1_build/    # ROS1 package.xml, CMakeLists.txt, xacro, URDF, world
 ├── ros1_launch/   # ROS1 XML launch files
 ├── *.ros1.py      # ROS1 Python nodes (rospy)
 └── ...            # Legacy pipeline variants

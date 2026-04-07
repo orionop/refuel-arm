@@ -2,7 +2,7 @@
 <package format="3">
   <name>ur_description</name>
   <version>1.3.0</version>
-  <description>UR5 Robot Description (ROS2 Humble — Refueling Project)</description>
+  <description>UR5 Robot Description (ROS2 Jazzy — Refueling Project)</description>
   <maintainer email="user@todo.todo">Anurag Shetye</maintainer>
   <license>BSD</license>
 
