@@ -108,5 +108,15 @@
         </collision>
       </link>
     </model>
+
+    <!-- Physics State: Force KUKA to Spawn Vertical ("Candle") -->
+    <state world_name="refuel_world">
+      <model name="kr6_r700">
+        <joint name="joint_2">
+          <angle>-1.57079</angle>
+        </joint>
+      </model>
+    </state>
+
   </world>
 </sdf>
