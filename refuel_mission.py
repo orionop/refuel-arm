@@ -167,20 +167,29 @@ def spawn_obstacles_gazebo(obs_list, ros2_node):
     """Spawn blue sphere obstacles in Gz Sim (ROS2 Jazzy).
 
     Uses ros_gz_sim create command (replaces gazebo_msgs SpawnEntity).
-    Unique names per run so re-runs in the same Gz Sim session work.
+    Deletes previous obstacles first so re-runs show fresh positions.
     """
     import subprocess
 
-    run_id = int(time.time()) % 100000
+    # Delete previous obstacles (silent fail on first run)
+    for k in range(len(obs_list)):
+        name = f"random_obstacle_{k}"
+        subprocess.run(
+            ['gz', 'service', '-s', '/world/refuel_world/remove',
+             '--reqtype', 'gz.msgs.Entity',
+             '--reptype', 'gz.msgs.Boolean',
+             '--timeout', '1000',
+             '--req', f'name: "{name}" type: 2'],
+            capture_output=True, text=True, timeout=5,
+        )
 
     for k, (center, radius) in enumerate(obs_list):
         x, y = float(center[0]), float(center[1])
         # Keep obstacle collision body above ground-plane contact threshold.
         z = max(float(center[2]), float(radius) + 1e-3)
-        model_name = f"obs_{run_id}_{k}"
         sdf = f"""<?xml version="1.0" ?>
 <sdf version="1.9">
-  <model name="{model_name}">
+  <model name="random_obstacle_{k}">
     <static>true</static>
     <pose>{x} {y} {z} 0 0 0</pose>
     <link name="link">
@@ -205,7 +214,7 @@ def spawn_obstacles_gazebo(obs_list, ros2_node):
             subprocess.run(
                 ['ros2', 'run', 'ros_gz_sim', 'create',
                  '-file', sdf_path,
-                 '-name', model_name,
+                 '-name', f'random_obstacle_{k}',
                  '-x', str(x), '-y', str(y), '-z', str(z)],
                 capture_output=True, text=True, timeout=10,
             )

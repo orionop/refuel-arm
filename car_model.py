@@ -83,19 +83,26 @@ def spawn_target_marker(target_xyz, ros2_node=None):
         print("  [car_model] spawn_target_marker: ros2_node is required in ROS2 mode")
         return
 
-    import time as _time
-
     # Gz Sim: spawn via ros_gz_sim create command
     x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
 
+    # Delete previous marker (silent fail on first run)
+    subprocess.run(
+        ['gz', 'service', '-s', '/world/refuel_world/remove',
+         '--reqtype', 'gz.msgs.Entity',
+         '--reptype', 'gz.msgs.Boolean',
+         '--timeout', '1000',
+         '--req', 'name: "refuel_target" type: 2'],
+        capture_output=True, text=True, timeout=5,
+    )
+
     # Render exactly at target center (back of the hollow socket)
     sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=z)
-    marker_name = f"refuel_target_{int(_time.time()) % 100000}"
 
     result = subprocess.run(
         ['ros2', 'run', 'ros_gz_sim', 'create',
          '-string', sdf_str,
-         '-name', marker_name,
+         '-name', 'refuel_target',
          '-x', str(x), '-y', str(y), '-z', str(z)],
         capture_output=True, text=True, timeout=15,
     )
