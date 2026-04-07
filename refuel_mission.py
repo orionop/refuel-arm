@@ -200,7 +200,8 @@ def spawn_obstacles_gazebo(obs_list, ros2_node):
             subprocess.run(
                 ['ros2', 'run', 'ros_gz_sim', 'create',
                  '-file', sdf_path,
-                 '-name', f'random_obstacle_{k}'],
+                 '-name', f'random_obstacle_{k}',
+                 '-x', str(x), '-y', str(y), '-z', str(z)],
                 capture_output=True, text=True, timeout=10,
             )
         except Exception:

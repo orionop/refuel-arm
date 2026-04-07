@@ -83,19 +83,23 @@ def spawn_target_marker(target_xyz, ros2_node=None):
         print("  [car_model] spawn_target_marker: ros2_node is required in ROS2 mode")
         return
 
-    # Gz Sim: spawn via ros_gz_sim create command (replaces gazebo_msgs SpawnEntity)
+    # Gz Sim: spawn via ros_gz_sim create command
     x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
     
-    # Inject exact pose into SDF to avoid command line argument parsing issues
-    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=z)
+    # Visual offset: push marker slightly towards the robot (approach direction)
+    # Based on the bay proxy depth (0.10), we offset by 5.1cm along the Y-axis
+    # to place it on the front surface.
+    y_vis = y - 0.051
+    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y_vis, z=z)
     
     result = subprocess.run(
         ['ros2', 'run', 'ros_gz_sim', 'create',
          '-string', sdf_str,
-         '-name', 'refuel_target'],
+         '-name', 'refuel_target',
+         '-x', str(x), '-y', str(y_vis), '-z', str(z)],
         capture_output=True, text=True, timeout=15,
     )
     if result.returncode == 0:
-        print(f"  Green target marker at [{x:.2f}, {y:.2f}, {z:.2f}]")
+        print(f"  Green target marker correctly visible at [{x:.2f}, {y_vis:.2f}, {z:.2f}]")
     else:
         print(f"  Target marker spawn note: {result.stderr.strip()}")
