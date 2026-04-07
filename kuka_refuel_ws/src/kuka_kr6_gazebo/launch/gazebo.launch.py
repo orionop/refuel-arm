@@ -15,6 +15,7 @@ import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
+    ExecuteProcess,
     IncludeLaunchDescription,
     RegisterEventHandler,
     SetEnvironmentVariable,
@@ -165,6 +166,22 @@ def generate_launch_description():
         output='screen',
     )
 
+    # After arm controller is active, immediately command candle position.
+    # Gz Sim's <initial_position> is broken for URDF models, so this is
+    # the only reliable way to reach candle before the user runs a mission.
+    move_to_candle = ExecuteProcess(
+        cmd=[
+            'ros2', 'action', 'send_goal',
+            '/kr6_arm_controller/follow_joint_trajectory',
+            'control_msgs/action/FollowJointTrajectory',
+            '{trajectory: {joint_names: [joint_1, joint_2, joint_3,'
+            ' joint_4, joint_5, joint_6],'
+            ' points: [{positions: [0.0, -1.5708, 0.0, 0.0, 0.0, 0.0],'
+            ' time_from_start: {sec: 2, nanosec: 0}}]}}',
+        ],
+        output='screen',
+    )
+
     return LaunchDescription([
         set_plugin_path,
         set_resource_path,
@@ -179,5 +196,9 @@ def generate_launch_description():
         RegisterEventHandler(OnProcessExit(
             target_action=load_jsb,
             on_exit=[load_arm],
+        )),
+        RegisterEventHandler(OnProcessExit(
+            target_action=load_arm,
+            on_exit=[move_to_candle],
         )),
     ])
