@@ -60,8 +60,8 @@ def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
     """Convert joint limits specified in degrees to radians (for clipping/cost)."""
     return np.radians(np.asarray(limits_deg, dtype=float))
 
-# Standard "elbow-up" home pose for KUKA
-Q_HOME     = np.array([0.0, -np.pi / 2, np.pi / 2, 0.0, np.pi / 2, 0.0])
+# Upright "Candle" home pose for KUKA
+Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.05
 
