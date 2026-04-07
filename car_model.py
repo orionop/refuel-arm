@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(
     'kuka_kr6_gazebo', 'scripts')))
 from ik_geometric import rot
 
-# ── Default target (reachable by KUKA KR6 R700) ──────────────────
-TARGET_XYZ_DEFAULT = np.array([0.55, 0.30, 0.50])
+# Target: Inside the 10cm-deep hollow port (Socket at X=0.60, Back at X=0.65)
+TARGET_XYZ_DEFAULT = np.array([0.65, 0.30, 0.50])
 
 # EE orientation: tool axis pointing +Y (toward the target)
 R_TOOL_INTO_CAR_KUKA = np.array([
@@ -86,20 +86,17 @@ def spawn_target_marker(target_xyz, ros2_node=None):
     # Gz Sim: spawn via ros_gz_sim create command
     x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
     
-    # Visual offset: push marker slightly towards the robot (approach direction)
-    # Based on the bay proxy depth (0.10), we offset by 5.1cm along the Y-axis
-    # to place it on the front surface.
-    y_vis = y - 0.051
-    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y_vis, z=z)
+    # Render exactly at target center (back of the hollow socket)
+    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=z)
     
     result = subprocess.run(
         ['ros2', 'run', 'ros_gz_sim', 'create',
          '-string', sdf_str,
          '-name', 'refuel_target',
-         '-x', str(x), '-y', str(y_vis), '-z', str(z)],
+         '-x', str(x), '-y', str(y), '-z', str(z)],
         capture_output=True, text=True, timeout=15,
     )
     if result.returncode == 0:
-        print(f"  Green target marker correctly visible at [{x:.2f}, {y_vis:.2f}, {z:.2f}]")
+        print(f"  Green target marker visible at socket base [{x:.2f}, {y:.2f}, {z:.2f}]")
     else:
         print(f"  Target marker spawn note: {result.stderr.strip()}")

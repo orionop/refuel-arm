@@ -46,31 +46,66 @@
       </link>
     </model>
 
-    <!-- Static refueling bay proxy structure (kept separate from dynamic target marker). -->
-    <model name="refuel_bay_proxy">
+    <!-- Hollow Refueling Inlet (Concave Structure) -->
+    <model name="hollow_refuel_inlet">
       <static>true</static>
-      <pose>0.55 0.30 0.25 0 0 0</pose>
-      <link name="body">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.24 0.10 0.50</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>0.24 0.10 0.50</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0.2 0.2 0.2 1</ambient>
-            <diffuse>0.2 0.2 0.2 1</diffuse>
-            <specular>0.5 0.5 0.5 1</specular>
-          </material>
-          <transparency>0.6</transparency>
+      <pose>0.60 0.30 0.50 0 0 0</pose>
+      <link name="inlet_body">
+        <!-- Back Plate -->
+        <visual name="back_visual">
+          <pose>0.05 0 0 0 0 0</pose>
+          <geometry><box><size>0.02 0.12 0.12</size></box></geometry>
+          <material><ambient>0.2 0.2 0.22 1</ambient><diffuse>0.2 0.2 0.22 1</diffuse></material>
+          <transparency>0.4</transparency>
         </visual>
+        <collision name="back_collision">
+          <pose>0.05 0 0 0 0 0</pose>
+          <geometry><box><size>0.02 0.12 0.12</size></box></geometry>
+        </collision>
+        <!-- Top Wall -->
+        <visual name="top_visual">
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry><box><size>0.10 0.12 0.02</size></box></geometry>
+          <material><ambient>0.2 0.2 0.22 1</ambient><diffuse>0.2 0.2 0.22 1</diffuse></material>
+          <transparency>0.4</transparency>
+        </visual>
+        <collision name="top_collision">
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry><box><size>0.10 0.12 0.02</size></box></geometry>
+        </collision>
+        <!-- Bottom Wall -->
+        <visual name="bottom_visual">
+          <pose>0 0 -0.05 0 0 0</pose>
+          <geometry><box><size>0.10 0.12 0.02</size></box></geometry>
+          <material><ambient>0.2 0.2 0.22 1</ambient><diffuse>0.2 0.2 0.22 1</diffuse></material>
+          <transparency>0.4</transparency>
+        </visual>
+        <collision name="bottom_collision">
+          <pose>0 0 -0.05 0 0 0</pose>
+          <geometry><box><size>0.10 0.12 0.02</size></box></geometry>
+        </collision>
+        <!-- Left Wall -->
+        <visual name="left_visual">
+          <pose>0 0.05 0 0 0 0</pose>
+          <geometry><box><size>0.10 0.02 0.08</size></box></geometry>
+          <material><ambient>0.2 0.2 0.22 1</ambient><diffuse>0.2 0.2 0.22 1</diffuse></material>
+          <transparency>0.4</transparency>
+        </visual>
+        <collision name="left_collision">
+          <pose>0 0.05 0 0 0 0</pose>
+          <geometry><box><size>0.10 0.02 0.08</size></box></geometry>
+        </collision>
+        <!-- Right Wall -->
+        <visual name="right_visual">
+          <pose>0 -0.05 0 0 0 0</pose>
+          <geometry><box><size>0.10 0.02 0.08</size></box></geometry>
+          <material><ambient>0.2 0.2 0.22 1</ambient><diffuse>0.2 0.2 0.22 1</diffuse></material>
+          <transparency>0.4</transparency>
+        </visual>
+        <collision name="right_collision">
+          <pose>0 -0.05 0 0 0 0</pose>
+          <geometry><box><size>0.10 0.02 0.08</size></box></geometry>
+        </collision>
       </link>
     </model>
   </world>
