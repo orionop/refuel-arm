@@ -625,13 +625,12 @@ def main():
     print("  IK-Geo + STOMP + Elastic Strips")
     print("=" * 65)
 
-    # ── Step 1: IK-Geo ────────────────────────────────────────────
     inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
-    # Standoff of 20cm (10cm from mouth of socket, which is 10cm deep)
-    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.20, robot=active_robot)
+    # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
+    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
 
-    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (Socket Base)")
-    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (Approach Point)")
+    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (20cm Socket Base)")
+    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (5cm clear of mouth)")
 
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} target pose...")
     Q_target = IK_solve(inlet_R, inlet_xyz, robot=active_robot)

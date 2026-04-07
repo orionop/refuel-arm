@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(
     'kuka_kr6_gazebo', 'scripts')))
 from ik_geometric import rot
 
-# Target: Inside the 10cm-deep hollow port (Socket at X=0.60, Back at X=0.65)
-TARGET_XYZ_DEFAULT = np.array([0.65, 0.30, 0.50])
+# Target: Base of a 20cm-deep socket (Center X=0.62 + 0.10)
+TARGET_XYZ_DEFAULT = np.array([0.72, 0.30, 0.50])
 
 # EE orientation: tool axis pointing +Y (toward the target)
 R_TOOL_INTO_CAR_KUKA = np.array([
