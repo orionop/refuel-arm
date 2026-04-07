@@ -77,11 +77,17 @@ def generate_launch_description():
 
     delayed_spawn = TimerAction(period=5.0, actions=[spawn_robot])
 
-    # ── 6. Bridge /clock from Gz Sim → ROS2 (required for use_sim_time) ─
-    clock_bridge = Node(
+    # ── 6. Bridge Gz Sim → ROS2 ───────────────────────────────────────
+    # - /clock: required for use_sim_time
+    # - /tf and /tf_static: allows seeing the robot/world state in RViz
+    bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        arguments=[
+            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            '/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
+            '/tf_static@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
+        ],
         output='screen',
     )
 
@@ -105,7 +111,7 @@ def generate_launch_description():
         set_resource_path,
         robot_state_publisher,
         gz_sim,
-        clock_bridge,
+        bridge,
         delayed_spawn,
         RegisterEventHandler(OnProcessExit(
             target_action=spawn_robot,
