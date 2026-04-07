@@ -11,6 +11,7 @@ import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
+    ExecuteProcess,
     IncludeLaunchDescription,
     RegisterEventHandler,
     SetEnvironmentVariable,
@@ -55,12 +56,14 @@ def generate_launch_description():
 
     # ── 4. Gz Sim ─────────────────────────────────────────────────────
     world_path = os.path.join(pkg, 'worlds', 'refuel_world.sdf')
+    # Start world PAUSED (no -r flag) so robot spawns with correct joint
+    # positions before gravity acts. Unpause happens after controllers load.
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('ros_gz_sim'),
                          'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': ['-r ', world_path]}.items(),
+        launch_arguments={'gz_args': world_path}.items(),
     )
 
     # ── 5. Spawn robot ────────────────────────────────────────────────
@@ -71,8 +74,6 @@ def generate_launch_description():
             '-topic', '/robot_description',
             '-name', 'kr6_r700',
             '-z', '0.05',
-            '--joint-names', 'joint_1,joint_2,joint_3,joint_4,joint_5,joint_6',
-            '--joint-positions', '0.0,-1.5708,0.0,0.0,0.0,0.0',
         ],
         output='screen',
     )
@@ -108,6 +109,18 @@ def generate_launch_description():
         output='screen',
     )
 
+    # Unpause simulation after arm controller is loaded — robot spawns
+    # with <initial_position> joint angles while world is paused, so
+    # gravity never acts before the controller is ready to hold position.
+    unpause_sim = ExecuteProcess(
+        cmd=['gz', 'service', '-s', '/world/refuel_world/control',
+             '--reqtype', 'gz.msgs.WorldControl',
+             '--reptype', 'gz.msgs.Boolean',
+             '--timeout', '10000',
+             '--req', 'pause: false'],
+        output='screen',
+    )
+
     return LaunchDescription([
         set_plugin_path,
         set_resource_path,
@@ -122,5 +135,9 @@ def generate_launch_description():
         RegisterEventHandler(OnProcessExit(
             target_action=load_jsb,
             on_exit=[load_arm],
+        )),
+        RegisterEventHandler(OnProcessExit(
+            target_action=load_arm,
+            on_exit=[unpause_sim],
         )),
     ])
