@@ -34,9 +34,10 @@ import numpy as np # type: ignore
 
 # ── Path setup (Localized for ref_env) ──────────────────────────────
 # Add project root so we can import stomp_collision.py from root
+# Appended (not inserted) so ref_env/ copies take priority
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
+    sys.path.append(_PROJECT_ROOT)
 
 from ik_geometric import ( # type: ignore
     IK_spherical_2_parallel, fwd_kinematics, rot,
