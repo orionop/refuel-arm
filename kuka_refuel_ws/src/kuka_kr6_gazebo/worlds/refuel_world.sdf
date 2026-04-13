@@ -85,5 +85,21 @@
       </link>
     </model>
 
+    <!-- Static Obstacle 1: Pillar blocking the path -->
+    <model name="pillar_1">
+      <static>true</static>
+      <!-- Center Z is 0.40 since length is 0.80 (spans Z=0 to Z=0.80) -->
+      <pose>0.25 0.30 0.40 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
+          <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
   </world>
 </sdf>
