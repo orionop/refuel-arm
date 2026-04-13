@@ -197,7 +197,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
         q_start=q_start, q_goal=q_goal,
         joint_limits=limits_rad,
         simple_obstacles=obstacles or None,
-        n_waypoints=n_wp, n_iterations=100, n_rollouts=12,
+        n_waypoints=n_wp, n_iterations=45, n_rollouts=8,
         noise_stddev=0.08, w_smooth=20.0, w_vel=15.0,
         verbose=False, kin=kin,
     )
@@ -221,7 +221,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
         traj, _, stats = bubble_strip_deform(
             traj, obstacles,
             joint_limits=limits_rad,
-            n_iterations=150,
+            n_iterations=60,
             k_contraction=0.5, k_repulsion=30.0,
             rho_0=0.20, damping=0.85, verbose=False,
         )
@@ -582,8 +582,8 @@ def main():
     parser.add_argument("--target-z", type=float, default=TARGET_XYZ_DEFAULT[2])
     parser.add_argument("--seed", type=int, default=None,
                         help="Random seed for obstacle placement (default: random)")
-    parser.add_argument("--mirror-return", action="store_true",
-                        help="Return along the reversed approach path instead of re-planning")
+    parser.add_argument("--plan-return", action="store_true",
+                        help="Re-plan the return path instead of mirroring the approach (default)")
     parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5"],
                         help="Target robot platform (default: kuka)")
     parser.add_argument("--avoidance", type=str, default="bubble", choices=["bubble", "tangent", "none"],
@@ -664,7 +664,7 @@ def main():
                                  q_target, "Phase 3: Target -> Pre-approach", n_wp=20, kin=kin_params)
 
     # Phase 4: Gross Return (C-Space)
-    if args.mirror_return:
+    if not args.plan_return:
         seg_return = seg_approach[::-1].copy()
         print(f"\n  Planning: Phase 4: Pre-approach -> HOME (mirrored approach)")
         print(f"     Reversed approach trajectory ({len(seg_return)} wp)")
