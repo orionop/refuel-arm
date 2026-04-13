@@ -638,7 +638,7 @@ def main():
     print("  IK-Geo + STOMP + Elastic Strips")
     print("=" * 65)
 
-    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
+    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, yaw=1.5708, robot=active_robot)
     # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
     pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
 

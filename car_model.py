@@ -12,13 +12,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 from ik_geometric import rot
 
 # Target: Base of a 20cm-deep socket (Center X=0.62 + 0.10)
-TARGET_XYZ_DEFAULT = np.array([0.72, 0.30, 0.50])
+TARGET_XYZ_DEFAULT = np.array([0.40, 0.30, 0.50])
 
-# EE orientation: tool axis pointing +X (forward straight into the socket)
+# EE orientation: tool axis pointing +Y (toward the target)
 R_TOOL_INTO_CAR_KUKA = np.array([
+    [0.,  0.,  1.],
     [1.,  0.,  0.],
-    [0.,  1.,  0.],
-    [0.,  0.,  1.]])
+    [0.,  1.,  0.]])
 
 R_TOOL_INTO_CAR_UR5 = np.array([
     [ 0.,  0., -1.],
