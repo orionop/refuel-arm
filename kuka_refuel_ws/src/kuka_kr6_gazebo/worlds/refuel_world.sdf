@@ -88,8 +88,9 @@
     <!-- Dynamic Obstacle: Pillar on a slider joint oscillating along X-axis -->
     <model name="dynamic_pillar">
       <static>false</static>
-      <pose>0.45 0.30 0.40 0 0 0</pose>
+      <pose>0.20 0.30 0.42 0 0 0</pose>
       <link name="pillar_link">
+        <gravity>false</gravity>
         <inertial>
           <mass>2.0</mass>
           <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.01</izz></inertia>
