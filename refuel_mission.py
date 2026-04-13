@@ -638,7 +638,7 @@ def main():
     print("  IK-Geo + STOMP + Elastic Strips")
     print("=" * 65)
 
-    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
+    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, yaw=1.5708, robot=active_robot)
     # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
     pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
 
@@ -673,8 +673,8 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Spawning 2 random obstacles on the path...")
-    obs_list = random_obstacles_on_path(seg_blind, n_obs=NUM_OBSTACLES, rng=rng, kin=kin_params)
+    print("\n[Obstacles] Testing bare environment (0 obstacles)...")
+    obs_list = []
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
@@ -727,7 +727,7 @@ def main():
         _ROS_NODE = rclpy.create_node('refuel_mission')
 
         if args.ros:
-            spawn_target_marker(target_xyz, ros2_node=_ROS_NODE)
+            pass # Using physical socket baked into SDF
             spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
 
         # publish_markers expects (label, traj, dt) tuples — strip compliant flag
