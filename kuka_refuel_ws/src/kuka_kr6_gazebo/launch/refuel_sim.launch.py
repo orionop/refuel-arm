@@ -15,6 +15,7 @@ from launch.actions import (
     RegisterEventHandler,
     SetEnvironmentVariable,
     TimerAction,
+    ExecuteProcess,
 )
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -94,6 +95,16 @@ def generate_launch_description():
         output='screen',
     )
 
+    # 8. Command upright candle pose
+    candle_pose_cmd = ExecuteProcess(
+        cmd=[
+            'ros2', 'topic', 'pub', '--once', '/kr6_arm_controller/joint_trajectory',
+            'trajectory_msgs/msg/JointTrajectory',
+            '{"joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"], "points": [{"positions": [0.0, -1.5708, 0.0, 0.0, 0.0, 0.0], "time_from_start": {"sec": 1, "nanosec": 0}}]}'
+        ],
+        output='screen'
+    )
+
     return LaunchDescription([
         set_plugin_path,
         set_resource_path,
@@ -108,5 +119,9 @@ def generate_launch_description():
         RegisterEventHandler(OnProcessExit(
             target_action=load_jsb,
             on_exit=[load_arm],
+        )),
+        RegisterEventHandler(OnProcessExit(
+            target_action=load_arm,
+            on_exit=[candle_pose_cmd],
         )),
     ])
