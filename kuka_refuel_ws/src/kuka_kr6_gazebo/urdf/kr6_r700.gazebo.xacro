@@ -26,7 +26,7 @@
     </joint>
 
     <joint name="joint_2">
-      <param name="initial_value">-1.5708</param>
+      <param name="initial_value">0.0</param>
       <param name="position_proportional_gain">100.0</param>
       <param name="position_derivative_gain">10.0</param>
       <command_interface name="position">
@@ -141,7 +141,7 @@
   </gazebo>
   
   <gazebo reference="joint_2">
-    <initial_position>-1.5708</initial_position>
+    <initial_position>0.0</initial_position>
   </gazebo>
 
 </robot>

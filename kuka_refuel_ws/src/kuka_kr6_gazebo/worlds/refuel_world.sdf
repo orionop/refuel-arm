@@ -6,12 +6,10 @@
       <real_time_factor>1.0</real_time_factor>
     </physics>
 
-    <!-- Required Gz Sim system plugins -->
     <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
     <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
     <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
 
-    <!-- Sunlight -->
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
       <pose>0 0 10 0 0 0</pose>
@@ -20,7 +18,6 @@
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 
-    <!-- Ground plane -->
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
@@ -32,156 +29,6 @@
           <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
         </visual>
       </link>
-    </model>
-
-    <!-- Robot Pedestal -->
-    <model name="robot_pedestal">
-      <static>true</static>
-      <pose>0 0 0.3 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.4 0.4 0.6</size></box></geometry>
-          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
-        </visual>
-        <collision name="collision">
-          <geometry><box><size>0.4 0.4 0.6</size></box></geometry>
-        </collision>
-      </link>
-    </model>
-
-    <!-- SUV removed — fuel inlet serves as floating target marker -->
-
-    <!-- Refined Concave Socket (Industrial Grade) -->
-    <!-- Positioned precisely where the nozzle must enter -->
-    <model name="hollow_refuel_inlet">
-      <static>true</static>
-      <pose>0.62 0.30 1.10 0 0 0</pose>
-      <link name="inlet_body">
-        <!-- Back Face (Goal) -->
-        <visual name="back_visual">
-          <pose>0.20 0 0 0 0 0</pose>
-          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
-          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
-        </visual>
-        <collision name="back_collision">
-          <pose>0.20 0 0 0 0 0</pose>
-          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
-        </collision>
-        <!-- Surround Walls (20cm Deep) -->
-        <visual name="top_wall">
-          <pose>0.10 0 0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
-        </visual>
-        <collision name="top_wall_col">
-          <pose>0.10 0 0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-        </collision>
-        <visual name="bottom_wall">
-          <pose>0.10 0 -0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
-        </visual>
-        <collision name="bottom_wall_col">
-          <pose>0.10 0 -0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-        </collision>
-        <visual name="left_wall">
-          <pose>0.10 0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-        </visual>
-        <collision name="left_wall_col">
-          <pose>0.10 0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-        </collision>
-        <visual name="right_wall">
-          <pose>0.10 -0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-        </visual>
-        <collision name="right_wall_col">
-          <pose>0.10 -0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-        </collision>
-        <!-- Fuel Flap (Convex Obstacle) -->
-        <!-- Poised as if the door is open but still obstructing the approach path -->
-        <visual name="flap_visual">
-          <pose>-0.05 0.12 0 0 0 -0.5</pose> <!-- Angled outwards -->
-          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
-          <material><ambient>0.2 0.2 0.22 1</ambient><diffuse>0.2 0.2 0.22 1</diffuse></material>
-        </visual>
-        <collision name="flap_collision">
-          <pose>-0.05 0.12 0 0 0 -0.5</pose>
-          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
-        </collision>
-      </link>
-    </model>
-
-    <!-- Industrial Obstacles (Non-Neural-Network Testbed) -->
-    
-    <!-- Static Rectangular Pillar -->
-    <model name="static_pillar">
-      <static>true</static>
-      <pose>0.45 0.15 0.7 0 0 0.785</pose> <!-- Rotated 45 deg -->
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.15 0.06 0.8</size></box></geometry>
-          <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
-        </visual>
-        <collision name="collision">
-          <geometry><box><size>0.15 0.06 0.8</size></box></geometry>
-        </collision>
-      </link>
-    </model>
-
-    <!-- Static Cylinder -->
-    <model name="static_cylinder">
-      <static>true</static>
-      <pose>0.55 -0.25 0.7 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
-          <material><ambient>0.1 0.1 0.8 1</ambient><diffuse>0.1 0.1 0.8 1</diffuse></material>
-        </visual>
-        <collision name="collision">
-          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
-        </collision>
-      </link>
-    </model>
-
-    <!-- Oscillating Dynamic Cylinder (Prismatic) -->
-    <model name="dynamic_cylinder">
-      <pose>0.50 0.35 0.7 0 0 0</pose>
-      <link name="link">
-        <inertial>
-          <mass>1.0</mass>
-          <inertia><ixx>0.01</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.01</iyy><iyz>0</iyz><izz>0.01</izz></inertia>
-        </inertial>
-        <visual name="visual">
-          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
-          <material><ambient>0.8 0.8 0.2 1</ambient><diffuse>0.8 0.8 0.2 1</diffuse></material>
-        </visual>
-        <collision name="collision">
-          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
-        </collision>
-      </link>
-
-      <joint name="oscillation_joint" type="prismatic">
-        <parent>world</parent>
-        <child>link</child>
-        <axis>
-          <xyz>0 1 0</xyz> <!-- Movement along Y axis -->
-          <limit>
-            <lower>-0.4</lower>
-            <upper>0.4</upper>
-          </limit>
-        </axis>
-      </joint>
-
-      <!-- Basic controller plugin to allow ROS2 command injection -->
-      <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
-        <joint_name>oscillation_joint</joint_name>
-        <topic>/model/dynamic_cylinder/joint/oscillation_joint/0/cmd_pos</topic>
-      </plugin>
     </model>
 
   </world>
