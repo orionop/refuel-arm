@@ -118,17 +118,17 @@
 
     <!-- Industrial Obstacles (Non-Neural-Network Testbed) -->
     
-    <!-- Static Rectangular Pillar (0.2 x 0.08) -->
+    <!-- Static Rectangular Pillar -->
     <model name="static_pillar">
       <static>true</static>
-      <pose>0.4 0.1 0.8 0 0 0.785</pose> <!-- Rotated 45 deg -->
+      <pose>0.45 0.15 0.7 0 0 0.785</pose> <!-- Rotated 45 deg -->
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.2 0.08 1.6</size></box></geometry>
+          <geometry><box><size>0.15 0.06 0.8</size></box></geometry>
           <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><box><size>0.2 0.08 1.6</size></box></geometry>
+          <geometry><box><size>0.15 0.06 0.8</size></box></geometry>
         </collision>
       </link>
     </model>
@@ -136,32 +136,32 @@
     <!-- Static Cylinder -->
     <model name="static_cylinder">
       <static>true</static>
-      <pose>0.5 -0.2 0.9 0 0 0</pose>
+      <pose>0.55 -0.25 0.7 0 0 0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><cylinder><radius>0.05</radius><length>1.8</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
           <material><ambient>0.1 0.1 0.8 1</ambient><diffuse>0.1 0.1 0.8 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.05</radius><length>1.8</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
         </collision>
       </link>
     </model>
 
     <!-- Oscillating Dynamic Cylinder (Prismatic) -->
     <model name="dynamic_cylinder">
-      <pose>0.45 0.3 0.8 0 0 0</pose>
+      <pose>0.50 0.35 0.7 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
           <inertia><ixx>0.01</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.01</iyy><iyz>0</iyz><izz>0.01</izz></inertia>
         </inertial>
         <visual name="visual">
-          <geometry><cylinder><radius>0.05</radius><length>1.6</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
           <material><ambient>0.8 0.8 0.2 1</ambient><diffuse>0.8 0.8 0.2 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.05</radius><length>1.6</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.03</radius><length>0.8</length></cylinder></geometry>
         </collision>
       </link>
 

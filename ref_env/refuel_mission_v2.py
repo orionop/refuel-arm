@@ -33,7 +33,11 @@ import tempfile
 import numpy as np # type: ignore
 
 # ── Path setup (Localized for ref_env) ──────────────────────────────
-# We now import directly from the local ref_env copies
+# Add project root so we can import stomp_collision.py from root
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 from ik_geometric import ( # type: ignore
     IK_spherical_2_parallel, fwd_kinematics, rot,
     IK_solve, KIN_UR5, KIN_KR6_R700
@@ -59,7 +63,7 @@ def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
     return np.radians(np.asarray(limits_deg, dtype=float))
 
 # Upright "Candle" home pose for KUKA
-Q_HOME     = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])  # Candle (singularity upright)
+Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.05
 
@@ -133,26 +137,18 @@ def ee_positions(trajectory, kin=None):
 # ── Realistic obstacles (Pillars, Cylinders, Walls) ─────────────
 
 def get_realistic_obstacles():
-    """Returns a list of realistic obstacles matching refuel_world_v2.sdf.
+    """Returns obstacles matching refuel_world_v2.sdf.
     Format: (type, center, dimensions, orientation)
-    Types: 'sphere', 'box', 'cylinder'
+    Uses proper box/cylinder geometry for stomp_collision_v2.
+    Coordinates are in base_link frame (Gazebo world Z minus 0.6m pedestal).
     """
-    # Coordinates are in base_link frame (Gazebo world Z minus 0.6m pedestal).
-    # Dimensions match refuel_world_v2.sdf after scale fix.
     obstacles = [
-        # Static Pillar (Box) — SDF pose Z=0.8, height 1.6m
-        ('box', np.array([0.4, 0.1, 0.2]), np.array([0.2, 0.08, 1.6]), 0.785),
-        # Static Cylinder — SDF pose Z=0.9, length 1.8m, radius 0.05
-        ('cylinder', np.array([0.5, -0.2, 0.3]), (0.05, 1.8), 0.0),
-        # Dynamic Cylinder (initial pose; oscillates along Y via oscillator.py)
-        # Planner uses worst-case envelope: center ± amplitude (0.35m) on Y
-        # SDF pose Z=0.8, length 1.6m, radius 0.05
-        ('cylinder', np.array([0.45, 0.3, 0.2]), (0.05, 1.6), 0.0),
-        # Fuel Flap (Box)
-        # Inlet is at SDF [0.62, 0.30, 1.10] → base_link [0.62, 0.30, 0.50]
-        # Flap is local pose [-0.05, 0.12, 0] relative to inlet.
-        # World pose approx [0.57, 0.42, 0.50]
-        ('box', np.array([0.57, 0.42, 0.50]), np.array([0.01, 0.15, 0.15]), -0.5),
+        # Static Pillar (Box) — SDF at [0.45, 0.15, 0.7], 0.15x0.06x0.8
+        ('box', np.array([0.45, 0.15, 0.1]), np.array([0.15, 0.06, 0.8]), 0.785),
+        # Static Cylinder — SDF at [0.55, -0.25, 0.7], r=0.03, h=0.8
+        ('cylinder', np.array([0.55, -0.25, 0.1]), (0.03, 0.8), 0.0),
+        # Dynamic Cylinder — SDF at [0.50, 0.35, 0.7], r=0.03, h=0.8
+        ('cylinder', np.array([0.50, 0.35, 0.1]), (0.03, 0.8), 0.0),
     ]
     return obstacles
 
@@ -201,7 +197,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
         q_start=q_start, q_goal=q_goal,
         joint_limits=limits_rad,
         simple_obstacles=obstacles or None,
-        n_waypoints=n_wp, n_iterations=45, n_rollouts=8,
+        n_waypoints=n_wp, n_iterations=100, n_rollouts=12,
         noise_stddev=0.08, w_smooth=20.0, w_vel=15.0,
         verbose=False, kin=kin,
     )
@@ -225,7 +221,7 @@ def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None)
         traj, _, stats = bubble_strip_deform(
             traj, obstacles,
             joint_limits=limits_rad,
-            n_iterations=60,
+            n_iterations=150,
             k_contraction=0.5, k_repulsion=30.0,
             rho_0=0.20, damping=0.85, verbose=False,
         )
