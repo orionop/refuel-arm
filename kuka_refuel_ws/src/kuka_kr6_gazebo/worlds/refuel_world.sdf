@@ -85,20 +85,36 @@
       </link>
     </model>
 
-    <!-- Static Obstacle 1: Pillar blocking the path -->
-    <model name="pillar_1">
-      <static>true</static>
-      <!-- Center Z is 0.40 since length is 0.80 (spans Z=0 to Z=0.80) -->
+    <!-- Dynamic Obstacle: Pillar on a slider joint oscillating along X-axis -->
+    <model name="dynamic_pillar">
+      <static>false</static>
       <pose>0.45 0.30 0.40 0 0 0</pose>
-      <link name="link">
+      <link name="pillar_link">
+        <inertial>
+          <mass>2.0</mass>
+          <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.01</izz></inertia>
+        </inertial>
         <visual name="visual">
           <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
-          <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
+          <material><ambient>0.8 0.5 0.1 1</ambient><diffuse>0.8 0.5 0.1 1</diffuse></material>
         </visual>
         <collision name="collision">
           <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
         </collision>
       </link>
+      <joint name="x_slider" type="prismatic">
+        <parent>world</parent>
+        <child>pillar_link</child>
+        <axis>
+          <xyz>1 0 0</xyz> <!-- Moves along X axis (away from the box) -->
+          <limit><lower>-5</lower><upper>5</upper></limit>
+          <dynamics><damping>0.1</damping></dynamics>
+        </axis>
+      </joint>
+      <plugin filename="gz-sim-joint-velocity-controller-system" name="gz::sim::systems::JointVelocityController">
+        <joint_name>x_slider</joint_name>
+        <initial_velocity>0</initial_velocity>
+      </plugin>
     </model>
 
   </world>
