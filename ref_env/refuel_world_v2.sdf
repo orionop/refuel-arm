@@ -49,12 +49,7 @@
       </link>
     </model>
 
-    <!-- Realistic SUV Model from Gazebo Fuel -->
-    <include>
-      <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/SUV</uri>
-      <name>target_vehicle</name>
-      <pose>1.5 0.3 0 0 0 1.5708</pose> <!-- Positioned so fuel port is roughly at X=0.62 -->
-    </include>
+    <!-- SUV removed — fuel inlet serves as floating target marker -->
 
     <!-- Refined Concave Socket (Industrial Grade) -->
     <!-- Positioned precisely where the nozzle must enter -->
@@ -126,14 +121,14 @@
     <!-- Static Rectangular Pillar (0.2 x 0.08) -->
     <model name="static_pillar">
       <static>true</static>
-      <pose>0.4 0.1 0.6 0 0 0.785</pose> <!-- Rotated 45 deg -->
+      <pose>0.4 0.1 0.8 0 0 0.785</pose> <!-- Rotated 45 deg -->
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.2 0.08 1.2</size></box></geometry>
+          <geometry><box><size>0.2 0.08 1.6</size></box></geometry>
           <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><box><size>0.2 0.08 1.2</size></box></geometry>
+          <geometry><box><size>0.2 0.08 1.6</size></box></geometry>
         </collision>
       </link>
     </model>
@@ -141,14 +136,14 @@
     <!-- Static Cylinder -->
     <model name="static_cylinder">
       <static>true</static>
-      <pose>0.5 -0.2 0.7 0 0 0</pose>
+      <pose>0.5 -0.2 0.9 0 0 0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><cylinder><radius>0.04</radius><length>1.4</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>1.8</length></cylinder></geometry>
           <material><ambient>0.1 0.1 0.8 1</ambient><diffuse>0.1 0.1 0.8 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.04</radius><length>1.4</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>1.8</length></cylinder></geometry>
         </collision>
       </link>
     </model>
@@ -162,11 +157,11 @@
           <inertia><ixx>0.01</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.01</iyy><iyz>0</iyz><izz>0.01</izz></inertia>
         </inertial>
         <visual name="visual">
-          <geometry><cylinder><radius>0.04</radius><length>1.2</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>1.6</length></cylinder></geometry>
           <material><ambient>0.8 0.8 0.2 1</ambient><diffuse>0.8 0.8 0.2 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.04</radius><length>1.2</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>1.6</length></cylinder></geometry>
         </collision>
       </link>
 

@@ -59,7 +59,7 @@ def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
     return np.radians(np.asarray(limits_deg, dtype=float))
 
 # Upright "Candle" home pose for KUKA
-Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
+Q_HOME     = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])  # Candle (singularity upright)
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.05
 
@@ -140,14 +140,14 @@ def get_realistic_obstacles():
     # Coordinates are in base_link frame (Gazebo world Z minus 0.6m pedestal).
     # Dimensions match refuel_world_v2.sdf after scale fix.
     obstacles = [
-        # Static Pillar (Box) — SDF pose Z=0.6, height 1.2m
-        ('box', np.array([0.4, 0.1, 0.0]), np.array([0.2, 0.08, 1.2]), 0.785),
-        # Static Cylinder — SDF pose Z=0.7, length 1.4m
-        ('cylinder', np.array([0.5, -0.2, 0.1]), (0.04, 1.4), 0.0),
+        # Static Pillar (Box) — SDF pose Z=0.8, height 1.6m
+        ('box', np.array([0.4, 0.1, 0.2]), np.array([0.2, 0.08, 1.6]), 0.785),
+        # Static Cylinder — SDF pose Z=0.9, length 1.8m, radius 0.05
+        ('cylinder', np.array([0.5, -0.2, 0.3]), (0.05, 1.8), 0.0),
         # Dynamic Cylinder (initial pose; oscillates along Y via oscillator.py)
         # Planner uses worst-case envelope: center ± amplitude (0.35m) on Y
-        # SDF pose Z=0.8, length 1.2m
-        ('cylinder', np.array([0.45, 0.3, 0.2]), (0.04, 1.2), 0.0),
+        # SDF pose Z=0.8, length 1.6m, radius 0.05
+        ('cylinder', np.array([0.45, 0.3, 0.2]), (0.05, 1.6), 0.0),
         # Fuel Flap (Box)
         # Inlet is at SDF [0.62, 0.30, 1.10] → base_link [0.62, 0.30, 0.50]
         # Flap is local pose [-0.05, 0.12, 0] relative to inlet.
