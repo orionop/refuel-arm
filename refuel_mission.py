@@ -639,8 +639,8 @@ def main():
     print("=" * 65)
 
     inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
-    # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
-    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
+    # Standoff of 45cm (starts at Y=0.05, enters mouth at Y=0.30, reaches base at Y=0.50)
+    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.45, robot=active_robot)
 
     print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (20cm Socket Base)")
     print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (5cm clear of mouth)")

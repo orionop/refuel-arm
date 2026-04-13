@@ -89,7 +89,7 @@
     <model name="dynamic_pillar">
       <static>false</static>
       <!-- Placed directly forward from the open face (-Y direction) -->
-      <pose>0.52 0.0 0.42 0 0 0</pose>
+      <pose>0.52 0.15 0.42 0 0 0</pose>
       <link name="pillar_link">
         <gravity>false</gravity>
         <inertial>
