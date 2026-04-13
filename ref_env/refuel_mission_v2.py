@@ -1,0 +1,783 @@
+#!/usr/bin/env python3
+"""
+KUKA KR6 R700 — Autonomous Refueling Mission
+==============================================
+
+Hybrid C-Space / W-Space 4-phase mission architecture:
+
+  Phase 1  HOME → Pre-approach     (C-Space: STOMP + Elastic Strips)
+  Phase 2  Pre-approach → Target   (W-Space: Cartesian straight-line + IK)
+  Phase 3  Target → Pre-approach   (W-Space: Cartesian straight-line + IK)
+  Phase 4  Pre-approach → HOME     (C-Space: STOMP + Elastic Strips)
+
+Random obstacles (blue spheres) are placed along the gross-motion path.
+STOMP + Elastic Strips avoid them. Fine insertion/extraction use Cartesian
+interpolation with fixed orientation to guarantee a straight-line nozzle path.
+
+Outputs two graphs:
+  - EE workspace trajectory (3D)
+  - Joint angle trajectories (degrees) over the full mission
+
+Run locally:   python3 refuel_mission.py
+Run in Gazebo: python3 refuel_mission.py --ros
+Run in RViz:   python3 refuel_mission.py --rviz
+
+ROS2 migration: ROS1 (rospy/actionlib) → ROS2 (rclpy/action)
+ROS1 version:   deprecated/refuel_mission.ros1.py
+"""
+import sys
+import os
+import time
+import argparse
+import tempfile
+import numpy as np # type: ignore
+
+# ── Path setup (Localized for ref_env) ──────────────────────────────
+# We now import directly from the local ref_env copies
+from ik_geometric import ( # type: ignore
+    IK_spherical_2_parallel, fwd_kinematics, rot,
+    IK_solve, KIN_UR5, KIN_KR6_R700
+)
+from stomp_collision_v2 import stomp_optimize # type: ignore
+from bubble_strips import bubble_strip_deform, set_kinematics as bs_set_kinematics # type: ignore
+from car_model_v2 import ( # type: ignore
+    get_inlet_pose, get_preapproach_pose, spawn_target_marker,
+    TARGET_XYZ_DEFAULT,
+)
+from tangent_bug import tangent_bug_optimize # type: ignore
+
+# ── KUKA default joint limits (backup) ──────────────────────────
+JOINT_LIMITS_DEFAULT = np.array([
+    [-170.0, 170.0], [-190.0, 45.0], [-120.0, 156.0],
+    [-185.0, 185.0], [-120.0, 120.0], [-350.0, 350.0]
+])
+# Legacy alias for internal functions
+JOINT_LIMITS = JOINT_LIMITS_DEFAULT
+
+def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
+    """Convert joint limits specified in degrees to radians (for clipping/cost)."""
+    return np.radians(np.asarray(limits_deg, dtype=float))
+
+# Upright "Candle" home pose for KUKA
+Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
+DWELL_TIME = 5.0
+OBS_RADIUS = 0.05
+
+
+# ── Utility ───────────────────────────────────────────────────────
+
+def within_joint_limits(q):
+    # Joint states are in radians; the stored limits are in degrees.
+    q_deg = np.degrees(q)
+    for i in range(6):
+        if q_deg[i] < JOINT_LIMITS[i, 0] or q_deg[i] > JOINT_LIMITS[i, 1]:
+            return False
+    return True
+
+
+def wrap_to_limits(q):
+    q_w = np.copy(q)
+    for i in range(6):
+        while q_w[i] > np.pi:
+            q_w[i] -= 2 * np.pi
+        while q_w[i] < -np.pi:
+            q_w[i] += 2 * np.pi
+    return q_w
+
+
+def delta_wrap(d):
+    """Wrap angular delta to [-pi, pi]."""
+    return (d + np.pi) % (2 * np.pi) - np.pi
+
+
+def filter_solutions(Q, q_current, limits=None):
+    """Filter IK solutions by joint limits and proximity to current configuration."""
+    if Q.size == 0:
+        return Q
+    if limits is None:
+        limits = JOINT_LIMITS
+    
+    # Cast to ndarray for linter
+    lims = np.asarray(limits)
+    Q_deg = np.degrees(Q)
+    valid_idx = []
+    for i in range(Q.shape[1]):
+        q = Q_deg[:, i]
+        in_limits = True
+        for j in range(6):
+            if q[j] < lims[j][0] or q[j] > lims[j][1]: # type: ignore
+                in_limits = False
+                break
+        if in_limits: # type: ignore
+            valid_idx.append(i) # type: ignore
+    
+    valid = Q[:, valid_idx] # type: ignore
+    
+    if valid.size > 0:
+        # Sort by distance to q_current
+        diff = valid - q_current[:, np.newaxis]
+        dist = np.linalg.norm(diff, axis=0) # type: ignore
+        valid = valid[:, np.argsort(dist)] # type: ignore
+    return valid
+
+
+def ee_positions(trajectory, kin=None):
+    """Compute EE XYZ for every waypoint."""
+    pts = np.zeros((len(trajectory), 3))
+    for i, q in enumerate(trajectory):
+        _, p = fwd_kinematics(q, kin=kin) # type: ignore
+        pts[i] = p
+    return pts
+
+
+# ── Realistic obstacles (Pillars, Cylinders, Walls) ─────────────
+
+def get_realistic_obstacles():
+    """Returns a list of realistic obstacles matching refuel_world_v2.sdf.
+    Format: (type, center, dimensions, orientation)
+    Types: 'sphere', 'box', 'cylinder'
+    """
+    obstacles = [
+        # Static Pillar (Box)
+        ('box', np.array([0.4, 0.1, 0.3]), np.array([0.2, 0.08, 0.6]), 0.785),
+        # Static Cylinder
+        ('cylinder', np.array([0.5, -0.2, 0.4]), (0.04, 0.8), 0.0),
+        # Dynamic Cylinder (initial pose; oscillates along Y via oscillator.py)
+        # Planner uses worst-case envelope: center ± amplitude (0.35m) on Y
+        ('cylinder', np.array([0.45, 0.3, 0.4]), (0.04, 0.6), 0.0),
+        # Fuel Flap (Box)
+        # Inlet is at [0.62, 0.30, 0.50]. Flap is local pose [-0.05, 0.12, 0] relative to inlet.
+        # World pose approx [0.57, 0.42, 0.50]
+        ('box', np.array([0.57, 0.42, 0.50]), np.array([0.01, 0.15, 0.15]), -0.5),
+    ]
+    return obstacles
+
+
+def spawn_obstacles_gazebo(obs_list, ros2_node):
+    """Realistic obstacles are already in refuel_world_v2.sdf. 
+    This function is now a no-op or used for dynamic markers if needed.
+    """
+    pass
+
+
+# ── Trajectory planning ──────────────────────────────────────────
+
+def smooth_trajectory(traj, window=5, passes=2, limits=None):
+    """Moving-average smoothing with pinned endpoints and joint-limit clamping.
+
+    Applies a centered moving average ``passes`` times. Start and end
+    waypoints are never modified so the trajectory still hits its goals.
+    """
+    if limits is None:
+        limits = JOINT_LIMITS
+    smoothed = traj.copy()
+    half = window // 2
+    for _ in range(passes):
+        buf = smoothed.copy()
+        for i in range(1, len(smoothed) - 1):
+            lo = max(0, i - half)
+            hi = min(len(smoothed), i + half + 1)
+            buf[i] = smoothed[lo:hi].mean(axis=0)
+        # Clamp to joint limits
+        for j in range(6):
+            buf[:, j] = np.clip(buf[:, j], limits[j][0], limits[j][1])
+        buf[0] = traj[0]
+        buf[-1] = traj[-1]
+        smoothed = buf
+    return smoothed
+
+
+def plan_stomp(q_start, q_goal, obstacles, name, n_wp=30, limits=None, kin=None):
+    """STOMP + Elastic Strips + post-smoothing with platform-specific limits."""
+    print(f"\n  Planning: {name}")
+    limits_deg = JOINT_LIMITS if limits is None else np.asarray(limits, dtype=float)
+    limits_rad = limits_deg_to_rad(limits_deg)
+        
+    traj = stomp_optimize(
+        q_start=q_start, q_goal=q_goal,
+        joint_limits=limits_rad,
+        simple_obstacles=obstacles or None,
+        n_waypoints=n_wp, n_iterations=100, n_rollouts=12,
+        noise_stddev=0.08, w_smooth=20.0, w_vel=15.0,
+        verbose=False, kin=kin,
+    )
+    diffs = np.diff(traj, axis=0)
+    max_jump = np.max(np.abs(diffs))
+    
+    # Check limits using dynamic limits
+    ok = True
+    for wp in traj:
+        wp_deg = np.degrees(wp)
+        for j in range(6):
+            if wp_deg[j] < limits_deg[j][0] or wp_deg[j] > limits_deg[j][1]: # type: ignore
+                ok = False
+                break
+        if not ok: break
+        
+    print(f"     STOMP: {n_wp} wp, max_jump={np.degrees(max_jump):.1f} deg, "
+          f"limits {'OK' if ok else 'VIOLATED'}")
+
+    if obstacles:
+        traj, _, stats = bubble_strip_deform(
+            traj, obstacles,
+            joint_limits=limits_rad,
+            n_iterations=150,
+            k_contraction=0.5, k_repulsion=30.0,
+            rho_0=0.20, damping=0.85, verbose=False,
+        )
+        print(f"     Bubble Strips: {stats['final_waypoints']} wp, "
+              f"min_rho={stats['final_min_clearance']:.4f}m")
+
+    traj = smooth_trajectory(traj, window=5, passes=2, limits=limits_rad)
+    diffs_post = np.diff(traj, axis=0)
+    max_jump_post = np.max(np.abs(diffs_post)) # type: ignore
+    print(f"     Smoothed: max_jump {np.degrees(max_jump):.1f} -> "
+          f"{np.degrees(max_jump_post):.1f} deg")
+    return traj
+
+
+def plan_cartesian(pos_start, pos_goal, R_fixed, q_seed, name, n_wp=20, kin=None):
+    """Straight-line Cartesian interpolation with IK at every point.
+    
+    Uses platform-specific IK_solve for UR5 or KUKA.
+    """
+    print(f"\n  Planning: {name} (Cartesian, {n_wp} wp)")
+    # Determine robot type from kin params if possible
+    is_ur5 = False
+    if kin is not None and hasattr(kin, 'get'):
+        # Check H1 axis orientation (UR5 is [0,0,1], KUKA is [0,0,-1])
+        h_matrix = np.asarray(kin.get('H'))
+        is_ur5 = h_matrix[2, 0] > 0
+    
+    active_bot = "ur5" if is_ur5 else "kuka"
+    traj = np.zeros((n_wp, 6))
+    history = [q_seed.copy()]
+    
+    for i in range(n_wp):
+        alpha = i / (n_wp - 1)
+        p_i = (1 - alpha) * pos_start + alpha * pos_goal
+        Q = IK_solve(R_fixed, p_i, robot=active_bot)
+        
+        # Safeguard limits
+        l_dict = kin.get('joint_limits', JOINT_LIMITS) if (kin is not None and hasattr(kin, 'get')) else JOINT_LIMITS # type: ignore
+        Q_valid = filter_solutions(Q, history[-1], limits=l_dict)
+        
+        if Q_valid.size == 0:
+            print(f"     WARNING: no IK at wp {i}, falling back to prev")
+            traj[i] = history[-1]
+        else:
+            traj[i] = Q_valid[:, 0]
+            history.append(traj[i])
+            if len(history) > 3:
+                history.pop(0)
+    
+    _, p_end = fwd_kinematics(traj[-1], kin=kin)
+    err = np.linalg.norm(p_end - pos_goal)
+    print(f"     Cartesian: {n_wp} wp, endpoint FK error: {err:.2e} m")
+    return traj
+
+
+def plan_fine(q_start, q_goal, n_wp=20):
+    """C-space linear interpolation for short precise motions."""
+    traj = np.zeros((n_wp, 6))
+    for i in range(n_wp):
+        alpha = i / (n_wp - 1)
+        traj[i] = (1 - alpha) * q_start + alpha * q_goal
+    return traj
+
+
+# ── ROS execution ─────────────────────────────────────────────────
+
+def _ensure_ros_path():
+    ros_python = '/opt/ros/jazzy/lib/python3/dist-packages'
+    if ros_python not in sys.path and os.path.isdir(ros_python):
+        sys.path.insert(0, ros_python)
+
+
+# ── Robot-specific ROS configuration ──────────────────────────────
+ROS_CONFIG = {
+    'kuka': {
+        'controller': '/kr6_arm_controller/follow_joint_trajectory',
+        'joint_names': [f'joint_{i}' for i in range(1, 7)],
+    },
+    'ur5': {
+        'controller': '/ur5_arm_controller/follow_joint_trajectory',
+        'joint_names': [
+            'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+            'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint',
+        ],
+    },
+}
+
+
+def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
+    """Send a joint trajectory via ROS2 FollowJointTrajectory action.
+
+    ROS1 equivalent used actionlib.SimpleActionClient + FollowJointTrajectoryGoal.
+    ROS2 uses rclpy.action.ActionClient (matches refuel_mission_commander.py pattern).
+    """
+    _ensure_ros_path()
+    import rclpy # type: ignore
+    from rclpy.action import ActionClient # type: ignore
+    from control_msgs.action import FollowJointTrajectory # type: ignore
+    from trajectory_msgs.msg import JointTrajectoryPoint # type: ignore
+    from builtin_interfaces.msg import Duration as BuiltinDuration # type: ignore
+
+    cfg    = ROS_CONFIG[robot]
+    client = ActionClient(_ROS_NODE, FollowJointTrajectory, cfg['controller'])
+    if not client.wait_for_server(timeout_sec=5.0):
+        print(f"  [send_trajectory_ros] Action server not available: {cfg['controller']}")
+        return None
+
+    goal_msg = FollowJointTrajectory.Goal()
+    goal_msg.trajectory.joint_names = cfg['joint_names']
+
+    for i, q in enumerate(trajectory):
+        pt = JointTrajectoryPoint()
+        pt.positions  = q.tolist()
+        pt.velocities = [0.0] * 6
+        t = i * dt
+        pt.time_from_start = BuiltinDuration(
+            sec=int(t),
+            nanosec=int((t % 1) * 1_000_000_000))
+        goal_msg.trajectory.points.append(pt)
+
+    send_future = client.send_goal_async(goal_msg)
+    rclpy.spin_until_future_complete(_ROS_NODE, send_future)
+    goal_handle = send_future.result()
+
+    if not goal_handle.accepted:
+        print("  [send_trajectory_ros] Goal rejected")
+        return None
+
+    result_future = goal_handle.get_result_async()
+    rclpy.spin_until_future_complete(_ROS_NODE, result_future)
+    return result_future.result().result
+
+
+_ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
+_ADMITTANCE_NODE = None
+
+def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
+    """Send trajectory through the admittance controller for force-compliant execution.
+
+    Used for fine insertion/extraction phases where contact forces must be
+    accommodated. The admittance node yields when external forces exceed
+    15N and aborts if they exceed 50N.
+
+    Returns True on success, False on abort.
+    """
+    global _ADMITTANCE_NODE
+    _ensure_ros_path()
+
+    if _ADMITTANCE_NODE is None:
+        # AdmittanceNode is now a proper rclpy.Node subclass — just instantiate it.
+        # rclpy.init() has already been called in main() before we get here.
+        from admittance_node import AdmittanceNode  # type: ignore
+        _ADMITTANCE_NODE = AdmittanceNode()
+        import time
+        time.sleep(0.5)  # Let subscribers connect
+
+    return _ADMITTANCE_NODE.execute_trajectory(trajectory, dt=dt)
+
+
+_RVIZ_PUB = None
+
+def send_trajectory_rviz(trajectory, dt=0.15, robot='kuka'):
+    """Publish joint states for RViz visualization (no Gazebo physics).
+
+    ROS1 used rospy.Publisher + rospy.Rate + rospy.Time.now().
+    ROS2 uses _ROS_NODE.create_publisher + time.sleep + node.get_clock().now().
+    """
+    global _RVIZ_PUB
+    _ensure_ros_path()
+    import time # type: ignore
+    from sensor_msgs.msg import JointState # type: ignore
+
+    if _RVIZ_PUB is None:
+        _RVIZ_PUB = _ROS_NODE.create_publisher(JointState, '/joint_states', 10)
+        time.sleep(0.5)
+
+    cfg = ROS_CONFIG[robot]
+    msg = JointState()
+    msg.name = cfg['joint_names']
+
+    for q in trajectory:
+        msg.header.stamp = _ROS_NODE.get_clock().now().to_msg()
+        msg.position     = q.tolist()
+        _RVIZ_PUB.publish(msg)
+        time.sleep(dt)
+
+    return True
+
+
+# ── RViz markers ──────────────────────────────────────────────────
+
+def publish_markers(target_xyz, obs_list, segments, kin=None):
+    _ensure_ros_path()
+    import time # type: ignore
+    from visualization_msgs.msg import Marker, MarkerArray # type: ignore
+    from geometry_msgs.msg import Point # type: ignore
+
+    pub = _ROS_NODE.create_publisher(MarkerArray, '/visualization_marker_array', 10)
+    time.sleep(0.5)
+    ma = MarkerArray()
+
+    # Green target
+    m = Marker()
+    m.header.frame_id = "world"; m.ns = "mission"; m.id = 1
+    m.type = Marker.CUBE; m.action = Marker.ADD # type: ignore
+    m.pose.position.x, m.pose.position.y, m.pose.position.z = target_xyz
+    m.pose.orientation.w = 1.0
+    m.scale.x = 0.06; m.scale.y = 0.06; m.scale.z = 0.06
+    m.color.r = 0.0; m.color.g = 0.9; m.color.b = 0.0; m.color.a = 1.0
+    ma.markers.append(m)
+
+    # Obstacles (multi-primitive format: type, center, dims, yaw)
+    for k, obs in enumerate(obs_list):
+        obs_type, center, dims, yaw = obs
+        m2 = Marker()
+        m2.header.frame_id = "world"; m2.ns = "mission"; m2.id = 10 + k
+        m2.pose.position.x, m2.pose.position.y, m2.pose.position.z = center
+        # Apply yaw rotation
+        m2.pose.orientation.z = float(np.sin(yaw / 2))
+        m2.pose.orientation.w = float(np.cos(yaw / 2))
+        if obs_type == 'box':
+            m2.type = Marker.CUBE; m2.action = Marker.ADD
+            m2.scale.x, m2.scale.y, m2.scale.z = float(dims[0]), float(dims[1]), float(dims[2])
+        elif obs_type == 'cylinder':
+            m2.type = Marker.CYLINDER; m2.action = Marker.ADD
+            m2.scale.x = m2.scale.y = float(dims[0]) * 2  # diameter
+            m2.scale.z = float(dims[1])  # height
+        elif obs_type == 'sphere':
+            m2.type = Marker.SPHERE; m2.action = Marker.ADD
+            m2.scale.x = m2.scale.y = m2.scale.z = float(dims) * 2
+        else:
+            continue
+        m2.color.r = 0.2; m2.color.g = 0.2; m2.color.b = 0.9; m2.color.a = 0.6
+        ma.markers.append(m2)
+
+    # Trajectory trace (white)
+    m_path = Marker()
+    m_path.header.frame_id = "world"; m_path.ns = "trajectory"; m_path.id = 100
+    m_path.type = Marker.LINE_STRIP; m_path.action = Marker.ADD # type: ignore
+    m_path.pose.orientation.w = 1.0
+    m_path.scale.x = 0.008
+    m_path.color.r = 1.0; m_path.color.g = 1.0; m_path.color.b = 1.0; m_path.color.a = 0.8
+    for label, traj, _ in segments:
+        if traj is not None:
+            for q in traj:
+                _, p = fwd_kinematics(q, kin=kin)
+                m_path.points.append(Point(x=p[0], y=p[1], z=p[2]))
+    ma.markers.append(m_path)
+
+    pub.publish(ma)
+
+
+# ── Graphs ────────────────────────────────────────────────────────
+
+def plot_trajectory_3d(all_traj, target_xyz, obs_list, save_path, kin=None):
+    """Plot 3D EE workspace trajectory with target and multi-primitive obstacles."""
+    import matplotlib # type: ignore
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt # type: ignore
+    from mpl_toolkits.mplot3d import Axes3D  # type: ignore # noqa: F401 — registers '3d' projection
+
+    pts = ee_positions(all_traj, kin=kin)
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot(pts[:, 0], pts[:, 1], pts[:, 2], 'k-', lw=1.5, label='EE Trajectory')
+    ax.scatter(*pts[0], color='blue', s=80, marker='^', label='HOME (start)', zorder=5)
+    ax.scatter(*target_xyz, color='green', s=100, marker='s', label='Target (refuel)', zorder=5)
+    ax.scatter(*pts[-1], color='blue', s=80, marker='v', label='HOME (return)', zorder=5)
+
+    # Draw multi-primitive obstacles
+    obs_colors = ['#cc3333', '#3366cc', '#cc9933', '#339966']
+    obs_labels = ['Pillar', 'Static Cyl', 'Dynamic Cyl', 'Fuel Flap']
+    for k, obs in enumerate(obs_list):
+        obs_type, center, dims, yaw = obs
+        c_color = obs_colors[k % len(obs_colors)]
+        lbl = obs_labels[k] if k < len(obs_labels) else f'Obstacle {k+1}'
+        if obs_type == 'box':
+            # Draw box center as scatter + wireframe approximation
+            ax.scatter(*center, color=c_color, s=60, marker='s', label=lbl, zorder=5)
+        elif obs_type == 'cylinder':
+            # Draw cylinder as stacked circles
+            radius, height = dims
+            theta = np.linspace(0, 2 * np.pi, 30)
+            z_cyl = np.linspace(center[2] - height/2, center[2] + height/2, 8)
+            for zz in z_cyl:
+                xs = center[0] + radius * np.cos(theta)
+                ys = center[1] + radius * np.sin(theta)
+                ax.plot(xs, ys, zz * np.ones_like(theta), color=c_color, alpha=0.3, lw=0.5)
+            ax.scatter(*center, color=c_color, s=60, marker='o', label=lbl, zorder=5)
+        elif obs_type == 'sphere':
+            u = np.linspace(0, 2 * np.pi, 20)
+            v = np.linspace(0, np.pi, 15)
+            r = dims
+            xs = center[0] + r * np.outer(np.cos(u), np.sin(v))
+            ys = center[1] + r * np.outer(np.sin(u), np.sin(v))
+            zs = center[2] + r * np.outer(np.ones_like(u), np.cos(v))
+            ax.plot_surface(xs, ys, zs, alpha=0.25, color=c_color)
+            ax.scatter(*center, color=c_color, s=40, marker='x', label=lbl, zorder=5)
+
+    ax.set_xlabel('X (m)')
+    ax.set_ylabel('Y (m)')
+    ax.set_zlabel('Z (m)')
+    ax.set_title('End-Effector Trajectory — IK-Geo + STOMP + Elastic Strips',
+                 fontweight='bold')
+    ax.legend(loc='upper left', fontsize=8)
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {save_path}")
+
+
+def plot_joint_angles(all_traj, save_path):
+    """Plot joint angles (degrees) over the full mission trajectory."""
+    import matplotlib # type: ignore
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt # type: ignore
+
+    n = len(all_traj)
+    angles_deg = np.degrees(all_traj)
+    waypoints = np.arange(n)
+
+    colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#a65628']
+    labels = [f'Joint {i+1}' for i in range(6)]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for j in range(6):
+        ax.plot(waypoints, angles_deg[:, j], color=colors[j], lw=1.5,
+                label=labels[j])
+
+    ax.set_xlabel('Waypoint Index')
+    ax.set_ylabel('Joint Angle (degrees)')
+    ax.set_title('Joint Angle Trajectories — Full Mission', fontweight='bold')
+    ax.legend(loc='best', fontsize=9, ncol=2)
+    ax.grid(True, alpha=0.3)
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {save_path}")
+
+
+# ── Main ──────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="KUKA KR6 R700 Autonomous Refueling Mission")
+    parser.add_argument("--ros", action="store_true",
+                        help="Execute on ROS Noetic + Gazebo")
+    parser.add_argument("--rviz", action="store_true",
+                        help="Visualise in RViz only (no Gazebo physics)")
+    parser.add_argument("--waypoints", type=int, default=30,
+                        help="Waypoints per coarse segment")
+    parser.add_argument("--target-x", type=float, default=TARGET_XYZ_DEFAULT[0])
+    parser.add_argument("--target-y", type=float, default=TARGET_XYZ_DEFAULT[1])
+    parser.add_argument("--target-z", type=float, default=TARGET_XYZ_DEFAULT[2])
+    parser.add_argument("--seed", type=int, default=None,
+                        help="Random seed for obstacle placement (default: random)")
+    parser.add_argument("--mirror-return", action="store_true",
+                        help="Return along the reversed approach path instead of re-planning")
+    parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5"],
+                        help="Target robot platform (default: kuka)")
+    parser.add_argument("--avoidance", type=str, default="bubble", choices=["bubble", "tangent", "none"],
+                        help="Collision avoidance algorithm (default: bubble)")
+    parser.add_argument("--compliant", action="store_true",
+                        help="Use admittance controller for fine insertion/extraction (UR5 only)")
+    args = parser.parse_args()
+
+    active_robot = args.robot.lower()
+    kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR6_R700
+    joint_limits_deg = np.asarray(
+        kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT), dtype=float
+    )
+    joint_limits_rad = limits_deg_to_rad(joint_limits_deg)
+
+    # Inject active platform parameters into bubble strips
+    bs_set_kinematics(kin_params, joint_limits_rad)
+
+    target_xyz = np.array([args.target_x, args.target_y, args.target_z])
+    n_wp = args.waypoints
+    rng = np.random.default_rng(args.seed)
+
+    print("=" * 65)
+    print(f"  {active_robot.upper()} — Autonomous Refueling Mission")
+    print("  IK-Geo + STOMP + Elastic Strips")
+    print("=" * 65)
+
+    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
+    # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
+    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
+
+    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (20cm Socket Base)")
+    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (5cm clear of mouth)")
+
+    print(f"\n[IK-Geo] Solving for {active_robot.upper()} target pose...")
+    Q_target = IK_solve(inlet_R, inlet_xyz, robot=active_robot)
+    Q_v_target = filter_solutions(Q_target, Q_HOME, limits=joint_limits_deg)
+    if Q_v_target.size == 0:
+        print(f"  No valid IK solution for {active_robot.upper()} Target!")
+        return
+    q_target = Q_v_target[:, 0]
+    
+    print(f"\n[IK-Geo] Solving for {active_robot.upper()} pre-approach pose...")
+    Q_pre = IK_solve(inlet_R, pre_xyz, robot=active_robot)
+    Q_v_pre = filter_solutions(Q_pre, Q_HOME, limits=joint_limits_deg)
+    if Q_v_pre.size == 0:
+        print(f"  No valid IK solution for {active_robot.upper()} Pre-approach!")
+        return
+    q_pre = Q_v_pre[:, 0]
+
+    _, p_chk = fwd_kinematics(q_target, kin=kin_params)
+    print(f"     Target Selected: {np.round(np.degrees(q_target), 1)} deg")
+    print(f"     Target FK error: {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
+
+    # ── Step 2: Blind STOMP to find the path, then place obstacle ─
+    print("\n[Obstacles] Loading realistic world obstacles...")
+    obs_list = get_realistic_obstacles()
+
+    # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
+    
+    # Phase 1: Gross Approach (C-Space)
+    if args.avoidance == "tangent":
+        seg_approach = tangent_bug_optimize(Q_HOME, q_pre, obs_list, max_steps=150, step_size=0.08, kin=kin_params)
+        print(f"     Tangent Bug: {len(seg_approach)} wp generated")
+    else:
+        seg_approach = plan_stomp(Q_HOME, q_pre, obs_list,
+                                  "Phase 1: HOME -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
+
+    # Phase 2: Fine Insertion (W-Space)
+    seg_insert = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
+                                q_pre, "Phase 2: Pre-approach -> Target", n_wp=20, kin=kin_params)
+                                
+    # Dwell at target
+    seg_dwell = plan_fine(q_target, q_target, n_wp=5)
+
+    # Phase 3: Fine Extraction (W-Space)
+    seg_extract = plan_cartesian(inlet_xyz, pre_xyz, inlet_R,
+                                 q_target, "Phase 3: Target -> Pre-approach", n_wp=20, kin=kin_params)
+
+    # Phase 4: Gross Return (C-Space)
+    if args.mirror_return:
+        seg_return = seg_approach[::-1].copy()
+        print(f"\n  Planning: Phase 4: Pre-approach -> HOME (mirrored approach)")
+        print(f"     Reversed approach trajectory ({len(seg_return)} wp)")
+    else:
+        if args.avoidance == "tangent":
+            seg_return = tangent_bug_optimize(q_pre, Q_HOME, obs_list, max_steps=150, step_size=0.08, kin=kin_params)
+            print(f"     Tangent Bug: {len(seg_return)} wp generated")
+        else:
+            seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
+                                    "Phase 4: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
+
+    # ── Step 4: Concatenate full trajectory for graphs ────────────
+    full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])
+
+    # compliant_phases: which segments use admittance control
+    use_compliant = args.compliant and active_robot == 'ur5'
+    segments = [
+        ("Gross Approach",  seg_approach, 0.15, False),
+        ("Fine Insertion",  seg_insert,   0.05, use_compliant),
+        ("Refueling",       None,         DWELL_TIME, False),
+        ("Fine Extraction", seg_extract,  0.05, use_compliant),
+        ("Gross Return",    seg_return,   0.15, False),
+    ]
+    if use_compliant:
+        print("\n[Admittance] Compliant mode ENABLED for fine insertion/extraction")
+
+    # ── Step 5: Spawn in Gazebo / RViz FIRST ──────────────────────
+    use_ros = args.ros or args.rviz
+    _oscillator_proc = None
+    if use_ros:
+        _ensure_ros_path()
+        import rclpy # type: ignore
+        import subprocess as _sp
+        global _ROS_NODE
+        rclpy.init()
+        _ROS_NODE = rclpy.create_node('refuel_mission')
+
+        if args.ros:
+            spawn_target_marker(target_xyz, ros2_node=_ROS_NODE)
+            spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
+            # Start dynamic cylinder oscillator as background process
+            _osc_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'oscillator.py')
+            _oscillator_proc = _sp.Popen(
+                [sys.executable, _osc_path],
+                stdout=_sp.DEVNULL, stderr=_sp.DEVNULL)
+            print("  Oscillator node started (dynamic cylinder)")
+
+        # publish_markers expects (label, traj, dt) tuples — strip compliant flag
+        markers_segments = [(l, t, d) for l, t, d, _ in segments]
+        publish_markers(target_xyz, obs_list, markers_segments, kin=kin_params)
+
+    # ── Step 6: Generate graphs ───────────────────────────────────
+    print("\n[Graphs]")
+    plot_trajectory_3d(full_traj, target_xyz, obs_list,
+                       "output_graphs/ee_trajectory_3d.png", kin=kin_params)
+    plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
+
+    # ── Step 7: Execute motion ────────────────────────────────────
+    if use_ros:
+        import time as _time  # ensure available regardless of ROS state
+        try:
+            for i, (label, traj, dt, compliant) in enumerate(segments, 1):
+                print(f"\n  Step {i}/{len(segments)}: {label}"
+                      f"{' [COMPLIANT]' if compliant else ''}")
+                if traj is None:
+                    print(f"     Refueling: holding for {dt:.0f}s...")
+                    _time.sleep(dt)  # ROS2: plain time.sleep replaces rospy.sleep
+                    print(f"     Dwell complete")
+                else:
+                    if compliant and args.ros:
+                        result = send_trajectory_compliant(traj, dt=dt, robot=active_robot)
+                        if not result:
+                            print(f"     ADMITTANCE ABORT — mission halted")
+                            break
+                    elif args.ros:
+                        result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
+                    else:
+                        result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
+                    print(f"     {'done' if result else 'timeout/fail'}")
+        finally:
+            # Stop oscillator subprocess
+            if _oscillator_proc is not None:
+                _oscillator_proc.terminate()
+                _oscillator_proc.wait(timeout=3)
+            # ROS2 cleanup — always shut down cleanly
+            if _ROS_NODE is not None:
+                _ROS_NODE.destroy_node()
+            import rclpy as _rclpy  # type: ignore
+            if _rclpy.ok():
+                _rclpy.shutdown()
+    else:
+        print(f"\n[Preview]")
+        total_wp_list = []
+        for i, (label, traj, dt, compliant) in enumerate(segments, 1):
+            if traj is None:
+                print(f"  Step {i}: {label} ({dt:.0f}s dwell)")
+            else:
+                # Local shadow for linter type-inference safety
+                t = traj
+                if t is not None:
+                    seg_len = int(len(t))
+                    total_wp_list.append(seg_len)
+                    mode_tag = " [COMPLIANT]" if compliant else ""
+                    print(f"  Step {i}: {label}{mode_tag}  ({seg_len} wp, dt={dt}s)")
+                    if seg_len > 0:
+                        print(f"           start={np.round(np.degrees(t[0]), 1)} deg")
+                        print(f"           end  ={np.round(np.degrees(t[-1]), 1)} deg")
+        print(f"\n  Total waypoints: {sum(total_wp_list)}")
+
+    print(f"\n{'=' * 65}")
+    print("  Mission complete!")
+    print(f"{'=' * 65}")
+
+
+if __name__ == "__main__":
+    main()
