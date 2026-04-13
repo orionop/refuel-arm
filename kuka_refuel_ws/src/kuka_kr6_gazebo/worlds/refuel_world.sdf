@@ -34,7 +34,7 @@
     <!-- Refined Concave Socket (Industrial Grade) -->
     <model name="hollow_refuel_inlet">
       <static>true</static>
-      <pose>0.52 0.30 0.50 0 0 0</pose>
+      <pose>0.52 0.30 0.50 0 0 1.5708</pose>
       <link name="inlet_body">
         <!-- Back Face (Goal) -->
         <visual name="back_visual">
