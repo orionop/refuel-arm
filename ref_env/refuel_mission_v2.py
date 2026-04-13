@@ -137,16 +137,20 @@ def get_realistic_obstacles():
     Format: (type, center, dimensions, orientation)
     Types: 'sphere', 'box', 'cylinder'
     """
+    # Coordinates are in base_link frame (Gazebo world Z minus 0.6m pedestal).
+    # Dimensions match refuel_world_v2.sdf after scale fix.
     obstacles = [
-        # Static Pillar (Box)
-        ('box', np.array([0.4, 0.1, 0.3]), np.array([0.2, 0.08, 0.6]), 0.785),
-        # Static Cylinder
-        ('cylinder', np.array([0.5, -0.2, 0.4]), (0.04, 0.8), 0.0),
+        # Static Pillar (Box) — SDF pose Z=0.6, height 1.2m
+        ('box', np.array([0.4, 0.1, 0.0]), np.array([0.2, 0.08, 1.2]), 0.785),
+        # Static Cylinder — SDF pose Z=0.7, length 1.4m
+        ('cylinder', np.array([0.5, -0.2, 0.1]), (0.04, 1.4), 0.0),
         # Dynamic Cylinder (initial pose; oscillates along Y via oscillator.py)
         # Planner uses worst-case envelope: center ± amplitude (0.35m) on Y
-        ('cylinder', np.array([0.45, 0.3, 0.4]), (0.04, 0.6), 0.0),
+        # SDF pose Z=0.8, length 1.2m
+        ('cylinder', np.array([0.45, 0.3, 0.2]), (0.04, 1.2), 0.0),
         # Fuel Flap (Box)
-        # Inlet is at [0.62, 0.30, 0.50]. Flap is local pose [-0.05, 0.12, 0] relative to inlet.
+        # Inlet is at SDF [0.62, 0.30, 1.10] → base_link [0.62, 0.30, 0.50]
+        # Flap is local pose [-0.05, 0.12, 0] relative to inlet.
         # World pose approx [0.57, 0.42, 0.50]
         ('box', np.array([0.57, 0.42, 0.50]), np.array([0.01, 0.15, 0.15]), -0.5),
     ]

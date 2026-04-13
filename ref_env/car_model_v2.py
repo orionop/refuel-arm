@@ -81,8 +81,10 @@ def spawn_target_marker(target_xyz, ros2_node=None):
         print("  [car_model] spawn_target_marker: ros2_node is required in ROS2 mode")
         return
 
-    # Gz Sim: spawn via ros_gz_sim create command
+    # target_xyz is in base_link frame; add pedestal height for Gazebo world frame
+    PEDESTAL_HEIGHT = 0.6
     x, y, z = float(target_xyz[0]), float(target_xyz[1]), float(target_xyz[2])
+    gz_z = z + PEDESTAL_HEIGHT  # Convert to world frame
 
     # Delete previous marker (silent fail on first run)
     subprocess.run(
@@ -95,13 +97,13 @@ def spawn_target_marker(target_xyz, ros2_node=None):
     )
 
     # Render exactly at target center (back of the hollow socket)
-    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=z)
+    sdf_str = TARGET_MARKER_SDF_TEMPLATE.format(x=x, y=y, z=gz_z)
 
     result = subprocess.run(
         ['ros2', 'run', 'ros_gz_sim', 'create',
          '-string', sdf_str,
          '-name', 'refuel_target',
-         '-x', str(x), '-y', str(y), '-z', str(z)],
+         '-x', str(x), '-y', str(y), '-z', str(gz_z)],
         capture_output=True, text=True, timeout=15,
     )
     if result.returncode == 0:

@@ -34,6 +34,21 @@
       </link>
     </model>
 
+    <!-- Robot Pedestal -->
+    <model name="robot_pedestal">
+      <static>true</static>
+      <pose>0 0 0.3 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.4 0.4 0.6</size></box></geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>0.4 0.4 0.6</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
     <!-- Realistic SUV Model from Gazebo Fuel -->
     <include>
       <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/SUV</uri>
@@ -45,7 +60,7 @@
     <!-- Positioned precisely where the nozzle must enter -->
     <model name="hollow_refuel_inlet">
       <static>true</static>
-      <pose>0.62 0.30 0.50 0 0 0</pose>
+      <pose>0.62 0.30 1.10 0 0 0</pose>
       <link name="inlet_body">
         <!-- Back Face (Goal) -->
         <visual name="back_visual">
@@ -111,14 +126,14 @@
     <!-- Static Rectangular Pillar (0.2 x 0.08) -->
     <model name="static_pillar">
       <static>true</static>
-      <pose>0.4 0.1 0.3 0 0 0.785</pose> <!-- Rotated 45 deg -->
+      <pose>0.4 0.1 0.6 0 0 0.785</pose> <!-- Rotated 45 deg -->
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.2 0.08 0.6</size></box></geometry>
+          <geometry><box><size>0.2 0.08 1.2</size></box></geometry>
           <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><box><size>0.2 0.08 0.6</size></box></geometry>
+          <geometry><box><size>0.2 0.08 1.2</size></box></geometry>
         </collision>
       </link>
     </model>
@@ -126,32 +141,32 @@
     <!-- Static Cylinder -->
     <model name="static_cylinder">
       <static>true</static>
-      <pose>0.5 -0.2 0.4 0 0 0</pose>
+      <pose>0.5 -0.2 0.7 0 0 0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><cylinder><radius>0.04</radius><length>0.8</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.04</radius><length>1.4</length></cylinder></geometry>
           <material><ambient>0.1 0.1 0.8 1</ambient><diffuse>0.1 0.1 0.8 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.04</radius><length>0.8</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.04</radius><length>1.4</length></cylinder></geometry>
         </collision>
       </link>
     </model>
 
     <!-- Oscillating Dynamic Cylinder (Prismatic) -->
     <model name="dynamic_cylinder">
-      <pose>0.45 0.3 0.4 0 0 0</pose>
+      <pose>0.45 0.3 0.8 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
           <inertia><ixx>0.01</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.01</iyy><iyz>0</iyz><izz>0.01</izz></inertia>
         </inertial>
         <visual name="visual">
-          <geometry><cylinder><radius>0.04</radius><length>0.6</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.04</radius><length>1.2</length></cylinder></geometry>
           <material><ambient>0.8 0.8 0.2 1</ambient><diffuse>0.8 0.8 0.2 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.04</radius><length>0.6</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.04</radius><length>1.2</length></cylinder></geometry>
         </collision>
       </link>
 
