@@ -85,10 +85,11 @@
       </link>
     </model>
 
-    <!-- Dynamic Obstacle: Pillar on a slider joint oscillating along X-axis -->
+    <!-- Dynamic Obstacle: Pillar oscillating strictly along the Y axis in front of the inlet -->
     <model name="dynamic_pillar">
       <static>false</static>
-      <pose>0.20 0.30 0.42 0 0 0</pose>
+      <!-- Placed directly forward from the open face (-Y direction) -->
+      <pose>0.52 0.0 0.42 0 0 0</pose>
       <link name="pillar_link">
         <gravity>false</gravity>
         <inertial>
@@ -103,18 +104,8 @@
           <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
         </collision>
       </link>
-      <joint name="x_slider" type="prismatic">
-        <parent>world</parent>
-        <child>pillar_link</child>
-        <axis>
-          <xyz>1 0 0</xyz> <!-- Moves along X axis (away from the box) -->
-          <limit><lower>-5</lower><upper>5</upper></limit>
-          <dynamics><damping>0.1</damping></dynamics>
-        </axis>
-      </joint>
-      <plugin filename="gz-sim-joint-velocity-controller-system" name="gz::sim::systems::JointVelocityController">
-        <joint_name>x_slider</joint_name>
-        <initial_velocity>0</initial_velocity>
+      <!-- Direct Velocity Control Plugin -->
+      <plugin filename="gz-sim-velocity-control-system" name="gz::sim::systems::VelocityControl">
       </plugin>
     </model>
 
