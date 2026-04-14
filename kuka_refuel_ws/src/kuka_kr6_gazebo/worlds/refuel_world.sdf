@@ -91,9 +91,9 @@
     <!-- Dynamic Pillar (Static for initial testing) -->
     <model name="dynamic_pillar">
       <static>true</static>
-      <!-- Shifted forward (+X to 0.42) and into the approach path (Y=0.10) -->
+      <!-- Shifted forward (+X to 0.45) and into the approach path (Y=0.10) -->
       <!-- Z=0.25 and length=0.50 means it touches ground (0) and reaches exactly up to the socket base (0.50) -->
-      <pose>0.42 0.10 0.25 0 0 0</pose>
+      <pose>0.45 0.10 0.25 0 0 0</pose>
       <link name="pillar_link">
         <gravity>false</gravity>
         <inertial>
