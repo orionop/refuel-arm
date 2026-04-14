@@ -31,83 +31,165 @@
       </link>
     </model>
 
-    <!-- Refined Concave Socket (Industrial Grade) -->
-    <model name="hollow_refuel_inlet">
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!--  FUEL DISPENSER — L-Shaped Wall (STATIC OBSTACLE)          -->
+    <!--                                                            -->
+    <!--  Top-down view (+X forward, +Y left):                      -->
+    <!--                                                            -->
+    <!--        ARM (0,0)                                           -->
+    <!--             \                                              -->
+    <!--              \   Leg B (overhang, blocks path to inlet)    -->
+    <!--               \   ┌─────────┐                              -->
+    <!--                \  │         │                              -->
+    <!--                 ──┤  Leg A  │  ← Grab point (inner face)  -->
+    <!--                   │ (back)  │                              -->
+    <!--                   └─────────┘                              -->
+    <!--                                                            -->
+    <!--  Model center: (0.40, -0.15, 0.0)                         -->
+    <!--  Leg A: main back wall, 0.20m(X) x 0.08m(Y) x 0.35m(Z)  -->
+    <!--  Leg B: overhang toward +Y, 0.08m(X) x 0.20m(Y) x 0.35m -->
+    <!--  Nozzle grab point ≈ world (0.40, -0.11, 0.30)           -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <model name="fuel_dispenser">
       <static>true</static>
-      <pose>0.52 0.60 0.50 0 0 1.5708</pose>
-      <link name="inlet_body">
-        <!-- Back Face (Goal) -->
-        <visual name="back_visual">
-          <pose>0.20 0 0 0 0 0</pose>
-          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
-          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      <pose>0.40 -0.15 0.0 0 0 0</pose>
+      <link name="dispenser_body">
+
+        <!-- Leg A: Main back wall (runs along X axis) -->
+        <visual name="leg_a_vis">
+          <pose>0 0 0.175 0 0 0</pose>
+          <geometry><box><size>0.20 0.08 0.35</size></box></geometry>
+          <material>
+            <ambient>0.15 0.35 0.65 1</ambient>
+            <diffuse>0.15 0.35 0.65 1</diffuse>
+          </material>
         </visual>
-        <collision name="back_collision">
-          <pose>0.20 0 0 0 0 0</pose>
-          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
+        <collision name="leg_a_col">
+          <pose>0 0 0.175 0 0 0</pose>
+          <geometry><box><size>0.20 0.08 0.35</size></box></geometry>
         </collision>
-        <!-- Surround Walls (20cm Deep) -->
-        <visual name="top_wall">
-          <pose>0.10 0 0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+
+        <!-- Leg B: Overhang extending toward inlet (+Y direction) -->
+        <!-- Flush with the +X outer edge of Leg A                 -->
+        <!-- Blocks the direct sweep path from dispenser to inlet  -->
+        <visual name="leg_b_vis">
+          <pose>0.06 0.14 0.175 0 0 0</pose>
+          <geometry><box><size>0.08 0.20 0.35</size></box></geometry>
+          <material>
+            <ambient>0.15 0.35 0.65 1</ambient>
+            <diffuse>0.15 0.35 0.65 1</diffuse>
+          </material>
         </visual>
-        <collision name="top_wall_col">
-          <pose>0.10 0 0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
+        <collision name="leg_b_col">
+          <pose>0.06 0.14 0.175 0 0 0</pose>
+          <geometry><box><size>0.08 0.20 0.35</size></box></geometry>
         </collision>
-        <visual name="bottom_wall">
-          <pose>0.10 0 -0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+
+        <!-- Small red marker: Nozzle grab point on inner face of Leg A -->
+        <visual name="nozzle_marker">
+          <pose>0 0.045 0.28 0 0 0</pose>
+          <geometry><sphere><radius>0.015</radius></sphere></geometry>
+          <material>
+            <ambient>0.9 0.1 0.1 1</ambient>
+            <diffuse>0.9 0.1 0.1 1</diffuse>
+          </material>
         </visual>
-        <collision name="bottom_wall_col">
-          <pose>0.10 0 -0.075 0 0 0</pose>
-          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
-        </collision>
-        <visual name="left_wall">
-          <pose>0.10 0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
-        </visual>
-        <collision name="left_wall_col">
-          <pose>0.10 0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-        </collision>
-        <visual name="right_wall">
-          <pose>0.10 -0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
-        </visual>
-        <collision name="right_wall_col">
-          <pose>0.10 -0.075 0 0 0 0</pose>
-          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
-        </collision>
-        <!-- Flap Removed as requested -->
+
       </link>
     </model>
 
-    <!-- Dynamic Pillar (Static for initial testing) -->
-    <model name="dynamic_pillar">
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!--  CAR FUEL INLET — Concave Socket (TARGET)                  -->
+    <!--                                                            -->
+    <!--  Located forward-left of the arm. The arm inserts the      -->
+    <!--  nozzle here. Rotated 90° so the opening faces the arm.    -->
+    <!--  Position: (0.45, 0.35, 0.40)                              -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <model name="car_fuel_inlet">
       <static>true</static>
-      <!-- Shifted LEFT (X=0.35) so arm can arc right to reach inlet at Y=0.60 -->
-      <!-- Lowered (Z=0.25) so it sits below the inlet height -->
-      <pose>0.35 0.30 0.25 0 0 0</pose>
-      <link name="pillar_link">
-        <gravity>false</gravity>
-        <inertial>
-          <mass>2.0</mass>
-          <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.01</izz></inertia>
-        </inertial>
-        <visual name="visual">
-          <geometry><cylinder><radius>0.05</radius><length>0.40</length></cylinder></geometry>
-          <material><ambient>0.8 0.5 0.1 1</ambient><diffuse>0.8 0.5 0.1 1</diffuse></material>
+      <pose>0.45 0.35 0.40 0 0 1.5708</pose>
+      <link name="inlet_body">
+        <!-- Back Face (Goal) -->
+        <visual name="back_visual">
+          <pose>0.12 0 0 0 0 0</pose>
+          <geometry><box><size>0.01 0.12 0.12</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
         </visual>
-        <collision name="collision">
-          <geometry><cylinder><radius>0.05</radius><length>0.40</length></cylinder></geometry>
+        <collision name="back_collision">
+          <pose>0.12 0 0 0 0 0</pose>
+          <geometry><box><size>0.01 0.12 0.12</size></box></geometry>
+        </collision>
+        <!-- Top wall -->
+        <visual name="top_wall">
+          <pose>0.06 0 0.06 0 0 0</pose>
+          <geometry><box><size>0.12 0.12 0.01</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="top_wall_col">
+          <pose>0.06 0 0.06 0 0 0</pose>
+          <geometry><box><size>0.12 0.12 0.01</size></box></geometry>
+        </collision>
+        <!-- Bottom wall -->
+        <visual name="bottom_wall">
+          <pose>0.06 0 -0.06 0 0 0</pose>
+          <geometry><box><size>0.12 0.12 0.01</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="bottom_wall_col">
+          <pose>0.06 0 -0.06 0 0 0</pose>
+          <geometry><box><size>0.12 0.12 0.01</size></box></geometry>
+        </collision>
+        <!-- Left wall -->
+        <visual name="left_wall">
+          <pose>0.06 0.06 0 0 0 0</pose>
+          <geometry><box><size>0.12 0.01 0.12</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="left_wall_col">
+          <pose>0.06 0.06 0 0 0 0</pose>
+          <geometry><box><size>0.12 0.01 0.12</size></box></geometry>
+        </collision>
+        <!-- Right wall -->
+        <visual name="right_wall">
+          <pose>0.06 -0.06 0 0 0 0</pose>
+          <geometry><box><size>0.12 0.01 0.12</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="right_wall_col">
+          <pose>0.06 -0.06 0 0 0 0</pose>
+          <geometry><box><size>0.12 0.01 0.12</size></box></geometry>
         </collision>
       </link>
-      <!-- Direct Velocity Control Plugin -->
+    </model>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!--  DYNAMIC OBSTACLE — Cylinder (Pedestrian / Debris)         -->
+    <!--                                                            -->
+    <!--  Sits in the workspace between arm and inlet.              -->
+    <!--  Controlled via ROS velocity commands for slow drift.      -->
+    <!--  Position: (0.30, 0.15, 0.0)  — between dispenser & inlet -->
+    <!--  Radius: 0.04m, Height: 0.25m (person-leg scale)          -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <model name="dynamic_obstacle">
+      <static>false</static>
+      <pose>0.30 0.15 0.125 0 0 0</pose>
+      <link name="cylinder_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>1.0</mass>
+          <inertia><ixx>0.01</ixx><iyy>0.01</iyy><izz>0.005</izz></inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.04</radius><length>0.25</length></cylinder></geometry>
+          <material>
+            <ambient>0.85 0.25 0.10 1</ambient>
+            <diffuse>0.85 0.25 0.10 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.04</radius><length>0.25</length></cylinder></geometry>
+        </collision>
+      </link>
       <plugin filename="gz-sim-velocity-control-system" name="gz::sim::systems::VelocityControl">
       </plugin>
     </model>
