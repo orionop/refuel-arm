@@ -419,6 +419,55 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
 
 _ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
 _ADMITTANCE_NODE = None
+LIVE_OBSTACLES   = []
+
+def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
+    """Executes the trajectory dynamically by reading LIVE_OBSTACLES and running Bubble Strips live.
+       Streams JointTrajectory messages to bypass the blocking ActionServer."""
+    _ensure_ros_path()
+    import time
+    from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint # type: ignore
+    from builtin_interfaces.msg import Duration # type: ignore
+    from bubble_strips import bubble_strip_deform # type: ignore
+    import rclpy # type: ignore
+
+    cfg = ROS_CONFIG[robot]
+    topic = f'/{robot}_arm_controller/joint_trajectory'
+    if robot == 'kuka': topic = '/kr6_arm_controller/joint_trajectory'
+    
+    pub = _ROS_NODE.create_publisher(JointTrajectory, topic, 10)
+    
+    active_band = traj.copy()
+    current_idx = 0
+    
+    print(f"     [Dynamic] Activated receding horizon execution...")
+    
+    while current_idx < len(active_band):
+        rclpy.spin_once(_ROS_NODE, timeout_sec=0.0)
+        
+        rem = len(active_band) - current_idx
+        # Deform remaining band if enough points remain to anchor it
+        if rem >= 5 and len(LIVE_OBSTACLES) > 0:
+            sub = active_band[current_idx:]
+            new_sub, _, _ = bubble_strip_deform(sub, LIVE_OBSTACLES, n_iterations=3, verbose=False)
+            active_band = np.vstack([active_band[:current_idx], new_sub])
+            
+        q_next = active_band[current_idx]
+        
+        msg = JointTrajectory()
+        msg.joint_names = cfg['joint_names']
+        pt = JointTrajectoryPoint()
+        pt.positions = q_next.tolist()
+        pt.velocities = [0.0] * 6
+        # Slight interpolation buffer for smooth motor control
+        pt.time_from_start = Duration(sec=0, nanosec=int(dt * 1e9 * 1.5)) 
+        msg.points.append(pt)
+        pub.publish(msg)
+        
+        current_idx += 1
+        time.sleep(dt)
+        
+    return True
 
 def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
     """Send trajectory through the admittance controller for force-compliant execution.
@@ -726,6 +775,14 @@ def main():
         rclpy.init()
         _ROS_NODE = rclpy.create_node('refuel_mission')
 
+        from geometry_msgs.msg import Point # type: ignore
+        def pillar_pose_cb(msg: Point):
+            global LIVE_OBSTACLES
+            # Pack as [x, y, z, radius] for bubble_strips format
+            LIVE_OBSTACLES = [[msg.x, msg.y, msg.z, 0.05]]
+            
+        _ROS_NODE.create_subscription(Point, '/dynamic_pillar/pose', pillar_pose_cb, 10)
+
         if args.ros:
             pass # Using physical socket baked into SDF
             spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
@@ -758,7 +815,11 @@ def main():
                             print(f"     ADMITTANCE ABORT — mission halted")
                             break
                     elif args.ros:
-                        result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
+                        if label == "Gross Approach" or label == "Gross Return":
+                            # Use live real-time Bubble Strips for these phases!
+                            result = execute_dynamic_receding_horizon(traj, dt=dt, robot=active_robot)
+                        else:
+                            result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
                     else:
                         result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
                     print(f"     {'done' if result else 'timeout/fail'}")
