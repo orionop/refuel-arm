@@ -674,8 +674,8 @@ def main():
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
     print("\n[Obstacles] Injecting static cylinder bounding box...")
-    # Cylinder position matching SDF: X=0.38, Y=0.10, Z=0.25, planning radius=0.10
-    obs_list = [(np.array([0.38, 0.10, 0.25]), 0.10)]
+    # Cylinder position matching SDF: X=0.60, Y=0.10, Z=0.25, planning radius=0.10
+    obs_list = [(np.array([0.60, 0.10, 0.25]), 0.10)]
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     

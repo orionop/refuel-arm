@@ -34,8 +34,8 @@
     <!-- Refined Concave Socket (Industrial Grade) -->
     <model name="hollow_refuel_inlet">
       <static>true</static>
-      <!-- Shifted RIGHT to Y=0.20 so the arm spawns on the relative LEFT -->
-      <pose>0.52 0.20 0.50 0 0 1.5708</pose>
+      <!-- Shifted RIGHT to Y=0.25 so the arm spawns slightly right (away from box) -->
+      <pose>0.52 0.25 0.50 0 0 1.5708</pose>
       <link name="inlet_body">
         <!-- Back Face (Goal) -->
         <visual name="back_visual">
@@ -91,9 +91,9 @@
     <!-- Dynamic Pillar (Static for initial testing) -->
     <model name="dynamic_pillar">
       <static>true</static>
-      <!-- Shifted opposite (+X -> 0.38) and into the approach path (Y=0.10) -->
+      <!-- Shifted opposite (+X -> 0.60) to the OTHER edge of the approach path -->
       <!-- Z=0.25 and length=0.50 means it touches ground (0) and reaches exactly up to the socket base (0.50) -->
-      <pose>0.38 0.10 0.25 0 0 0</pose>
+      <pose>0.60 0.10 0.25 0 0 0</pose>
       <link name="pillar_link">
         <gravity>false</gravity>
         <inertial>
