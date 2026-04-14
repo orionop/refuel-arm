@@ -53,8 +53,6 @@ JOINT_LIMITS_DEFAULT = np.array([
     [-170.0, 170.0], [-190.0, 45.0], [-120.0, 156.0],
     [-185.0, 185.0], [-120.0, 120.0], [-350.0, 350.0]
 ])
-# Mathematical bounds: TARGET_XYZ is the base of the socket.
-TARGET_XYZ_DEFAULT = [0.52, 0.80, 0.50]
 # Legacy alias for internal functions
 JOINT_LIMITS = JOINT_LIMITS_DEFAULT
 
@@ -421,94 +419,6 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
 
 _ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
 _ADMITTANCE_NODE = None
-# Safely initialize the environment to defend against the cylinder even if ROS topic drops
-import numpy as np
-LIVE_OBSTACLES   = [(np.array([0.35, 0.30, 0.25]), 0.10)]
-
-def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
-    """Executes the trajectory dynamically by reading LIVE_OBSTACLES and running Bubble Strips live.
-       Streams JointTrajectory messages to bypass the blocking ActionServer."""
-    _ensure_ros_path()
-    import time
-    from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint # type: ignore
-    from builtin_interfaces.msg import Duration # type: ignore
-    from bubble_strips import bubble_strip_deform # type: ignore
-    import rclpy # type: ignore
-
-    cfg = ROS_CONFIG[robot]
-    topic = f'/{robot}_arm_controller/joint_trajectory'
-    if robot == 'kuka': topic = '/kr6_arm_controller/joint_trajectory'
-    
-    pub = _ROS_NODE.create_publisher(JointTrajectory, topic, 10)
-    
-    active_band = traj.copy()
-    current_idx = 0
-    
-    print(f"     [Dynamic] Activated receding horizon execution...")
-    
-    # filter_solutions is defined locally in this file, NOT in ik_geometric
-    from ik_geometric import fwd_kinematics, IK_solve # type: ignore
-    
-    while current_idx < len(active_band):
-        rclpy.spin_once(_ROS_NODE, timeout_sec=0.0)
-        
-        # --- 1. Bubble Strips (PLANNING-TIME, NOT EXECUTION-TIME) ---
-        # For STATIC obstacles, avoidance is handled upstream by plan_stomp()
-        # which runs STOMP + bubble_strip_deform(150 iters) + smoothing.
-        # The trajectory arriving here is ALREADY collision-free.
-        #
-        # [COMMENTED OUT] Live per-tick Bubble deformation (too slow, crashes):
-        # rem = len(active_band) - current_idx
-        # if rem >= 5 and len(LIVE_OBSTACLES) > 0:
-        #     sub = active_band[current_idx:]
-        #     new_sub, _, _ = bubble_strip_deform(sub, LIVE_OBSTACLES, n_iterations=3, verbose=False)
-        #     active_band = np.vstack([active_band[:current_idx], new_sub])
-        
-        # [COMMENTED OUT] Tangent Bug Boundary Following:
-        # q_next = active_band[current_idx]
-        # is_following = False
-        # if len(LIVE_OBSTACLES) > 0:
-        #     kin_p = getattr(cfg, 'kin_params', KIN_KR6_R700)
-        #     _, base_p = fwd_kinematics(active_band[current_idx], kin=kin_p)
-        #     obs_center = LIVE_OBSTACLES[0][0]
-        #     dist_to_pillar_base = float(np.linalg.norm(base_p - obs_center))
-        #     if dist_to_pillar_base < 0.25:
-        #         is_following = True
-        #         q_executing = current_q if 'current_q' in locals() else active_band[max(0, current_idx-1)]
-        #         R_curr, p_curr = fwd_kinematics(q_executing, kin=kin_p)
-        #         dist_curr_to_obs = float(np.linalg.norm(p_curr - obs_center))
-        #         v_out = p_curr - obs_center
-        #         v_out[2] = 0.0
-        #         norm_out = np.linalg.norm(v_out)
-        #         if norm_out > 1e-4: v_out = v_out / norm_out
-        #         v_tangent = np.array([-v_out[1], v_out[0], 0.0])
-        #         step_size = 0.02
-        #         p_new = p_curr + v_tangent * step_size
-        #         Q_new = IK_solve(R_curr, p_new, robot=robot)
-        #         from math import radians
-        #         limits_rad = np.array([[-radians(170), radians(170)], [-radians(190), radians(45)], [-radians(120), radians(156)], [-radians(185), radians(185)], [-radians(120), radians(120)], [-radians(350), radians(350)]])
-        #         Q_v = filter_solutions(Q_new, q_executing, limits=limits_rad)
-        #         if Q_v.size > 0:
-        #             q_next = Q_v[:, 0]
-        #         else:
-        #             q_next = q_executing
-        
-        q_next = active_band[current_idx]
-        
-        # --- 2. Stream to robot ---
-        msg = JointTrajectory()
-        msg.joint_names = cfg['joint_names']
-        pt = JointTrajectoryPoint()
-        pt.positions = q_next.tolist()
-        pt.velocities = [0.0] * 6
-        pt.time_from_start = Duration(sec=0, nanosec=int(dt * 1e9 * 1.5)) 
-        msg.points.append(pt)
-        pub.publish(msg)
-        
-        current_idx += 1
-        time.sleep(dt)
-        
-    return True
 
 def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
     """Send trajectory through the admittance controller for force-compliant execution.
@@ -729,8 +639,8 @@ def main():
     print("=" * 65)
 
     inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
-    # Standoff of 45cm (starts at Y=0.05, enters mouth at Y=0.30, reaches base at Y=0.50)
-    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.45, robot=active_robot)
+    # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
+    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
 
     print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (20cm Socket Base)")
     print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (5cm clear of mouth)")
@@ -763,7 +673,7 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Injecting static bounding-box for cylinder...")
+    print("\n[Obstacles] Injecting static cylinder bounding box...")
     # Cylinder position matching SDF: X=0.35, Y=0.30, Z=0.25, planning radius=0.10
     obs_list = [(np.array([0.35, 0.30, 0.25]), 0.10)]
 
@@ -817,17 +727,8 @@ def main():
         rclpy.init()
         _ROS_NODE = rclpy.create_node('refuel_mission')
 
-        from geometry_msgs.msg import Point # type: ignore
-        def pillar_pose_cb(msg: Point):
-            global LIVE_OBSTACLES
-            # Pack as (center_array, radius) exactly matching Bubble Strips format
-            LIVE_OBSTACLES = [(np.array([msg.x, msg.y, msg.z]), 0.05)]
-            
-        _ROS_NODE.create_subscription(Point, '/dynamic_pillar/pose', pillar_pose_cb, 10)
-
         if args.ros:
             pass # Using physical socket baked into SDF
-            # [COMMENTED OUT] Sphere obstacles removed — using cylinder only
             # spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
 
         # publish_markers expects (label, traj, dt) tuples — strip compliant flag
@@ -858,11 +759,7 @@ def main():
                             print(f"     ADMITTANCE ABORT — mission halted")
                             break
                     elif args.ros:
-                        if label == "Gross Approach" or label == "Gross Return":
-                            # Use live real-time Bubble Strips for these phases!
-                            result = execute_dynamic_receding_horizon(traj, dt=dt, robot=active_robot)
-                        else:
-                            result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
+                        result = send_trajectory_ros(traj, dt=dt, robot=active_robot)
                     else:
                         result = send_trajectory_rviz(traj, dt=dt, robot=active_robot)
                     print(f"     {'done' if result else 'timeout/fail'}")
