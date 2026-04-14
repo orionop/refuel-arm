@@ -12,8 +12,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 from ik_geometric import rot
 
 # Target: Base of a 20cm-deep socket (Center X=0.62 + 0.10)
-# Shifted target rightward (Y=0.25) so the arm (at Y=0) spawns slightly more to the right.
-TARGET_XYZ_DEFAULT = np.array([0.52, 0.25, 0.50])
+# Shifted target rightward (Y=0.40) so the arm (at Y=0) spawns further to the right.
+TARGET_XYZ_DEFAULT = np.array([0.52, 0.40, 0.50])
 
 # EE orientation: tool axis pointing +Y (sideways into the socket)
 R_TOOL_INTO_CAR_KUKA = np.array([
