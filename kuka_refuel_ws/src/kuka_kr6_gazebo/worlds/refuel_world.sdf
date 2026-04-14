@@ -87,11 +87,12 @@
       </link>
     </model>
 
-    <!-- Dynamic Pillar (Controlled by ROS/Velocity Node) -->
+    <!-- Dynamic Pillar (Static for initial testing) -->
     <model name="dynamic_pillar">
-      <static>false</static>
-      <!-- Placed directly forward from the open face (-Y direction) -->
-      <pose>0.52 0.20 0.42 0 0 0</pose>
+      <static>true</static>
+      <!-- Shifted LEFT (X=0.35) so arm can arc right to reach inlet at Y=0.60 -->
+      <!-- Lowered (Z=0.25) so it sits below the inlet height -->
+      <pose>0.35 0.30 0.25 0 0 0</pose>
       <link name="pillar_link">
         <gravity>false</gravity>
         <inertial>
@@ -99,11 +100,11 @@
           <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.01</izz></inertia>
         </inertial>
         <visual name="visual">
-          <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>0.40</length></cylinder></geometry>
           <material><ambient>0.8 0.5 0.1 1</ambient><diffuse>0.8 0.5 0.1 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.05</radius><length>0.80</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>0.40</length></cylinder></geometry>
         </collision>
       </link>
       <!-- Direct Velocity Control Plugin -->
