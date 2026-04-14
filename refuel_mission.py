@@ -419,7 +419,9 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
 
 _ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
 _ADMITTANCE_NODE = None
-LIVE_OBSTACLES   = []
+# Safely initialize the environment to defend against the cylinder even if ROS topic drops
+import numpy as np
+LIVE_OBSTACLES   = [(np.array([0.52, -0.10, 0.42]), 0.10)]
 
 def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
     """Executes the trajectory dynamically by reading LIVE_OBSTACLES and running Bubble Strips live.
@@ -743,8 +745,9 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Testing bare environment (0 obstacles)...")
-    obs_list = []
+    print("\n[Obstacles] Injecting static bounding-box for dynamic pillar...")
+    # Base spawn location of the cylinder [X, Y, Z, R]
+    obs_list = [(np.array([0.52, -0.10, 0.42]), 0.10)]
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
