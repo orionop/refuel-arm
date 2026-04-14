@@ -31,5 +31,86 @@
       </link>
     </model>
 
+    <!-- Refined Concave Socket (Industrial Grade) -->
+    <model name="hollow_refuel_inlet">
+      <static>true</static>
+      <pose>0.52 0.60 0.50 0 0 1.5708</pose>
+      <link name="inlet_body">
+        <!-- Back Face (Goal) -->
+        <visual name="back_visual">
+          <pose>0.20 0 0 0 0 0</pose>
+          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+        <collision name="back_collision">
+          <pose>0.20 0 0 0 0 0</pose>
+          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
+        </collision>
+        <!-- Surround Walls (20cm Deep) -->
+        <visual name="top_wall">
+          <pose>0.10 0 0.075 0 0 0</pose>
+          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="top_wall_col">
+          <pose>0.10 0 0.075 0 0 0</pose>
+          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
+        </collision>
+        <visual name="bottom_wall">
+          <pose>0.10 0 -0.075 0 0 0</pose>
+          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="bottom_wall_col">
+          <pose>0.10 0 -0.075 0 0 0</pose>
+          <geometry><box><size>0.20 0.15 0.01</size></box></geometry>
+        </collision>
+        <visual name="left_wall">
+          <pose>0.10 0.075 0 0 0 0</pose>
+          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="left_wall_col">
+          <pose>0.10 0.075 0 0 0 0</pose>
+          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
+        </collision>
+        <visual name="right_wall">
+          <pose>0.10 -0.075 0 0 0 0</pose>
+          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.3 0.3 0.3 1</diffuse></material>
+        </visual>
+        <collision name="right_wall_col">
+          <pose>0.10 -0.075 0 0 0 0</pose>
+          <geometry><box><size>0.20 0.01 0.15</size></box></geometry>
+        </collision>
+        <!-- Flap Removed as requested -->
+      </link>
+    </model>
+
+    <!-- Dynamic Pillar (Static for initial testing) -->
+    <model name="dynamic_pillar">
+      <static>true</static>
+      <!-- Shifted LEFT (X=0.35) so arm can arc right to reach inlet at Y=0.60 -->
+      <!-- Lowered (Z=0.25) so it sits below the inlet height -->
+      <pose>0.35 0.30 0.25 0 0 0</pose>
+      <link name="pillar_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>2.0</mass>
+          <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.01</izz></inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.05</radius><length>0.40</length></cylinder></geometry>
+          <material><ambient>0.8 0.5 0.1 1</ambient><diffuse>0.8 0.5 0.1 1</diffuse></material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.05</radius><length>0.40</length></cylinder></geometry>
+        </collision>
+      </link>
+      <!-- Direct Velocity Control Plugin -->
+      <plugin filename="gz-sim-velocity-control-system" name="gz::sim::systems::VelocityControl">
+      </plugin>
+    </model>
+
   </world>
 </sdf>
