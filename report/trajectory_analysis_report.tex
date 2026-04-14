@@ -454,57 +454,56 @@ Solving the inverse kinematics and generating global paths is only half the batt
 \end{itemize}
 
 \vspace{0.4cm}
-{\large\textbf{2. 6-DOF Newtonian Reactivity (Elastic Strips)}}
+{\large\textbf{2. Local Deformation (Bubble Strips Engine)}}
 
-During the delicate Phase 2 and Phase 3 (Cartesian tracking), the arm is highly constrained. To provide dynamic, real-time safety without abandoning the straight-line fuel port trajectory, a \textbf{Multi-Dimensional Elastic Strips} engine was integrated into the pipeline.
+To provide mathematically guaranteed safety while retaining trajectory efficiency, a \textbf{Configuration-Space Bubble Strips} engine actively processes the global paths.
 
 \begin{itemize}
-    \item \textbf{The Concept:} The pre-planned Cartesian trajectory is treated mathematically like a tensioned rubber band.
-    \item \textbf{Repulsive Forces:} If a dynamic obstacle encroaches on the workspace, it generates a repulsive Newtonian force against the arm's specific physical links based on proximity.
-    \item \textbf{Jacobian Transpose ($J^T$) Mapping:} These 3D Cartesian forces are instantaneously mapped backward into 6D joint-torques using the manipulator's active Jacobian Transpose ($J^T$).
-    \item \textbf{Real-Time Deflection:} The mathematical "rubber band" deforms, allowing the robot's elbow or shoulder to smoothly bow outward to dodge the obstacle while the end-effector (nozzle) remains perfectly locked onto the straight-line insertion path. Once the obstacle clears, the "tension" snaps the arm back to its optimal resting posture.
+    \item \textbf{Free-Space Bubbles:} The algorithm defines "Bubbles" at every waypoint—hyper-spheres in C-space within which the manipulator is guaranteed to be collision-free. 
+    \item \textbf{Internal Contraction Field:} The trajectory is subjected to an internal normalized potential field, attempting to pull adjacent waypoints into a direct line to maximize geometric efficiency.
+    \item \textbf{External Repulsion Field:} Obstacles generate a strict repulsive Artificial Potential Field (APF). Utilizing a centralized finite-difference method, geometric clearance gradients are calculated directly in C-Space without relying on associative mappings.
+    \item \textbf{Equilibrium Deformation:} The trajectory mathematically deforms by sliding internal waypoints along the resultant generalized force vectors until the contraction and repulsion fields reach equilibrium, wrapping tightly around the external boundary without inducing collision.
 \end{itemize}
 
 \vspace{0.6cm}
-{\Large\textbf{Mathematical Modeling of Obstacle Avoidance Logic}}
+{\Large\textbf{Mathematical Modeling of Bubble Strips Avoidance Logic}}
 
-The core innovation of the Elastic Strips layer is the use of **Newtonian Force Equilibrium** to refine a pre-planned trajectory in real-time. We treat the path as a deformable string subjected to two competing virtual forces:
+The core innovation of the Bubble Strips layer is the equilibrium between two competing Artificial Potential Fields applied directly across the discretized joint-space path:
 
 \vspace{0.2cm}
 
-\textbf{1. The Internal Contraction Force ($F_{\text{int}}$)}
-To keep the trajectory tight and eliminate unnecessary "slack" or movement, we implement a restorative spring force. Mathematically, this is a **Discrete Laplacian Operator** that connects each waypoint to its immediate neighbors:
+\textbf{1. The Normalized Contraction Force ($F_{\text{int}}$)}
+To eliminate unnecessary trajectory slack and maximize geometric efficiency, a restorative internal field is applied. Instead of a standard quadratic field which can over-compress points, we utilize a \textbf{Normalized Discrete Laplacian Operator} that connects each waypoint to its immediate neighbors:
 \begin{equation}
-    F_{\text{int}} = k_{c} \cdot (q_{i-1} + q_{i+1} - 2q_{i})
+    F_{\text{int}} = k_{c} \left( \frac{q_{i-1} - q_i}{\|q_{i-1} - q_i\|} + \frac{q_{i+1} - q_i}{\|q_{i+1} - q_i\|} \right)
 \end{equation}
 where $k_{c}$ is the contraction gain and $q_{i}$ represents the joint configuration at waypoint $i$. 
-\textit{Logic: If a waypoint deviates from a straight line between its neighbors, this force "pulls" it back toward the local mean, naturally smoothing the trajectory.}
+\textit{Logic: This enforces uniform directional tension independently of waypoint spacing, ensuring the trajectory symmetrically tautens without arbitrarily collapsing waypoint distribution patterns.}
 
 \vspace{0.3cm}
 
-\textbf{2. The External Repulsive Force ($F_{\text{ext}}$)}
-To maintain a safe clearance around obstacles (like the car chassis or fuel inlet edges), we implement a **Quadratic Potential Field**. The repulsion force is only active within a defined safety margin $\mathcal{M}$:
+\textbf{2. The C-Space Repulsive Artificial Field ($F_{\text{ext}}$)}
+To maintain a strict collision-free boundary around obstacles (like the static cylinder), we implement a localized \textbf{Linear Artificial Potential Field (APF)}. The repulsion force activates exclusively when the clearance distance inside a local Free-Space Bubble ($\rho$) drops below the predefined minimum safety threshold ($\rho_0$):
 \begin{equation}
-    F_{\text{ext}} = \begin{cases} k_{r} \cdot \left( \frac{\mathcal{M} - d}{\mathcal{M}} \right)^2 \cdot \hat{n} & \text{if } d < \mathcal{M} \\ 0 & \text{if } d \geq \mathcal{M} \end{cases}
+    F_{\text{ext}} = \begin{cases} k_{r} \cdot (\rho_0 - \rho) \cdot \nabla \rho(q) & \text{if } \rho < \rho_0 \\ 0 & \text{if } \rho \geq \rho_0 \end{cases}
 \end{equation}
-where $d$ is the Euclidean distance to the obstacle and $\hat{n}$ is the unit vector pointing toward the robot.
-\textit{Logic: This creates a virtual "pressure" that grows exponentially as the robot approaches an object, forcing the arm to deflect away from potential collisions.}
+where $k_r$ is the repulsive gain. Crucially, the clearance gradient $\nabla \rho(q)$ is computed natively in C-Space using central finite differences:
+\begin{equation}
+\nabla \rho(q_j) = \frac{\rho(q_j + h) - \rho(q_j - h)}{2h}
+\end{equation}
+\textit{Logic: Rather than mapping workspace forces through a Jacobian torque mechanism, this finite-difference evaluation empirically measures the joint-space geometric gradient, ensuring the force vector directly nudges the exact 6-DOF configuration away from collision.}
 
 \vspace{0.3cm}
 
-\textbf{3. The Force-to-Torque Mapping (Jacobian Transpose $J^T$)}
-Because the robot moves in Joint Space ($\theta$) but forces exist in Workspace ($X, Y, Z$), we must bridge the two realms. We use the **Principle of Virtual Work** to map these 3D forces into 6-DOF joint torques ($\tau$):
-\begin{equation}
-    \tau_{\text{total}} = J^{T} \cdot (F_{\text{int}} + F_{\text{ext}})
-\end{equation}
-The resulting joint-displacement $\Delta q$ is what the KUKA motors actually execute. 
+\textbf{3. Kinematic Leverage Integration}
+Because physical link lengths exaggerate minimal basal joint movements at the end-effector, the module calculates specific \textbf{Lever Arms} ($L_j$) representing the maximum workspace displacement per radian of rotation for each specific joint. These kinematic scalars systematically bound the displacement definitions of the bubbles, mathematically guaranteeing that overlapped C-Space bubbles never physically violate continuous free-space overlap.
 
 \vspace{0.4cm}
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{elastic.png}
-\caption{Force Equilibrium in Elastic Strips: The competition between the restorative "Pull" of internal tension and the proactive "Push" of obstacle repulsion achieves a safe, high-clearance trajectory equilibrium.}
+\caption{Equilibrium via Bubble Strips: The continuous competition between the restorative Normalized Contraction Fields and the proactive C-Space Repulsion Gradients achieves a rigid, high-clearance trajectory equilibrium.}
 \end{figure}
 
 \vspace{0.4cm}
@@ -515,38 +514,32 @@ This tri-layered combination---Algebraic Inversion (IK-Geo) for exactness, Stoch
 % PAGE 9: Simplified Logical Overview
 % ═══════════════════════════════════════════════════════════════
 
-{\Large\textbf{Simplified Logical Overview of Force Dynamics}}
+{\Large\textbf{Detailed Algorithmic Mechanics of Bubble Strips}}
 
-For the purpose of a final mission defense, we can visualize the complex mathematics of the Elastic Strips layer using two simple physical analogies: **The Rubber Band** and **The Magnetic Bumper**.
+For the purpose of a formal analytical defense, we can break down the explicit physics of the Bubble Strips engine into two interconnected mechanisms:
 
 \vspace{0.6cm}
 
-\textbf{1. The Rubber Band (Internal Force $F_{\text{int}}$)}
-Imagine the robot's pre-planned path is a physical rubber band stretched between the start and the goal. 
+\textbf{1. Algorithmic Free-Space Analysis (The Bubbles)}
+For every waypoint generated by STOMP, the algorithm calculates the exact Euclidean distance from the manipulator's geometry to the nearest localized obstacle. It analytically establishes a "Bubble" (a generalized hyper-sphere of guaranteed collision-free space) precisely centered on that configuration, where the radius ($\rho$) is equivalent to the distance to the obstacle boundary. 
 \begin{itemize}
-    \item \textbf{High Tension:} The band naturally wants to be a tight, straight line. Any "slack" or unnecessary curves are pulled inward.
-    \item \textbf{Smoothing Effect:} This force ensures that the robot's path is the most efficient possible. It prevents the joints from "wandering" or making large, erratic sweeps that waste energy.
-    \item \textbf{Logic:} This is the **"Efficiency Force"** that keeps the movement fluid and professional.
+    \item \textbf{Intersection Principle:} As long as adjacent bubbles naturally overlap across the Configuration Space, the physical robotic links can safely transition between them without requiring granular sub-millimeter collision integration.
+    \item \textbf{Explicit Padding Inflation:} To provide absolute mechanical protection against dynamic noise, the bounding geometry of obstacles is hyper-inflated inside the analytical module (e.g., manually appending a $+0.05$m planning radius). Therefore, even when the theoretical mathematical bubble boundary precisely intersects the obstacle equation, the physical manipulator maintains a strict geometric buffer margin.
 \end{itemize}
 
 \vspace{0.6cm}
 
-\textbf{2. The Magnetic Bumper (External Force $F_{\text{ext}}$)}
-Imagine every obstacle (the car door, the fuel port edge) is covered in a powerful magnet that has the same polarity as the robot's arm.
+\textbf{2. Dynamic Resampling and Equilibrium Integration}
+The solver operates iteratively over 150 closed-loop cycles to resolve the tension equilibrium between the internal contraction and external repulsion vectors.
 \begin{itemize}
-    \item \textbf{Invisible Cushion:} The arm doesn't have to touch the obstacle to feel the effect. There is an invisible "safety cushion" (the 20cm margin $\mathcal{M}$).
-    \item \textbf{The Quadratic Effect:} The closer the arm gets, the "harder" the invisible wall becomes. It doesn't just push back gently; it pushes back with **exponentially increasing strength** the deeper you go into the cushion. 
-    \item \textbf{Logic:} This is the **"Safety Force"** that guarantees the robot never touches the car, even if the mission path tries to go through it.
+    \item \textbf{Algorithmic Decimation:} When the sequence of bubbles analyzes a clear, unobstructed topology, the Laplacian contraction fields snap the trajectory into global optimality, actively destroying redundant interpolative waypoints (e.g., sequentially decimating 30 raw STOMP waypoints into 5 optimal trajectory nodes).
+    \item \textbf{Midpoint Trajectory Insertion:} Conversely, if the contraction field stretches the trajectory over a severe repulsive obstacle gradient—forcing consecutive bubbles to lose fundamental intersection—the algorithm automatically synthesizes a new kinematic midpoint. This constraint guarantees the sequence never bridges a dangerous mathematical blind-spot.
 \end{itemize}
 
 \vspace{0.6cm}
 
-\textbf{The Natural Equilibrium: The "Sweet Spot"}
-The final movement we see in the simulation is the **Equilibrium**. It is the "Sweet Spot" where:
-\begin{center}
-    \textbf{Internal Pull (Efficiency) = External Push (Safety)}
-\end{center}
-The robot's arm "bows" outward to dodge the car door because the Magnetic Bumper is pushing it, but it doesn't fly infinitely far away because the Rubber Band is pulling it back toward the goal. This balance ensures the KUKA KR6 is always **Fast, Safe, and Precise**.
+\textbf{The Final Analytical Equilibrium}
+The output trajectory represents the statically resolved equilibrium state where the internal \textit{Normalized Contraction Flow} explicitly nullifies the external \textit{Repulsive APF Gradient}. The manipulator iteratively bows its combined joint angles outward around the kinematic boundary to the exact mathematical minimum necessary, resolving supreme joint-level efficiency without penetrating constraint envelopes.
 
 \clearpage
 
