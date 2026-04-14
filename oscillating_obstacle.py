@@ -20,9 +20,9 @@ class OscillatingBroadcaster(Node):
         # Velocity amplitude and frequency (slower, smoother)
         vel = 0.15 * math.sin(t * 1.0) 
         
-        # Position math: y(t) = 0.05 - 0.15 * cos(1.0*t)
-        # Bounded perfectly between [-0.10, 0.20]. Leaves 10cm absolute safety from the 0.30 box face.
-        y_pos = 0.05 - 0.15 * math.cos(t * 1.0)
+        # Position math: y(t) = 0.35 - 0.15 * cos(1.0*t)
+        # Bounded perfectly between [0.20, 0.50]. Leaves 10cm absolute safety from the 0.60 box face.
+        y_pos = 0.35 - 0.15 * math.cos(t * 1.0)
         
         # 1. Publish to ROS 2 for Python Algorithms
         msg = Point()

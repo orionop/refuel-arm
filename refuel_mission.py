@@ -53,6 +53,8 @@ JOINT_LIMITS_DEFAULT = np.array([
     [-170.0, 170.0], [-190.0, 45.0], [-120.0, 156.0],
     [-185.0, 185.0], [-120.0, 120.0], [-350.0, 350.0]
 ])
+# Mathematical bounds: TARGET_XYZ is the base of the socket.
+TARGET_XYZ_DEFAULT = [0.52, 0.80, 0.50]
 # Legacy alias for internal functions
 JOINT_LIMITS = JOINT_LIMITS_DEFAULT
 
@@ -421,7 +423,7 @@ _ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
 _ADMITTANCE_NODE = None
 # Safely initialize the environment to defend against the cylinder even if ROS topic drops
 import numpy as np
-LIVE_OBSTACLES   = [(np.array([0.52, -0.10, 0.42]), 0.10)]
+LIVE_OBSTACLES   = [(np.array([0.52, 0.20, 0.42]), 0.10)]
 
 def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
     """Executes the trajectory dynamically by reading LIVE_OBSTACLES and running Bubble Strips live.
@@ -747,7 +749,7 @@ def main():
 
     print("\n[Obstacles] Injecting static bounding-box for dynamic pillar...")
     # Base spawn location of the cylinder [X, Y, Z, R]
-    obs_list = [(np.array([0.52, -0.10, 0.42]), 0.10)]
+    obs_list = [(np.array([0.52, 0.20, 0.42]), 0.10)]
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
