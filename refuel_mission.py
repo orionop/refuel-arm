@@ -446,38 +446,70 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
     
     print(f"     [Dynamic] Activated receding horizon execution...")
     
+    from ik_geometric import fwd_kinematics, IK_solve, filter_solutions # type: ignore
+    
     while current_idx < len(active_band):
         rclpy.spin_once(_ROS_NODE, timeout_sec=0.0)
         
         # --- 1. Bubble Strips Deform ---
-        rem = len(active_band) - current_idx
-        if rem >= 5 and len(LIVE_OBSTACLES) > 0:
-            sub = active_band[current_idx:]
-            new_sub, _, _ = bubble_strip_deform(sub, LIVE_OBSTACLES, n_iterations=3, verbose=False)
-            active_band = np.vstack([active_band[:current_idx], new_sub])
+        # [COMMENTED OUT FOR TANGENT BUG IMPLEMENTATION]
+        # rem = len(active_band) - current_idx
+        # if rem >= 5 and len(LIVE_OBSTACLES) > 0:
+        #     sub = active_band[current_idx:]
+        #     from bubble_strips import bubble_strip_deform # type: ignore
+        #     new_sub, _, _ = bubble_strip_deform(sub, LIVE_OBSTACLES, n_iterations=3, verbose=False)
+        #     active_band = np.vstack([active_band[:current_idx], new_sub])
             
-        q_next = active_band[current_idx]
+        q_target_base = active_band[current_idx]
         
-        # --- 2. Live Safety Freeze Override ---
-        frozen = False
+        # --- 2. Live Tangent Bug (Boundary Following) ---
+        q_next = q_target_base
+        is_following = False
+        
         if len(LIVE_OBSTACLES) > 0:
-            from ik_geometric import fwd_kinematics
-            _, p_chk = fwd_kinematics(q_next, kin=cfg['kin_params'] if 'kin_params' in cfg else KIN_KR6_R700)
+            kin_p = getattr(cfg, 'kin_params', KIN_KR6_R700)
+            R_chk, p_chk = fwd_kinematics(q_target_base, kin=kin_p)
             
-            # Distance from tool-tip to the cylinder center
             obs_center = LIVE_OBSTACLES[0][0]
             dist_to_pillar = float(np.linalg.norm(p_chk - obs_center))
             
-            # Physical safety bubble of 25cm in Workspace
             if dist_to_pillar < 0.25:
-                # FREEZE: Arm waits until pillar swings away!
-                frozen = True
-                print(f"      [Safety] Threat detected ({dist_to_pillar:.2f}m) -> HOLDING POSITION")
-                # Send the PREVIOUS safe point (or current if at start)
-                q_next = active_band[max(0, current_idx - 1)]
-                # Do NOT increment current_idx!
+                # Tangent Bug Boundary Following Mode!
+                is_following = True
+                print(f"      [Tangent Bug] Boundary Following activated ({dist_to_pillar:.2f}m)...")
+                
+                # 1. Vector from Obstacle to End-Effector
+                v_out = p_chk - obs_center
+                v_out[2] = 0.0 # Restrict strictly to XY plane
+                norm_out = np.linalg.norm(v_out)
+                if norm_out > 1e-4:
+                    v_out = v_out / norm_out
+                
+                # 2. Tangent Vector (Cross Product for Counter-Clockwise contour)
+                v_tangent = np.array([-v_out[1], v_out[0], 0.0])
+                
+                # 3. W-Space Step
+                step_size = 0.03 # 3cm evasion steps
+                p_new = p_chk + v_tangent * step_size
+                
+                # 4. Map back to C-Space using IK-Geo
+                Q_new = IK_solve(R_chk, p_new, robot=robot)
+                # We need joint limits to filter
+                from math import radians
+                limits_rad = np.array([[-radians(170), radians(170)], [-radians(190), radians(45)], [-radians(120), radians(156)], [-radians(185), radians(185)], [-radians(120), radians(120)], [-radians(350), radians(350)]])
+                Q_v = filter_solutions(Q_new, current_q if 'current_q' in locals() else active_band[max(0, current_idx-1)], limits=limits_rad)
+                
+                if Q_v.size > 0:
+                    q_next = Q_v[:, 0]
+                else:
+                    print("      [Tangent Bug] IK Failure during contouring! Freezing!")
+                    q_next = current_q if 'current_q' in locals() else active_band[max(0, current_idx-1)]
+                
+                # DO NOT increment current_idx; we are trapped tracing the wall
         
         # --- 3. Stream to robot ---
+        current_q = q_next
+        
         msg = JointTrajectory()
         msg.joint_names = cfg['joint_names']
         pt = JointTrajectoryPoint()
@@ -487,7 +519,8 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
         msg.points.append(pt)
         pub.publish(msg)
         
-        if not frozen:
+        # Advance sequence only if we are naturally moving toward goal
+        if not is_following:
             current_idx += 1
             
         time.sleep(dt)
