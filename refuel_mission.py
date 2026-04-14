@@ -778,8 +778,8 @@ def main():
         from geometry_msgs.msg import Point # type: ignore
         def pillar_pose_cb(msg: Point):
             global LIVE_OBSTACLES
-            # Pack as [x, y, z, radius] for bubble_strips format
-            LIVE_OBSTACLES = [[msg.x, msg.y, msg.z, 0.05]]
+            # Pack as (center_array, radius) exactly matching Bubble Strips format
+            LIVE_OBSTACLES = [(np.array([msg.x, msg.y, msg.z]), 0.05)]
             
         _ROS_NODE.create_subscription(Point, '/dynamic_pillar/pose', pillar_pose_cb, 10)
 
