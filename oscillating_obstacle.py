@@ -17,15 +17,12 @@ class OscillatingBroadcaster(Node):
     def timer_callback(self):
         t = time.time() - self.start_time
         
-        # Velocity amplitude and frequency
-        vel = 0.15 * math.sin(t * 1.5) 
+        # Velocity amplitude and frequency (slower, smoother)
+        vel = 0.15 * math.sin(t * 1.0) 
         
-        # Position math: y(t) = y_initial + integral(v dt)
-        # integral(0.15 * sin(1.5*t)) = -0.10 * cos(1.5*t)
-        # So y(t) = 0.15 + (-0.10 * cos(1.5*t)) + C
-        # To make it start at Y=0.15 natively (when t=0, cos=1, so we need + 0.10 to offset)
-        # Wait, if we just want position:
-        y_pos = 0.15 + (-0.10 * math.cos(t * 1.5)) + 0.10
+        # Position math: y(t) = 0.05 - 0.15 * cos(1.0*t)
+        # Bounded perfectly between [-0.10, 0.20]. Leaves 10cm absolute safety from the 0.30 box face.
+        y_pos = 0.05 - 0.15 * math.cos(t * 1.0)
         
         # 1. Publish to ROS 2 for Python Algorithms
         msg = Point()

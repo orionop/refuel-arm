@@ -445,8 +445,8 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
     while current_idx < len(active_band):
         rclpy.spin_once(_ROS_NODE, timeout_sec=0.0)
         
+        # --- 1. Bubble Strips Deform ---
         rem = len(active_band) - current_idx
-        # Deform remaining band if enough points remain to anchor it
         if rem >= 5 and len(LIVE_OBSTACLES) > 0:
             sub = active_band[current_idx:]
             new_sub, _, _ = bubble_strip_deform(sub, LIVE_OBSTACLES, n_iterations=3, verbose=False)
@@ -454,17 +454,38 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
             
         q_next = active_band[current_idx]
         
+        # --- 2. Live Safety Freeze Override ---
+        frozen = False
+        if len(LIVE_OBSTACLES) > 0:
+            from ik_geometric import fwd_kinematics
+            _, p_chk = fwd_kinematics(q_next, kin=cfg['kin_params'] if 'kin_params' in cfg else KIN_KR6_R700)
+            
+            # Distance from tool-tip to the cylinder center
+            obs_center = LIVE_OBSTACLES[0][0]
+            dist_to_pillar = float(np.linalg.norm(p_chk - obs_center))
+            
+            # Physical safety bubble of 25cm in Workspace
+            if dist_to_pillar < 0.25:
+                # FREEZE: Arm waits until pillar swings away!
+                frozen = True
+                print(f"      [Safety] Threat detected ({dist_to_pillar:.2f}m) -> HOLDING POSITION")
+                # Send the PREVIOUS safe point (or current if at start)
+                q_next = active_band[max(0, current_idx - 1)]
+                # Do NOT increment current_idx!
+        
+        # --- 3. Stream to robot ---
         msg = JointTrajectory()
         msg.joint_names = cfg['joint_names']
         pt = JointTrajectoryPoint()
         pt.positions = q_next.tolist()
         pt.velocities = [0.0] * 6
-        # Slight interpolation buffer for smooth motor control
         pt.time_from_start = Duration(sec=0, nanosec=int(dt * 1e9 * 1.5)) 
         msg.points.append(pt)
         pub.publish(msg)
         
-        current_idx += 1
+        if not frozen:
+            current_idx += 1
+            
         time.sleep(dt)
         
     return True
