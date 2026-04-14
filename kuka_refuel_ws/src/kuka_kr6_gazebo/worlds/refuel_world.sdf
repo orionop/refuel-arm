@@ -31,23 +31,6 @@
       </link>
     </model>
 
-    <!-- Pedestal / base platform for the KUKA arm -->
-    <model name="arm_pedestal">
-      <static>true</static>
-      <pose>0 0 0.025 0 0 0</pose>
-      <link name="base_link">
-        <visual name="visual">
-          <geometry><box><size>0.40 0.40 0.05</size></box></geometry>
-          <material>
-            <ambient>0.25 0.25 0.25 1</ambient>
-            <diffuse>0.25 0.25 0.25 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <geometry><box><size>0.40 0.40 0.05</size></box></geometry>
-        </collision>
-      </link>
-    </model>
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!--  FUEL DISPENSER — L-Shaped Wall (STATIC OBSTACLE)          -->
