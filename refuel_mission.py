@@ -446,7 +446,8 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
     
     print(f"     [Dynamic] Activated receding horizon execution...")
     
-    from ik_geometric import fwd_kinematics, IK_solve, filter_solutions # type: ignore
+    # filter_solutions is defined locally in this file, NOT in ik_geometric
+    from ik_geometric import fwd_kinematics, IK_solve # type: ignore
     
     while current_idx < len(active_band):
         rclpy.spin_once(_ROS_NODE, timeout_sec=0.0)
@@ -460,26 +461,33 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
         #     new_sub, _, _ = bubble_strip_deform(sub, LIVE_OBSTACLES, n_iterations=3, verbose=False)
         #     active_band = np.vstack([active_band[:current_idx], new_sub])
             
-        q_target_base = active_band[current_idx]
+        # q_target_base = active_band[current_idx]
         
         # --- 2. Live Tangent Bug (Boundary Following) ---
-        q_next = q_target_base
+        q_next = active_band[current_idx]
         is_following = False
         
         if len(LIVE_OBSTACLES) > 0:
             kin_p = getattr(cfg, 'kin_params', KIN_KR6_R700)
-            R_chk, p_chk = fwd_kinematics(q_target_base, kin=kin_p)
             
+            # Check clearance against the actual intended STOMP path
+            _, base_p = fwd_kinematics(active_band[current_idx], kin=kin_p)
             obs_center = LIVE_OBSTACLES[0][0]
-            dist_to_pillar = float(np.linalg.norm(p_chk - obs_center))
+            dist_to_pillar_base = float(np.linalg.norm(base_p - obs_center))
             
-            if dist_to_pillar < 0.25:
+            if dist_to_pillar_base < 0.25:
                 # Tangent Bug Boundary Following Mode!
                 is_following = True
-                print(f"      [Tangent Bug] Boundary Following activated ({dist_to_pillar:.2f}m)...")
+                
+                # To successfully Wall-Follow, we step outward from our CURRENT executed position, not the base path!
+                q_executing = current_q if 'current_q' in locals() else active_band[max(0, current_idx-1)]
+                R_curr, p_curr = fwd_kinematics(q_executing, kin=kin_p)
+                
+                dist_curr_to_obs = float(np.linalg.norm(p_curr - obs_center))
+                print(f"      [Tangent Bug] Boundary Following activated ({dist_curr_to_obs:.2f}m)...")
                 
                 # 1. Vector from Obstacle to End-Effector
-                v_out = p_chk - obs_center
+                v_out = p_curr - obs_center
                 v_out[2] = 0.0 # Restrict strictly to XY plane
                 norm_out = np.linalg.norm(v_out)
                 if norm_out > 1e-4:
@@ -488,22 +496,23 @@ def execute_dynamic_receding_horizon(traj, dt=0.05, robot='kuka'):
                 # 2. Tangent Vector (Cross Product for Counter-Clockwise contour)
                 v_tangent = np.array([-v_out[1], v_out[0], 0.0])
                 
-                # 3. W-Space Step
-                step_size = 0.03 # 3cm evasion steps
-                p_new = p_chk + v_tangent * step_size
+                # 3. W-Space Step - integrate off the CURRENT position iteratively
+                step_size = 0.02 # 2cm evasion steps for smoother PID tracking
+                p_new = p_curr + v_tangent * step_size
                 
                 # 4. Map back to C-Space using IK-Geo
-                Q_new = IK_solve(R_chk, p_new, robot=robot)
+                Q_new = IK_solve(R_curr, p_new, robot=robot)
+                
                 # We need joint limits to filter
                 from math import radians
                 limits_rad = np.array([[-radians(170), radians(170)], [-radians(190), radians(45)], [-radians(120), radians(156)], [-radians(185), radians(185)], [-radians(120), radians(120)], [-radians(350), radians(350)]])
-                Q_v = filter_solutions(Q_new, current_q if 'current_q' in locals() else active_band[max(0, current_idx-1)], limits=limits_rad)
+                Q_v = filter_solutions(Q_new, q_executing, limits=limits_rad)
                 
                 if Q_v.size > 0:
                     q_next = Q_v[:, 0]
                 else:
                     print("      [Tangent Bug] IK Failure during contouring! Freezing!")
-                    q_next = current_q if 'current_q' in locals() else active_band[max(0, current_idx-1)]
+                    q_next = q_executing
                 
                 # DO NOT increment current_idx; we are trapped tracing the wall
         
@@ -844,7 +853,8 @@ def main():
 
         if args.ros:
             pass # Using physical socket baked into SDF
-            spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
+            # [COMMENTED OUT] Sphere obstacles removed — using cylinder only
+            # spawn_obstacles_gazebo(obs_list, ros2_node=_ROS_NODE)
 
         # publish_markers expects (label, traj, dt) tuples — strip compliant flag
         markers_segments = [(l, t, d) for l, t, d, _ in segments]
