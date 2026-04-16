@@ -673,35 +673,36 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Generating bounding spheres for tilted L-wall + taller cylinder...")
+    print("\n[Obstacles] Pulling bounding spheres from visual user layout...")
     obs_list = []
     
-    # Cylinder (taller, reaches Z=1.50). Placed vertically.
-    # We sample spheres along its Z axis to prevent arm from flying over it.
-    cyl_x, cyl_y = 0.60, 0.30
-    for z in np.linspace(0.2, 1.5, 6):
+    # Cylinder (taller, reaches Z=1.50). Placed at X=0.5898, Y=0.2924, Z center=0.0768
+    # Length=1.5, meaning it extends from Z=-0.67 to Z=0.82
+    cyl_x, cyl_y = 0.5898, 0.2924
+    for z in np.linspace(0.0, 0.85, 5):
         obs_list.append((np.array([cyl_x, cyl_y, z]), 0.10))
         
-    # L-Wall: corner at (0.50, -0.10), yaw = 0.4 rad
-    c_x, c_y = 0.50, -0.10
-    yaw = 0.4
-    R_yaw = np.array([
-        [np.cos(yaw), -np.sin(yaw)],
-        [np.sin(yaw),  np.cos(yaw)]
-    ])
+    # L-Wall: corner at (0.581, -0.442, 0.720)
+    c_x, c_y, c_z = 0.581, -0.442, 0.720
+    # Orientations: Roll=-2.9907, Pitch=-0.2614, Yaw=-2.1701
+    from scipy.spatial.transform import Rotation as R
+    r_mat = R.from_euler('xyz', [-2.9907, -0.2614, -2.1701]).as_matrix()
     
-    # We sample spheres at Z=1.20 (inlet height) and Z=0.80 (mid height)
-    for z_lvl in [0.80, 1.20]:
-        # Vertical leg: x from 0 to -0.80, y=0 (local)
-        for loc_x in np.linspace(0.0, -0.80, 9):
-            glob_p = np.array([c_x, c_y]) + R_yaw @ np.array([loc_x, 0.0])
-            obs_list.append((np.array([glob_p[0], glob_p[1], z_lvl]), 0.08))
+    # We sample spheres along the horizontal and vertical boxes relative to this matrix
+    # Vertical leg: size 0.80x0.04x1.50, local pose (-0.40, 0, 0)
+    # So X ranges from -0.80 to 0.0
+    for loc_x in np.linspace(0.0, -0.80, 7):
+        for z_lvl in [-0.5, 0.0, 0.5]:  # sample along local Z to capture 1.5m height
+            glob_p = np.array([c_x, c_y, c_z]) + r_mat @ np.array([loc_x, 0.0, z_lvl])
+            obs_list.append((glob_p, 0.08))
             
-        # Horizontal leg: x=0, y from 0.0 to 0.30 (local)
-        for loc_y in np.linspace(0.0, 0.30, 4):
-            if loc_y > 0.01: # skip corner overlapping with vertical
-                glob_p = np.array([c_x, c_y]) + R_yaw @ np.array([0.0, loc_y])
-                obs_list.append((np.array([glob_p[0], glob_p[1], z_lvl]), 0.08))
+    # Horizontal leg: size 0.04x0.30x1.50, local pose (0, 0.15, 0)
+    # So Y ranges from 0.0 to 0.30
+    for loc_y in np.linspace(0.0, 0.30, 4):
+        if loc_y > 0.01:
+            for z_lvl in [-0.5, 0.0, 0.5]:
+                glob_p = np.array([c_x, c_y, c_z]) + r_mat @ np.array([0.0, loc_y, z_lvl])
+                obs_list.append((glob_p, 0.08))
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
