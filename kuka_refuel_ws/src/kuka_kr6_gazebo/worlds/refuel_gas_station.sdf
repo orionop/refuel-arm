@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="refuel_gas_station">
+    <physics name="4ms" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Inclusion of the Gas Station from Gazebo Fuel -->
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Gas Station</uri>
+      <name>gas_station</name>
+      <pose>2.0 7.0 0 0 0 0</pose> <!-- Offset so robot spawns in a clear area -->
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Keeping your existing functional inlet for testing -->
+    <model name="hollow_refuel_inlet">
+      <static>true</static>
+      <pose>0.4389 0.40 0.647 0 0 1.5708</pose>
+      <link name="inlet_body">
+        <visual name="back_visual">
+          <pose>0.20 0 0 0 0 0</pose>
+          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient></material>
+        </visual>
+        <collision name="back_collision">
+          <pose>0.20 0 0 0 0 0</pose>
+          <geometry><box><size>0.01 0.15 0.15</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
+  </world>
+</sdf>
