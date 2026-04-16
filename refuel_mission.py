@@ -428,6 +428,22 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
 _ROS_NODE        = None   # rclpy.Node — set in main() when --ros is active
 _ADMITTANCE_NODE = None
 
+def ros_sleep(duration_sec: float):
+    """Wait for simulation time to pass using the ROS node clock."""
+    if _ROS_NODE is None:
+        import time as _time
+        _time.sleep(duration_sec)
+        return
+
+    start_t = _ROS_NODE.get_clock().now()
+    target_ns = int(duration_sec * 1e9)
+    
+    # Use a spinning wait loop to keep the node active while time passes
+    import rclpy # type: ignore
+    while (_ROS_NODE.get_clock().now() - start_t).nanoseconds < target_ns:
+        rclpy.spin_once(_ROS_NODE, timeout_sec=0.01)
+
+
 def send_trajectory_compliant(trajectory, dt=0.05, robot='ur5'):
     """Send trajectory through the admittance controller for force-compliant execution.
 
@@ -798,8 +814,8 @@ def main():
                 print(f"\n  Step {i}/{len(segments)}: {label}"
                       f"{' [COMPLIANT]' if compliant else ''}")
                 if traj is None:
-                    print(f"     Refueling: holding for {dt:.0f}s...")
-                    _time.sleep(dt)  # ROS2: plain time.sleep replaces rospy.sleep
+                    print(f"     Refueling: holding for {dt:.0f}s (Sim Time)...")
+                    ros_sleep(dt)
                     print(f"     Dwell complete")
                 else:
                     if compliant and args.ros:
