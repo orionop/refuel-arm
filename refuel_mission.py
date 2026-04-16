@@ -417,10 +417,11 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
         return None
 
     result_future = goal_handle.get_result_async()
-    # Wait for execution with 30s timeout
-    rclpy.spin_until_future_complete(_ROS_NODE, result_future, timeout_sec=30.0)
+    # Wait for execution with 600s timeout (Wall Clock)
+    # Note: 30s was too short if Gazebo RTF is low.
+    rclpy.spin_until_future_complete(_ROS_NODE, result_future, timeout_sec=600.0)
     if not result_future.done():
-        print("  [send_trajectory_ros] Execution TIMEOUT (30s exceeded)")
+        print("  [send_trajectory_ros] Execution TIMEOUT (600s Wall-Time exceeded)")
         return False
     return result_future.result().result
 
