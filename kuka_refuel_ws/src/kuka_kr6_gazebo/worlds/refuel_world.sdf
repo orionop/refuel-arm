@@ -103,7 +103,7 @@
     <!-- Wall: 0.04m thick, 0.50m long (X), 0.60m tall (Z)          -->
     <model name="l_wall_vertical">
       <static>true</static>
-      <pose>0.25 -0.05 0.30 0 0 0</pose>
+      <pose>0.25 -0.15 0.30 0 0 0</pose>
       <link name="wall_v_link">
         <gravity>false</gravity>
         <inertial>
@@ -125,7 +125,7 @@
     <!-- Wall: 0.04m thick, 0.50m wide (Y), 0.60m tall (Z)           -->
     <model name="l_wall_horizontal">
       <static>true</static>
-      <pose>0.50 0.20 0.30 0 0 0</pose>
+      <pose>0.50 0.15 0.30 0 0 0</pose>
       <link name="wall_h_link">
         <gravity>false</gravity>
         <inertial>
@@ -133,11 +133,11 @@
           <inertia><ixx>0.1</ixx><iyy>0.1</iyy><izz>0.01</izz></inertia>
         </inertial>
         <visual name="visual">
-          <geometry><box><size>0.04 0.50 0.60</size></box></geometry>
+          <geometry><box><size>0.04 0.70 0.60</size></box></geometry>
           <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><box><size>0.04 0.50 0.60</size></box></geometry>
+          <geometry><box><size>0.04 0.70 0.60</size></box></geometry>
         </collision>
       </link>
     </model>

@@ -678,18 +678,20 @@ def main():
     # L-Wall horizontal segment: center (0.50, 0.20), size 0.04x0.50, approximated as 5 spheres
     # Cylinder: center (0.60, 0.30, 0.30), r=0.05, planning radius=0.10
     obs_list = [
-        # L-Wall vertical segment (5 spheres along X at Y=-0.05, Z=0.30)
-        (np.array([0.05, -0.05, 0.30]), 0.08),
-        (np.array([0.15, -0.05, 0.30]), 0.08),
-        (np.array([0.25, -0.05, 0.30]), 0.08),
-        (np.array([0.35, -0.05, 0.30]), 0.08),
-        (np.array([0.45, -0.05, 0.30]), 0.08),
-        # L-Wall horizontal segment (5 spheres along Y at X=0.50, Z=0.30)
-        (np.array([0.50, -0.00, 0.30]), 0.08),
-        (np.array([0.50,  0.10, 0.30]), 0.08),
-        (np.array([0.50,  0.20, 0.30]), 0.08),
-        (np.array([0.50,  0.30, 0.30]), 0.08),
-        (np.array([0.50,  0.40, 0.30]), 0.08),
+        # L-Wall vertical segment (5 spheres along X at Y=-0.15, Z=0.30)
+        (np.array([0.05, -0.15, 0.30]), 0.08),
+        (np.array([0.15, -0.15, 0.30]), 0.08),
+        (np.array([0.25, -0.15, 0.30]), 0.08),
+        (np.array([0.35, -0.15, 0.30]), 0.08),
+        (np.array([0.45, -0.15, 0.30]), 0.08),
+        # L-Wall horizontal segment (7 spheres along Y at X=0.50, Z=0.30)
+        (np.array([0.50, -0.15, 0.30]), 0.08),
+        (np.array([0.50, -0.05, 0.30]), 0.08),
+        (np.array([0.50,  0.05, 0.30]), 0.08),
+        (np.array([0.50,  0.15, 0.30]), 0.08),
+        (np.array([0.50,  0.25, 0.30]), 0.08),
+        (np.array([0.50,  0.35, 0.30]), 0.08),
+        (np.array([0.50,  0.45, 0.30]), 0.08),
         # Cylinder (taller, at X=0.60, Y=0.30, Z=0.30)
         (np.array([0.60, 0.30, 0.30]), 0.10),
     ]
