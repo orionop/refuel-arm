@@ -673,18 +673,18 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Injecting L-wall + cylinder bounding spheres...")
-    # L-Wall vertical segment: center (0.25, -0.05), size 0.50x0.04, approximated as 5 spheres
-    # L-Wall horizontal segment: center (0.50, 0.20), size 0.04x0.50, approximated as 5 spheres
-    # Cylinder: center (0.60, 0.30, 0.30), r=0.05, planning radius=0.10
+    print("\n[Obstacles] Injecting FRONT and REAR L-wall + cylinder bounding spheres...")
+    # Front L-Wall: Center (0.25, -0.15), width 0.50x0.70
+    # Rear L-Wall:  Center (-0.50, -0.15), width 0.50x0.70
     obs_list = [
-        # L-Wall vertical segment (5 spheres along X at Y=-0.15, Z=0.30)
+        # --- FRONT L-WALL ---
+        # Vertical segment (5 spheres along X at Y=-0.15, Z=0.30)
         (np.array([0.05, -0.15, 0.30]), 0.08),
         (np.array([0.15, -0.15, 0.30]), 0.08),
         (np.array([0.25, -0.15, 0.30]), 0.08),
         (np.array([0.35, -0.15, 0.30]), 0.08),
         (np.array([0.45, -0.15, 0.30]), 0.08),
-        # L-Wall horizontal segment (7 spheres along Y at X=0.50, Z=0.30)
+        # Horizontal segment (7 spheres along Y at X=0.50, Z=0.30)
         (np.array([0.50, -0.15, 0.30]), 0.08),
         (np.array([0.50, -0.05, 0.30]), 0.08),
         (np.array([0.50,  0.05, 0.30]), 0.08),
@@ -692,6 +692,24 @@ def main():
         (np.array([0.50,  0.25, 0.30]), 0.08),
         (np.array([0.50,  0.35, 0.30]), 0.08),
         (np.array([0.50,  0.45, 0.30]), 0.08),
+        
+        # --- REAR L-WALL (Shifted back X=-0.75m) ---
+        # Vertical segment (5 spheres along X at Y=-0.15, Z=0.30)
+        (np.array([-0.70, -0.15, 0.30]), 0.08),
+        (np.array([-0.60, -0.15, 0.30]), 0.08),
+        (np.array([-0.50, -0.15, 0.30]), 0.08),
+        (np.array([-0.40, -0.15, 0.30]), 0.08),
+        (np.array([-0.30, -0.15, 0.30]), 0.08),
+        # Horizontal segment (7 spheres along Y at X=-0.25, Z=0.30)
+        (np.array([-0.25, -0.15, 0.30]), 0.08),
+        (np.array([-0.25, -0.05, 0.30]), 0.08),
+        (np.array([-0.25,  0.05, 0.30]), 0.08),
+        (np.array([-0.25,  0.15, 0.30]), 0.08),
+        (np.array([-0.25,  0.25, 0.30]), 0.08),
+        (np.array([-0.25,  0.35, 0.30]), 0.08),
+        (np.array([-0.25,  0.45, 0.30]), 0.08),
+
+        # --- CYLINDER ---
         # Cylinder (taller, at X=0.60, Y=0.30, Z=0.30)
         (np.array([0.60, 0.30, 0.30]), 0.10),
     ]
