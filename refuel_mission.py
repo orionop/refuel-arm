@@ -673,28 +673,35 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Injecting L-wall + cylinder bounding spheres...")
-    # L-Wall vertical segment: center (0.25, -0.05), size 0.50x0.04, approximated as 5 spheres
-    # L-Wall horizontal segment: center (0.50, 0.20), size 0.04x0.50, approximated as 5 spheres
-    # Cylinder: center (0.60, 0.30, 0.30), r=0.05, planning radius=0.10
-    obs_list = [
-        # L-Wall vertical segment (5 spheres along X at Y=-0.15, Z=0.30)
-        (np.array([0.05, -0.15, 0.30]), 0.08),
-        (np.array([0.15, -0.15, 0.30]), 0.08),
-        (np.array([0.25, -0.15, 0.30]), 0.08),
-        (np.array([0.35, -0.15, 0.30]), 0.08),
-        (np.array([0.45, -0.15, 0.30]), 0.08),
-        # L-Wall horizontal segment (7 spheres along Y at X=0.50, Z=0.30)
-        (np.array([0.50, -0.15, 0.30]), 0.08),
-        (np.array([0.50, -0.05, 0.30]), 0.08),
-        (np.array([0.50,  0.05, 0.30]), 0.08),
-        (np.array([0.50,  0.15, 0.30]), 0.08),
-        (np.array([0.50,  0.25, 0.30]), 0.08),
-        (np.array([0.50,  0.35, 0.30]), 0.08),
-        (np.array([0.50,  0.45, 0.30]), 0.08),
-        # Cylinder (taller, at X=0.60, Y=0.30, Z=0.30)
-        (np.array([0.60, 0.30, 0.30]), 0.10),
-    ]
+    print("\n[Obstacles] Generating bounding spheres for tilted L-wall + taller cylinder...")
+    obs_list = []
+    
+    # Cylinder (taller, reaches Z=1.50). Placed vertically.
+    # We sample spheres along its Z axis to prevent arm from flying over it.
+    cyl_x, cyl_y = 0.60, 0.30
+    for z in np.linspace(0.2, 1.5, 6):
+        obs_list.append((np.array([cyl_x, cyl_y, z]), 0.10))
+        
+    # L-Wall: corner at (0.50, -0.10), yaw = 0.4 rad
+    c_x, c_y = 0.50, -0.10
+    yaw = 0.4
+    R_yaw = np.array([
+        [np.cos(yaw), -np.sin(yaw)],
+        [np.sin(yaw),  np.cos(yaw)]
+    ])
+    
+    # We sample spheres at Z=1.20 (inlet height) and Z=0.80 (mid height)
+    for z_lvl in [0.80, 1.20]:
+        # Vertical leg: x from 0 to -0.80, y=0 (local)
+        for loc_x in np.linspace(0.0, -0.80, 9):
+            glob_p = np.array([c_x, c_y]) + R_yaw @ np.array([loc_x, 0.0])
+            obs_list.append((np.array([glob_p[0], glob_p[1], z_lvl]), 0.08))
+            
+        # Horizontal leg: x=0, y from 0.0 to 0.30 (local)
+        for loc_y in np.linspace(0.0, 0.30, 4):
+            if loc_y > 0.01: # skip corner overlapping with vertical
+                glob_p = np.array([c_x, c_y]) + R_yaw @ np.array([0.0, loc_y])
+                obs_list.append((np.array([glob_p[0], glob_p[1], z_lvl]), 0.08))
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
