@@ -142,46 +142,6 @@
       </link>
     </model>
 
-    <!-- REAR L-WALL: Vertical segment (Duplicate shifted backwards X=-0.75) -->
-    <model name="l_wall_vertical_rear">
-      <static>true</static>
-      <pose>-0.50 -0.15 0.30 0 0 0</pose>
-      <link name="wall_v_link_rear">
-        <gravity>false</gravity>
-        <inertial>
-          <mass>3.0</mass>
-          <inertia><ixx>0.1</ixx><iyy>0.1</iyy><izz>0.01</izz></inertia>
-        </inertial>
-        <visual name="visual">
-          <geometry><box><size>0.50 0.04 0.60</size></box></geometry>
-          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
-        </visual>
-        <collision name="collision">
-          <geometry><box><size>0.50 0.04 0.60</size></box></geometry>
-        </collision>
-      </link>
-    </model>
-
-    <!-- REAR L-WALL: Horizontal segment (Duplicate shifted backwards X=-0.75) -->
-    <model name="l_wall_horizontal_rear">
-      <static>true</static>
-      <pose>-0.25 0.15 0.30 0 0 0</pose>
-      <link name="wall_h_link_rear">
-        <gravity>false</gravity>
-        <inertial>
-          <mass>3.0</mass>
-          <inertia><ixx>0.1</ixx><iyy>0.1</iyy><izz>0.01</izz></inertia>
-        </inertial>
-        <visual name="visual">
-          <geometry><box><size>0.04 0.70 0.60</size></box></geometry>
-          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
-        </visual>
-        <collision name="collision">
-          <geometry><box><size>0.04 0.70 0.60</size></box></geometry>
-        </collision>
-      </link>
-    </model>
-
     <!-- Moving Cylinder — taller (0.60m), positioned past the L-wall corner -->
     <model name="dynamic_pillar">
       <static>true</static>
