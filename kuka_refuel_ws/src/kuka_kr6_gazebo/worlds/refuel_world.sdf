@@ -281,7 +281,7 @@
     <!-- REAR L-WALL: Identical copy shifted behind the arm (X = -0.62) -->
     <model name="l_wall_rear">
       <static>true</static>
-      <pose>-0.62 -0.4428 0.7200 -2.9907 -0.2614 -2.1701</pose>
+      <pose>-0.85408365726470947 0.067578628659248352 0.44603553414344788 -2.9053500112308668 0.18822598595332091 2.4133700354459795</pose>
       <link name="wall_links_rear">
         <gravity>false</gravity>
         <visual name="v_vis">
