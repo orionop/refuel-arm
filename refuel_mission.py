@@ -669,11 +669,14 @@ def main():
         return
     q_pre = Q_v_pre[:, 0]
 
-    # --- Phase 0: Dispenser Pose (moved to reachable zone) ---
+    # --- Step 3: Dispenser Pose (moved to reachable zone) ---
     DISPENSER_XYZ = np.array([-0.25, 0.30, 0.50])
-    # For the dispenser, we use an orientation that points towards it
+    
+    # For the dispenser, we use a 'face-the-target' orientation
+    # Point the tool axis (+X) directly from the base to the target
     disp_yaw = np.arctan2(DISPENSER_XYZ[1], DISPENSER_XYZ[0])
-    R_dispenser = rot(np.array([0., 0., 1.]), disp_yaw) @ rot(np.array([0., 1., 0.]), -np.pi/2)
+    # Use a slight downward tilt (-20 deg) to ensure natural reaching
+    R_dispenser = rot(np.array([0, 0, 1]), disp_yaw) @ rot(np.array([0, 1, 0]), -0.35)
     
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} dispenser pose at {DISPENSER_XYZ}...")
     Q_disp = IK_solve(R_dispenser, DISPENSER_XYZ, robot=active_robot)
