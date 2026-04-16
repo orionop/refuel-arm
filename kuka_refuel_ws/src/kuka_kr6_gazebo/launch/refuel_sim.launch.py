@@ -53,14 +53,14 @@ def generate_launch_description():
         parameters=[robot_description, {'use_sim_time': True}],
     )
 
-    # 4. Gz Sim
+    # 4. Gz Sim - start paused (no -r flag)
     world_path = os.path.join(pkg, 'worlds', 'refuel_world.sdf')
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('ros_gz_sim'),
                          'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': ['-r ', world_path]}.items(),
+        launch_arguments={'gz_args': [world_path]}.items(),
     )
 
     # 5. Spawn robot
@@ -95,13 +95,23 @@ def generate_launch_description():
         output='screen',
     )
 
-    # 8. Command upright candle pose
+    # 8. Command upright candle pose (near-instant 50ms snap)
     candle_pose_cmd = ExecuteProcess(
         cmd=[
             'ros2', 'topic', 'pub', '--once', '/kr6_arm_controller/joint_trajectory',
             'trajectory_msgs/msg/JointTrajectory',
-            '{"joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"], "points": [{"positions": [0.0, -1.5708, 0.0, 0.0, 0.0, 0.0], "time_from_start": {"sec": 1, "nanosec": 0}}]}'
+            '{"joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"], "points": [{"positions": [0.0, -1.5708, 0.0, 0.0, 0.0, 0.0], "time_from_start": {"sec": 0, "nanosec": 50000000}}]}'
         ],
+        output='screen'
+    )
+
+    # 9. Unpause simulation AFTER candle pose is commanded
+    unpause_sim = ExecuteProcess(
+        cmd=['gz', 'service', '-s', '/world/refuel_world/control',
+             '--reqtype', 'gz.msgs.WorldControl',
+             '--reptype', 'gz.msgs.Boolean',
+             '--timeout', '5000',
+             '--req', 'pause: false'],
         output='screen'
     )
 
@@ -123,5 +133,9 @@ def generate_launch_description():
         RegisterEventHandler(OnProcessExit(
             target_action=load_arm,
             on_exit=[candle_pose_cmd],
+        )),
+        RegisterEventHandler(OnProcessExit(
+            target_action=candle_pose_cmd,
+            on_exit=[unpause_sim],
         )),
     ])
