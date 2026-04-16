@@ -88,12 +88,64 @@
       </link>
     </model>
 
-    <!-- Dynamic Pillar (Static for initial testing) -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- L-Shaped Wall (Static) — partial enclosure around workspace -->
+    <!-- Layout (top-down, Y-up, X-right):                          -->
+    <!--   .                                                         -->
+    <!--   .        kuka (0,0)                                       -->
+    <!--   .                                                         -->
+    <!--   .  . . . . .              x (inlet)                       -->
+    <!--                  c (cylinder, moving)                        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <!-- L-Wall: Vertical segment — runs along X-axis (forward/back) -->
+    <!-- Positioned to the left of the arm (negative Y side)         -->
+    <!-- Wall: 0.04m thick, 0.50m long (X), 0.60m tall (Z)          -->
+    <model name="l_wall_vertical">
+      <static>true</static>
+      <pose>0.25 -0.05 0.30 0 0 0</pose>
+      <link name="wall_v_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>3.0</mass>
+          <inertia><ixx>0.1</ixx><iyy>0.1</iyy><izz>0.01</izz></inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><box><size>0.50 0.04 0.60</size></box></geometry>
+          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>0.50 0.04 0.60</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- L-Wall: Horizontal segment — runs along Y-axis (left/right) -->
+    <!-- Extends from the front end of the vertical wall toward inlet -->
+    <!-- Wall: 0.04m thick, 0.50m wide (Y), 0.60m tall (Z)           -->
+    <model name="l_wall_horizontal">
+      <static>true</static>
+      <pose>0.50 0.20 0.30 0 0 0</pose>
+      <link name="wall_h_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>3.0</mass>
+          <inertia><ixx>0.1</ixx><iyy>0.1</iyy><izz>0.01</izz></inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><box><size>0.04 0.50 0.60</size></box></geometry>
+          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>0.04 0.50 0.60</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Moving Cylinder — taller (0.60m), positioned past the L-wall corner -->
     <model name="dynamic_pillar">
       <static>true</static>
-      <!-- Shifted opposite (+X -> 0.60) to the OTHER edge of the approach path -->
-      <!-- Z=0.25 and length=0.50 means it touches ground (0) and reaches exactly up to the socket base (0.50) -->
-      <pose>0.60 0.25 0.25 0 0 0</pose>
+      <pose>0.60 0.30 0.30 0 0 0</pose>
       <link name="pillar_link">
         <gravity>false</gravity>
         <inertial>
@@ -101,14 +153,13 @@
           <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.01</izz></inertia>
         </inertial>
         <visual name="visual">
-          <geometry><cylinder><radius>0.05</radius><length>0.50</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>0.60</length></cylinder></geometry>
           <material><ambient>0.8 0.5 0.1 1</ambient><diffuse>0.8 0.5 0.1 1</diffuse></material>
         </visual>
         <collision name="collision">
-          <geometry><cylinder><radius>0.05</radius><length>0.50</length></cylinder></geometry>
+          <geometry><cylinder><radius>0.05</radius><length>0.60</length></cylinder></geometry>
         </collision>
       </link>
-      <!-- Direct Velocity Control Plugin -->
       <plugin filename="gz-sim-velocity-control-system" name="gz::sim::systems::VelocityControl">
       </plugin>
     </model>

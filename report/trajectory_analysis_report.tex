@@ -447,8 +447,8 @@ Solving the inverse kinematics and generating global paths is only half the batt
 {\large\textbf{1. The 4-Phase Hybrid Mission Architecture}}
 
 \begin{itemize}
-    \item \textbf{Phase 1: Global Approach (C-Space Tracking):} The arm begins at \texttt{REST}. STOMP generates a globally safe, obstacle-avoidant path through 6D Configuration Space to roughly position the arm 15cm in front of the fuel port (\texttt{PRE-APPROACH}).
-    \item \textbf{Phase 2: Cartesian Insertion (W-Space Tracking):} The arm cannot swing its elbow naturally while pushing the nozzle in, or it will snap the port. The trajectory shifts to a 3D straight Workspace line. IK-Geo solves for the exact 8 joint roots at millimeter intervals, and the \textbf{Derivative IK Selector} chains them together for flawlessly smooth, straight-line insertion.
+    \item \textbf{Phase 1: Global Approach (C-Space Tracking):} The arm begins at \texttt{REST}. STOMP generates a globally safe, obstacle-avoidant path through 6D Configuration Space to roughly position the arm 8cm in front of the fuel port (\texttt{PRE-APPROACH}).
+    \item \textbf{Phase 2: Cartesian Insertion (W-Space Tracking):} The arm cannot swing its elbow naturally while pushing the nozzle in, or it will snap the port. The trajectory shifts to a 3D straight Workspace line. IK-Geo solves for the necessary joint roots at high-resolution 4mm intervals, and the \textbf{Derivative IK Selector} chains them together for flawlessly smooth, straight-line insertion.
     \item \textbf{Phase 3: Cartesian Extraction (W-Space):} Following refueling, the arm pulls straight back out to the \texttt{PRE-APPROACH} coordinate using the same rigid tracking.
     \item \textbf{Phase 4: Global Return (C-Space):} STOMP takes over again to safely swing the arm back to the \texttt{REST} position without colliding with the car's general chassis.
 \end{itemize}
@@ -502,7 +502,7 @@ Because physical link lengths exaggerate minimal basal joint movements at the en
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.8\textwidth]{elastic.png}
+\includegraphics[width=0.8\textwidth]{bubble.png}
 \caption{Equilibrium via Bubble Strips: The continuous competition between the restorative Normalized Contraction Fields and the proactive C-Space Repulsion Gradients achieves a rigid, high-clearance trajectory equilibrium.}
 \end{figure}
 

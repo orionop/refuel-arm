@@ -673,9 +673,26 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Injecting static cylinder bounding box...")
-    # Cylinder position matching SDF: X=0.60, Y=0.25, Z=0.25, planning radius=0.10
-    obs_list = [(np.array([0.60, 0.25, 0.25]), 0.10)]
+    print("\n[Obstacles] Injecting L-wall + cylinder bounding spheres...")
+    # L-Wall vertical segment: center (0.25, -0.05), size 0.50x0.04, approximated as 5 spheres
+    # L-Wall horizontal segment: center (0.50, 0.20), size 0.04x0.50, approximated as 5 spheres
+    # Cylinder: center (0.60, 0.30, 0.30), r=0.05, planning radius=0.10
+    obs_list = [
+        # L-Wall vertical segment (5 spheres along X at Y=-0.05, Z=0.30)
+        (np.array([0.05, -0.05, 0.30]), 0.08),
+        (np.array([0.15, -0.05, 0.30]), 0.08),
+        (np.array([0.25, -0.05, 0.30]), 0.08),
+        (np.array([0.35, -0.05, 0.30]), 0.08),
+        (np.array([0.45, -0.05, 0.30]), 0.08),
+        # L-Wall horizontal segment (5 spheres along Y at X=0.50, Z=0.30)
+        (np.array([0.50, -0.00, 0.30]), 0.08),
+        (np.array([0.50,  0.10, 0.30]), 0.08),
+        (np.array([0.50,  0.20, 0.30]), 0.08),
+        (np.array([0.50,  0.30, 0.30]), 0.08),
+        (np.array([0.50,  0.40, 0.30]), 0.08),
+        # Cylinder (taller, at X=0.60, Y=0.30, Z=0.30)
+        (np.array([0.60, 0.30, 0.30]), 0.10),
+    ]
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
     
