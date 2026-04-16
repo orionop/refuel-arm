@@ -671,8 +671,10 @@ def main():
 
     # --- Phase 0: Dispenser Pose (moved to reachable zone) ---
     DISPENSER_XYZ = np.array([-0.25, 0.30, 0.50])
-    # For the dispenser, we use a generic reaching orientation (pointing -X toward the rear)
-    R_dispenser = rot(np.array([0., 0., 1.]), np.pi) @ inlet_R # simple flip
+    # For the dispenser, we use an orientation that points towards it
+    disp_yaw = np.arctan2(DISPENSER_XYZ[1], DISPENSER_XYZ[0])
+    R_dispenser = rot(np.array([0., 0., 1.]), disp_yaw) @ rot(np.array([0., 1., 0.]), -np.pi/2)
+    
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} dispenser pose at {DISPENSER_XYZ}...")
     Q_disp = IK_solve(R_dispenser, DISPENSER_XYZ, robot=active_robot)
     Q_v_disp = filter_solutions(Q_disp, Q_HOME, limits=joint_limits_deg)
@@ -680,10 +682,11 @@ def main():
         print(f"  No valid IK solution for {active_robot.upper()} Dispenser!")
         return
     q_disp = Q_v_disp[:, 0]
+    print(f"     Dispenser Joints: {np.round(np.degrees(q_disp), 1)} deg")
 
     _, p_chk = fwd_kinematics(q_target, kin=kin_params)
-    print(f"     Target Selected: {np.round(np.degrees(q_target), 1)} deg")
-    print(f"     Target FK error: {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
+    print(f"     Target Joints:    {np.round(np.degrees(q_target), 1)} deg")
+    print(f"     Target FK error:  {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
 
     # ── Step 2: Blind STOMP to find the path, then place obstacle ─
     print("\n[STOMP] Blind plan HOME -> Pre-approach (to determine path)...")
@@ -693,7 +696,7 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Syncing spheres with lat.sdf (Front: 0.92,0.01 | Rear: -0.06,-0.46)...")
+    print("\n[Obstacles] Syncing spheres with bb.sdf (Front: 0.88,-0.18 | Rear: -0.06,-0.46)...")
     obs_list = [
         # --- FRONT L-WALL (bb.sdf position at 0.88, -0.18) ---
         (np.array([0.68, -0.18, 0.30]), 0.08),
@@ -764,8 +767,11 @@ def main():
         _ensure_ros_path()
         import rclpy # type: ignore
         global _ROS_NODE
+        from rclpy.parameter import Parameter # type: ignore
         rclpy.init()
-        _ROS_NODE = rclpy.create_node('refuel_mission')
+        _ROS_NODE = rclpy.create_node('refuel_mission', 
+                                      parameter_overrides=[Parameter('use_sim_time', Parameter.Type.BOOL, True)])
+        print("[ROS2] Node started with use_sim_time: True")
 
         if args.ros:
             pass # Using physical socket baked into SDF
