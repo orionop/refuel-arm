@@ -203,7 +203,7 @@
     <!-- Tilted L-Shaped Wall (Static) — unified model with yaw      -->
     <model name="l_wall">
       <static>true</static>
-      <pose>0.58103400468826294 -0.44280201196670532 0.72001302242279053 -2.9907391358346977 -0.2614720271715818 -2.1701716621902265</pose>
+      <pose>0.92764437198638916 0.018316585570573807 0.56990331411361694 3.0408800087997232 -0.28413900133990611 -1.2926500652410564</pose>
       <link name="wall_links">
         <gravity>false</gravity>
         <visual name="v_vis">
@@ -278,31 +278,81 @@
       <self_collide>false</self_collide>
     </model>
 
-    <!-- REAR L-WALL: Identical copy shifted behind the arm (X = -0.62) -->
     <model name="l_wall_rear">
       <static>true</static>
-      <pose>-0.85408365726470947 0.067578628659248352 0.44603553414344788 -2.9053500112308668 0.18822598595332091 2.4133700354459795</pose>
+      <pose>-0.0651078000664711 -0.4698689877986908 0.48663601279258728 -0.22969331719059286 -0.097120125560542087 -0.80745500892211752</pose>
       <link name="wall_links_rear">
         <gravity>false</gravity>
         <visual name="v_vis">
-          <pose>-0.40 0 0 0 0 0</pose>
-          <geometry><box><size>0.80 0.04 1.5</size></box></geometry>
-          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+          <pose>-0.40000000000000002 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.80000000000000004 0.040000000000000001 1.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.600000024 0.600000024 0.600000024 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+          </material>
         </visual>
         <collision name="v_col">
-          <pose>-0.40 0 0 0 0 0</pose>
-          <geometry><box><size>0.80 0.04 1.5</size></box></geometry>
+          <pose>-0.40000000000000002 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.80000000000000004 0.040000000000000001 1.5</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
         </collision>
         <visual name="h_vis">
-          <pose>0 0.15 0 0 0 0</pose>
-          <geometry><box><size>0.04 0.3 1.5</size></box></geometry>
-          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+          <pose>0 0.14999999999999999 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.040000000000000001 0.29999999999999999 1.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.600000024 0.600000024 0.600000024 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+          </material>
         </visual>
         <collision name="h_col">
-          <pose>0 0.15 0 0 0 0</pose>
-          <geometry><box><size>0.04 0.3 1.5</size></box></geometry>
+          <pose>0 0.14999999999999999 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.040000000000000001 0.29999999999999999 1.5</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
         </collision>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
       </link>
+      <self_collide>false</self_collide>
     </model>
 
     <!-- Moving Cylinder — increased height (1.50m) -->
@@ -360,7 +410,7 @@
     <!-- Fuel Dispenser (Source Sphere) - Gold color -->
     <model name="fuel_dispenser">
       <static>true</static>
-      <pose>-1.20 0.40 0.60 0 0 0</pose>
+      <pose>-0.45485299825668335 0.63151854276657104 0.85940897464752197 0 0 0</pose>
       <link name="dispenser_link">
         <visual name="visual">
           <geometry><sphere><radius>0.05</radius></sphere></geometry>
