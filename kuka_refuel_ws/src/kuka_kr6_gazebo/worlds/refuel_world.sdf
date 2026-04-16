@@ -410,7 +410,7 @@
     <!-- Fuel Dispenser (Source Sphere) - Gold color -->
     <model name="fuel_dispenser">
       <static>true</static>
-      <pose>-0.45485299825668335 0.63151854276657104 0.85940897464752197 0 0 0</pose>
+      <pose>-0.25 0.30 0.50 0 0 0</pose>
       <link name="dispenser_link">
         <visual name="visual">
           <geometry><sphere><radius>0.05</radius></sphere></geometry>

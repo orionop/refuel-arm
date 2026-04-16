@@ -661,9 +661,8 @@ def main():
         return
     q_pre = Q_v_pre[:, 0]
 
-    # --- Phase 0: Dispenser Pose ---
-    # Coordinates from lat.sdf: dispenser at [-0.4548, 0.6315, 0.8594]
-    DISPENSER_XYZ = np.array([-0.455, 0.632, 0.859])
+    # --- Phase 0: Dispenser Pose (moved to reachable zone) ---
+    DISPENSER_XYZ = np.array([-0.25, 0.30, 0.50])
     # For the dispenser, we use a generic reaching orientation (pointing -X toward the rear)
     R_dispenser = rot(np.array([0., 0., 1.]), np.pi) @ inlet_R # simple flip
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} dispenser pose at {DISPENSER_XYZ}...")
