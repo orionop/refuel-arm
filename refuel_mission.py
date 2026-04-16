@@ -60,8 +60,8 @@ def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
     """Convert joint limits specified in degrees to radians (for clipping/cost)."""
     return np.radians(np.asarray(limits_deg, dtype=float))
 
-# Upright "Candle" home pose for KUKA (A2=-90, A3=90)
-Q_HOME     = np.array([0.0, -1.5708, 1.5708, 0.0, 0.0, 0.0])
+# Upright "Candle" home pose for KUKA (A2=-90, A3=0 as per URDF)
+Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.05
 
@@ -405,15 +405,23 @@ def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
         goal_msg.trajectory.points.append(pt)
 
     send_future = client.send_goal_async(goal_msg)
-    rclpy.spin_until_future_complete(_ROS_NODE, send_future)
+    # Wait for goal acceptance with 10s timeout
+    rclpy.spin_until_future_complete(_ROS_NODE, send_future, timeout_sec=10.0)
+    if not send_future.done():
+        print("  [send_trajectory_ros] Goal send TIMEOUT")
+        return None
     goal_handle = send_future.result()
 
     if not goal_handle.accepted:
-        print("  [send_trajectory_ros] Goal rejected")
+        print("  [send_trajectory_ros] Goal REJECTED by controller")
         return None
 
     result_future = goal_handle.get_result_async()
-    rclpy.spin_until_future_complete(_ROS_NODE, result_future)
+    # Wait for execution with 30s timeout
+    rclpy.spin_until_future_complete(_ROS_NODE, result_future, timeout_sec=30.0)
+    if not result_future.done():
+        print("  [send_trajectory_ros] Execution TIMEOUT (30s exceeded)")
+        return False
     return result_future.result().result
 
 
@@ -693,9 +701,6 @@ def main():
         (np.array([0.88, -0.18, 0.30]), 0.08),
         (np.array([0.98, -0.18, 0.30]), 0.08),
         (np.array([1.08, -0.18, 0.30]), 0.08),
-        (np.array([0.88, -0.08, 0.30]), 0.08),
-        (np.array([0.88,  0.02, 0.30]), 0.08),
-        
         # --- REAR L-WALL (lat.sdf position) ---
         (np.array([-0.20, -0.46, 0.30]), 0.08),
         (np.array([-0.10, -0.46, 0.30]), 0.08),
@@ -708,54 +713,47 @@ def main():
         (np.array([0.58, 0.29, 0.30]), 0.10),
     ]
 
-    # ── Step 3: Expanded Hybrid Mission Architecture ─────────────────
+    # ── Step 3: Refactored 8-Step Mission Sequence ──────────────────
     
-    # ── Step 3: Expanded Hybrid Mission Architecture ─────────────────
-    
-    # Phase 0: HOME -> Dispenser (Fetching fuel)
+    # Step 1: HOME -> Dispenser (Fetching fuel)
     seg_fetch = plan_stomp(Q_HOME, q_disp, obs_list,
-                           "Phase 0: HOME -> Fuel Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
+                           "Step 1: HOME -> Fuel Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    # Phase 0.5: Dispense Fuel (Dwell)
-    seg_dwell_disp = plan_fine(q_disp, q_disp, n_wp=5)
-
-    # Phase 1: Dispenser -> Return to HOME (Resting)
+    # Step 3: Return to HOME (Resting)
     seg_rest = plan_stomp(q_disp, Q_HOME, obs_list,
-                          "Phase 1: Dispenser -> Rest (HOME)", n_wp, limits=joint_limits_deg, kin=kin_params)
+                           "Step 3: Dispenser -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    # Phase 2: HOME -> Vehicle Pre-approach (Refueling start)
+    # Step 4: To Vehicle Pre-approach
     seg_approach = plan_stomp(Q_HOME, q_pre, obs_list,
-                              "Phase 2: HOME -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
+                               "Step 4: HOME -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    # Phase 3: Fine Insertion (W-Space)
+    # Step 5: Fine Insertion (W-Space)
     seg_insert = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
-                                q_pre, "Phase 3: Pre-approach -> Target", n_wp=20, kin=kin_params)
+                                q_pre, "Step 5: Pre-approach -> Target", n_wp=20, kin=kin_params)
                                 
-    # Dwell at target (Phase 4)
-    seg_dwell_inlet = plan_fine(q_target, q_target, n_wp=5)
-    
-    # Phase 5: Fine Extraction (W-Space)
+    # Step 7: Fine Extraction (W-Space)
     seg_extract = plan_cartesian(inlet_xyz, pre_xyz, inlet_R, 
-                                 q_target, "Phase 5: Target -> Pre-approach", n_wp=20, kin=kin_params)
+                                 q_target, "Step 7: Target -> Pre-approach", n_wp=20, kin=kin_params)
 
-    # Phase 6: Return to HOME
+    # Step 8: Return back to HOME from Pre-approach
     seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
-                            "Phase 6: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
+                            "Step 8: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    # ── Step 4: Concatenate full trajectory for graphs ────────────
-    full_traj = np.vstack([seg_fetch, seg_dwell_disp, seg_rest, seg_approach, seg_insert, seg_dwell_inlet, seg_extract, seg_return])
+    # ── Step 4: Concatenate full trajectory ───────────────────────
+    full_traj = np.vstack([seg_fetch, seg_rest, seg_approach, seg_insert, seg_extract, seg_return])
 
     # compliant_phases: which segments use admittance control
     use_compliant = args.compliant and active_robot == 'ur5'
+    
     segments = [
-        ("Phase 0: Fetching Fuel", seg_fetch, 8.0, False),
-        ("Phase 0.5: Dispensing",  None,      2.0, False),
-        ("Phase 1: Return to Rest", seg_rest,  7.0, False),
-        ("Phase 2: To Vehicle",    seg_approach, 8.0, False),
-        ("Phase 3: Insertion",     seg_insert, 5.0, use_compliant),
-        ("Phase 4: Refueling",     None,      DWELL_TIME, False),
-        ("Phase 5: Extraction",    seg_extract, 4.0, use_compliant),
-        ("Phase 6: Return Home",   seg_return, 7.0, False),
+        ("Step 1: Go to Yellow Dot", seg_fetch,    8.0, False),
+        ("Step 2: Wait 1s",          None,         1.0, False),
+        ("Step 3: Back to HOME",     seg_rest,      7.0, False),
+        ("Step 4: To Pre-approach",  seg_approach,  8.0, False),
+        ("Step 5: To Inlet",         seg_insert,    5.0, use_compliant),
+        ("Step 6: Refuel (Wait 5s)", None,         5.0, False),
+        ("Step 7: Back to Pre-app",  seg_extract,   4.0, use_compliant),
+        ("Step 8: Back to HOME",     seg_return,    7.0, False),
     ]
     if use_compliant:
         print("\n[Admittance] Compliant mode ENABLED for fine insertion/extraction")
