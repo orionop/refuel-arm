@@ -661,6 +661,18 @@ def main():
         return
     q_pre = Q_v_pre[:, 0]
 
+    # --- Phase 0: Dispenser Pose ---
+    DISPENSER_XYZ = np.array([-1.20, 0.40, 0.60])
+    # For the dispenser, we use a generic reaching orientation (pointing -X toward the rear)
+    R_dispenser = rot(np.array([0., 0., 1.]), np.pi) @ inlet_R # simple flip
+    print(f"\n[IK-Geo] Solving for {active_robot.upper()} dispenser pose at {DISPENSER_XYZ}...")
+    Q_disp = IK_solve(R_dispenser, DISPENSER_XYZ, robot=active_robot)
+    Q_v_disp = filter_solutions(Q_disp, Q_HOME, limits=joint_limits_deg)
+    if Q_v_disp.size == 0:
+        print(f"  No valid IK solution for {active_robot.upper()} Dispenser!")
+        return
+    q_disp = Q_v_disp[:, 0]
+
     _, p_chk = fwd_kinematics(q_target, kin=kin_params)
     print(f"     Target Selected: {np.round(np.degrees(q_target), 1)} deg")
     print(f"     Target FK error: {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
@@ -673,10 +685,9 @@ def main():
         n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
         noise_stddev=0.08, verbose=False, kin=kin_params)
 
-    print("\n[Obstacles] Injecting L-wall + cylinder bounding spheres...")
-    # L-Wall vertical segment: center (0.25, -0.05), size 0.50x0.04, approximated as 5 spheres
-    # L-Wall horizontal segment: center (0.50, 0.20), size 0.04x0.50, approximated as 5 spheres
-    # Cylinder: center (0.60, 0.30, 0.30), r=0.05, planning radius=0.10
+    print("\n[Obstacles] Injecting FRONT and REAR L-wall + cylinder bounding spheres...")
+    # Front L-Wall: Center (0.25, -0.15)
+    # Rear L-Wall:  Center (-0.85, 0.07)
     obs_list = [
         # --- FRONT L-WALL & CYLINDER ---
         (np.array([0.05, -0.15, 0.30]), 0.08),
@@ -692,9 +703,8 @@ def main():
         (np.array([0.50,  0.35, 0.30]), 0.08),
         (np.array([0.50,  0.45, 0.30]), 0.08),
         (np.array([0.60, 0.30, 0.30]), 0.10),
-
-        # --- REAR L-WALL (Visual Copy) ---
-        # Sampling spheres around the shifted rear enclosure (centered ~ -0.6 to -1.0)
+        
+        # --- REAR L-WALL ---
         (np.array([-0.30, -0.15, 0.30]), 0.08),
         (np.array([-0.40, -0.15, 0.30]), 0.08),
         (np.array([-0.50, -0.15, 0.30]), 0.08),
@@ -705,43 +715,46 @@ def main():
         (np.array([-1.00, -0.15, 0.30]), 0.08),
     ]
 
-    # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
+    # ── Step 3: Expanded Hybrid Mission Architecture ─────────────────
     
-    # Phase 1: Gross Approach (C-Space)
-    seg_approach = plan_stomp(Q_HOME, q_pre, obs_list,
-                              "Phase 1: HOME -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
+    # Phase 0: HOME -> Dispenser (Fetching fuel)
+    seg_fetch = plan_stomp(Q_HOME, q_disp, obs_list,
+                           "Phase 0: HOME -> Fuel Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
+
+    # Phase 0.5: Dispense Fuel (Dwell - represented as static pose in full_traj)
+    seg_dwell_disp = plan_fine(q_disp, q_disp, n_wp=5)
+
+    # Phase 1: Dispenser -> Vehicle Pre-approach
+    # This is a critical segment avoiding both wall enclosures
+    seg_approach = plan_stomp(q_disp, q_pre, obs_list,
+                              "Phase 1: Dispenser -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # Phase 2: Fine Insertion (W-Space)
     seg_insert = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
                                 q_pre, "Phase 2: Pre-approach -> Target", n_wp=20, kin=kin_params)
                                 
-    # Dwell at target
-    seg_dwell = plan_fine(q_target, q_target, n_wp=5)
+    # Dwell at target (Phase 3)
+    seg_dwell_inlet = plan_fine(q_target, q_target, n_wp=5)
+    
+    # Phase 4: Fine Extraction (W-Space)
+    seg_extract = plan_cartesian(inlet_xyz, pre_xyz, inlet_R, 
+                                 q_target, "Phase 4: Target -> Pre-approach", n_wp=20, kin=kin_params)
 
-    # Phase 3: Fine Extraction (W-Space)
-    seg_extract = plan_cartesian(inlet_xyz, pre_xyz, inlet_R,
-                                 q_target, "Phase 3: Target -> Pre-approach", n_wp=20, kin=kin_params)
-
-    # Phase 4: Gross Return (C-Space)
-    if args.mirror_return:
-        seg_return = seg_approach[::-1].copy()
-        print(f"\n  Planning: Phase 4: Pre-approach -> HOME (mirrored approach)")
-        print(f"     Reversed approach trajectory ({len(seg_return)} wp)")
-    else:
-        seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
-                                "Phase 4: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
+    # Phase 5: Return to HOME
+    seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
+                            "Phase 5: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # ── Step 4: Concatenate full trajectory for graphs ────────────
-    full_traj = np.vstack([seg_approach, seg_insert, seg_dwell, seg_extract, seg_return])
+    full_traj = np.vstack([seg_fetch, seg_dwell_disp, seg_approach, seg_insert, seg_dwell_inlet, seg_extract, seg_return])
 
-    # compliant_phases: which segments use admittance control
-    use_compliant = args.compliant and active_robot == 'ur5'
     segments = [
-        ("Gross Approach",  seg_approach, 0.15, False),
-        ("Fine Insertion",  seg_insert,   0.05, use_compliant),
-        ("Refueling",       None,         DWELL_TIME, False),
-        ("Fine Extraction", seg_extract,  0.05, use_compliant),
-        ("Gross Return",    seg_return,   0.15, False),
+        ("Phase 0: Fetching Fuel", seg_fetch, 8.0, False),
+        ("Phase 0.5: Dispensing",  None,      2.0, False),
+        ("Phase 1: To Vehicle",    seg_approach, 10.0, False),
+        ("Phase 2: Insertion",     seg_insert, 5.0, False),
+        ("Phase 3: Refueling",     None,      DWELL_TIME, False),
+        ("Phase 4: Extraction",    seg_extract, 4.0, False),
+        ("Phase 5: Return Home",   seg_return, 8.0, False),
     ]
     if use_compliant:
         print("\n[Admittance] Compliant mode ENABLED for fine insertion/extraction")

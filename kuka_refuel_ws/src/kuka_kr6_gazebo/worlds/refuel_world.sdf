@@ -357,5 +357,17 @@
       <self_collide>false</self_collide>
     </model>
 
+    <!-- Fuel Dispenser (Source Sphere) - Gold color -->
+    <model name="fuel_dispenser">
+      <static>true</static>
+      <pose>-1.20 0.40 0.60 0 0 0</pose>
+      <link name="dispenser_link">
+        <visual name="visual">
+          <geometry><sphere><radius>0.05</radius></sphere></geometry>
+          <material><ambient>1.0 0.8 0.0 1</ambient><diffuse>1.0 0.8 0.0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
   </world>
 </sdf>
