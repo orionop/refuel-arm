@@ -140,8 +140,24 @@
     </material>
   </gazebo>
   
+  <!-- Initial joint positions — spawn directly in upright candle pose -->
+  <gazebo reference="joint_1">
+    <initial_position>0.0</initial_position>
+  </gazebo>
   <gazebo reference="joint_2">
     <initial_position>-1.5708</initial_position>
+  </gazebo>
+  <gazebo reference="joint_3">
+    <initial_position>0.0</initial_position>
+  </gazebo>
+  <gazebo reference="joint_4">
+    <initial_position>0.0</initial_position>
+  </gazebo>
+  <gazebo reference="joint_5">
+    <initial_position>0.0</initial_position>
+  </gazebo>
+  <gazebo reference="joint_6">
+    <initial_position>0.0</initial_position>
   </gazebo>
 
 </robot>
