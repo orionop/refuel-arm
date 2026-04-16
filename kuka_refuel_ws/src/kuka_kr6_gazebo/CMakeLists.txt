@@ -11,6 +11,7 @@ install(DIRECTORY
   worlds
   config
   meshes
+  models
   DESTINATION share/${PROJECT_NAME}/
 )
 

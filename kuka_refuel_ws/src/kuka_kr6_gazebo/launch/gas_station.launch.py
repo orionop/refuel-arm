@@ -20,9 +20,10 @@ def generate_launch_description():
         value='/opt/ros/jazzy/lib:' + os.environ.get('GZ_SIM_SYSTEM_PLUGIN_PATH', ''),
     )
     share_parent = os.path.dirname(pkg)
+    models_path = os.path.join(pkg, 'models')
     set_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
-        value=share_parent + ':' + os.environ.get('GZ_SIM_RESOURCE_PATH', ''),
+        value=share_parent + ':' + models_path + ':' + os.environ.get('GZ_SIM_RESOURCE_PATH', ''),
     )
 
     robot_state_publisher = Node(
