@@ -278,6 +278,33 @@
       <self_collide>false</self_collide>
     </model>
 
+    <!-- REAR L-WALL: Identical copy shifted behind the arm (X = -0.62) -->
+    <model name="l_wall_rear">
+      <static>true</static>
+      <pose>-0.62 -0.4428 0.7200 -2.9907 -0.2614 -2.1701</pose>
+      <link name="wall_links_rear">
+        <gravity>false</gravity>
+        <visual name="v_vis">
+          <pose>-0.40 0 0 0 0 0</pose>
+          <geometry><box><size>0.80 0.04 1.5</size></box></geometry>
+          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+        </visual>
+        <collision name="v_col">
+          <pose>-0.40 0 0 0 0 0</pose>
+          <geometry><box><size>0.80 0.04 1.5</size></box></geometry>
+        </collision>
+        <visual name="h_vis">
+          <pose>0 0.15 0 0 0 0</pose>
+          <geometry><box><size>0.04 0.3 1.5</size></box></geometry>
+          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+        </visual>
+        <collision name="h_col">
+          <pose>0 0.15 0 0 0 0</pose>
+          <geometry><box><size>0.04 0.3 1.5</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
     <!-- Moving Cylinder — increased height (1.50m) -->
     <model name="dynamic_pillar">
       <static>true</static>

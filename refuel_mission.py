@@ -678,13 +678,12 @@ def main():
     # L-Wall horizontal segment: center (0.50, 0.20), size 0.04x0.50, approximated as 5 spheres
     # Cylinder: center (0.60, 0.30, 0.30), r=0.05, planning radius=0.10
     obs_list = [
-        # L-Wall vertical segment (5 spheres along X at Y=-0.15, Z=0.30)
+        # --- FRONT L-WALL & CYLINDER ---
         (np.array([0.05, -0.15, 0.30]), 0.08),
         (np.array([0.15, -0.15, 0.30]), 0.08),
         (np.array([0.25, -0.15, 0.30]), 0.08),
         (np.array([0.35, -0.15, 0.30]), 0.08),
         (np.array([0.45, -0.15, 0.30]), 0.08),
-        # L-Wall horizontal segment (7 spheres along Y at X=0.50, Z=0.30)
         (np.array([0.50, -0.15, 0.30]), 0.08),
         (np.array([0.50, -0.05, 0.30]), 0.08),
         (np.array([0.50,  0.05, 0.30]), 0.08),
@@ -692,8 +691,18 @@ def main():
         (np.array([0.50,  0.25, 0.30]), 0.08),
         (np.array([0.50,  0.35, 0.30]), 0.08),
         (np.array([0.50,  0.45, 0.30]), 0.08),
-        # Cylinder (taller, at X=0.60, Y=0.30, Z=0.30)
         (np.array([0.60, 0.30, 0.30]), 0.10),
+
+        # --- REAR L-WALL (Visual Copy) ---
+        # Sampling spheres around the shifted rear enclosure (centered ~ -0.6 to -1.0)
+        (np.array([-0.30, -0.15, 0.30]), 0.08),
+        (np.array([-0.40, -0.15, 0.30]), 0.08),
+        (np.array([-0.50, -0.15, 0.30]), 0.08),
+        (np.array([-0.60, -0.15, 0.30]), 0.08),
+        (np.array([-0.70, -0.15, 0.30]), 0.08),
+        (np.array([-0.80, -0.15, 0.30]), 0.08),
+        (np.array([-0.90, -0.15, 0.30]), 0.08),
+        (np.array([-1.00, -0.15, 0.30]), 0.08),
     ]
 
     # ── Step 3: 4-Phase Hybrid Mission Architecture ─────────────────
