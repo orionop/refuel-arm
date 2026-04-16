@@ -745,14 +745,16 @@ def main():
     # ── Step 4: Concatenate full trajectory for graphs ────────────
     full_traj = np.vstack([seg_fetch, seg_dwell_disp, seg_rest, seg_approach, seg_insert, seg_dwell_inlet, seg_extract, seg_return])
 
+    # compliant_phases: which segments use admittance control
+    use_compliant = args.compliant and active_robot == 'ur5'
     segments = [
         ("Phase 0: Fetching Fuel", seg_fetch, 8.0, False),
         ("Phase 0.5: Dispensing",  None,      2.0, False),
         ("Phase 1: Return to Rest", seg_rest,  7.0, False),
         ("Phase 2: To Vehicle",    seg_approach, 8.0, False),
-        ("Phase 3: Insertion",     seg_insert, 5.0, False),
+        ("Phase 3: Insertion",     seg_insert, 5.0, use_compliant),
         ("Phase 4: Refueling",     None,      DWELL_TIME, False),
-        ("Phase 5: Extraction",    seg_extract, 4.0, False),
+        ("Phase 5: Extraction",    seg_extract, 4.0, use_compliant),
         ("Phase 6: Return Home",   seg_return, 7.0, False),
     ]
     if use_compliant:
