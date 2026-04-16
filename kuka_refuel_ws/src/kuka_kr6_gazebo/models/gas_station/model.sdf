@@ -18,20 +18,15 @@
           </mesh>
         </geometry>
         <material>
+          <diffuse>1.0 1.0 1.0 1.0</diffuse>
+          <specular>1.0 1.0 1.0 1.0</specular>
           <pbr>
             <metal>
               <albedo_map>model://gas_station/materials/textures/GasStation_Diffuse.png</albedo_map>
               <normal_map>model://gas_station/materials/textures/GasStation_Normal.png</normal_map>
-              <roughness>0.6</roughness>
-              <metalness>0.0</metalness>
+              <metalness_map>model://gas_station/materials/textures/GasStation_Spec.png</metalness_map>
             </metal>
           </pbr>
-          <!-- Fallback for legacy systems -->
-          <script>
-            <uri>model://gas_station/materials/scripts</uri>
-            <uri>model://gas_station/materials/textures</uri>
-            <name>GasStation/Diffuse</name>
-          </script>
         </material>
       </visual>
     </link>
