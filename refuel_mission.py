@@ -789,9 +789,11 @@ def main():
         global _ROS_NODE
         from rclpy.parameter import Parameter # type: ignore
         rclpy.init()
+        # use_sim_time MUST be False for RViz-only mode, otherwise the node hangs waiting for Gazebo clock
+        sim_time_bool = True if args.ros else False
         _ROS_NODE = rclpy.create_node('refuel_mission', 
-                                      parameter_overrides=[Parameter('use_sim_time', Parameter.Type.BOOL, True)])
-        print("[ROS2] Node started with use_sim_time: True")
+                                      parameter_overrides=[Parameter('use_sim_time', Parameter.Type.BOOL, sim_time_bool)])
+        print(f"[ROS2] Node started with use_sim_time: {sim_time_bool}")
 
         if args.ros:
             pass # Using physical socket baked into SDF

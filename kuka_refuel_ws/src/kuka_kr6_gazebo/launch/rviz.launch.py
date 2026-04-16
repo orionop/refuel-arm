@@ -26,7 +26,15 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         output='both',
-        parameters=[robot_description],
+        parameters=[robot_description, {'use_sim_time': False}],
+    )
+
+    # Joint State Publisher (provides default pose if mission script isn't running)
+    # This prevents the robot from being 'invisible' initially
+    joint_state_publisher = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        parameters=[{'use_sim_time': False}],
     )
 
     # RViz2
@@ -36,9 +44,11 @@ def generate_launch_description():
         executable='rviz2',
         arguments=['-d', rviz_config],
         output='screen',
+        parameters=[{'use_sim_time': False}],
     )
 
     return LaunchDescription([
         robot_state_publisher,
+        joint_state_publisher,
         rviz,
     ])
