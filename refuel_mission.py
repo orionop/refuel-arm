@@ -688,14 +688,14 @@ def main():
 
     print("\n[Obstacles] Syncing spheres with lat.sdf (Front: 0.92,0.01 | Rear: -0.06,-0.46)...")
     obs_list = [
-        # --- FRONT L-WALL (lat.sdf position) ---
+        # --- FRONT L-WALL (lat.sdf position shifted to 0.82) ---
+        (np.array([0.60, 0.01, 0.30]), 0.08),
         (np.array([0.70, 0.01, 0.30]), 0.08),
         (np.array([0.80, 0.01, 0.30]), 0.08),
         (np.array([0.90, 0.01, 0.30]), 0.08),
         (np.array([1.00, 0.01, 0.30]), 0.08),
-        (np.array([1.10, 0.01, 0.30]), 0.08),
-        (np.array([0.92, 0.10, 0.30]), 0.08),
-        (np.array([0.92, 0.20, 0.30]), 0.08),
+        (np.array([0.82, 0.10, 0.30]), 0.08),
+        (np.array([0.82, 0.20, 0.30]), 0.08),
         
         # --- REAR L-WALL (lat.sdf position) ---
         (np.array([-0.20, -0.46, 0.30]), 0.08),

@@ -203,7 +203,7 @@
     <!-- Tilted L-Shaped Wall (Static) — unified model with yaw      -->
     <model name="l_wall">
       <static>true</static>
-      <pose>0.92764437198638916 0.018316585570573807 0.56990331411361694 3.0408800087997232 -0.28413900133990611 -1.2926500652410564</pose>
+      <pose>0.8276 0.0183 0.5699 3.0408800087997232 -0.28413900133990611 -1.2926500652410564</pose>
       <link name="wall_links">
         <gravity>false</gravity>
         <visual name="v_vis">
