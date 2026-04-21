@@ -82,7 +82,7 @@
 - Migrated to **Gazebo Harmonic (Gz Sim)** — the modern simulator replacing Gazebo Classic. Required full SDF 1.9 rewrite and native system plugin declarations.
 - Solved the **URDF initial_position bug** in Gz Sim by building a custom URDF→SDF converter that patches the XML tree at launch time.
 - Pure-Python planning path (`python3 refuel_mission.py` without `--ros`) **entirely untouched** throughout migration — IK, STOMP, Bubble Strips run with zero ROS dependency.
-- All ROS 1 files deprecated to `deprecated/ros1_build/`, `deprecated/ros1_launch/`, and `deprecated/*.ros1.py` — project convention maintained.
+- All ROS 1 files and old reference code deprecated to `deprecated/` (organized into `docs/`, `envs/`, `scripts/`, `ros1_build/`, etc.) — project convention maintained, maintaining a clean root.
 
 ---
 

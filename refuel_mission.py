@@ -39,7 +39,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 
 from ik_geometric import ( # type: ignore
     IK_spherical_2_parallel, fwd_kinematics, rot,
-    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100, KIN_KR8_R2100
+    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100
 )
 from stomp_collision import stomp_optimize # type: ignore
 from bubble_strips import bubble_strip_deform, set_kinematics as bs_set_kinematics # type: ignore
@@ -48,14 +48,14 @@ from car_model import ( # type: ignore
     TARGET_XYZ_DEFAULT,
 )
 
-# ── KUKA KR 8 R2100 arc HW joint limits (degrees) ──────────
+# ── KUKA KR210 R3100 joint limits ──────────────────────────
 JOINT_LIMITS_DEFAULT = np.array([
-    [-185.0, 185.0],   # A1
-    [-185.0,  65.0],   # A2
-    [-138.0, 175.0],   # A3
-    [-165.0, 165.0],   # A4
-    [-115.0, 140.0],   # A5
-    [-350.0, 350.0],   # A6
+    [-185.0, 185.0],
+    [-45.0, 85.0],
+    [-210.0, 65.0],
+    [-350.0, 350.0],
+    [-125.0, 125.0],
+    [-350.0, 350.0]
 ])
 # Legacy alias for internal functions
 JOINT_LIMITS = JOINT_LIMITS_DEFAULT
@@ -669,19 +669,14 @@ def main():
                         help="Random seed for obstacle placement (default: random)")
     parser.add_argument("--mirror-return", action="store_true",
                         help="Return along the reversed approach path instead of re-planning")
-    parser.add_argument("--robot", type=str, default="kr8", choices=["kuka", "kr8", "ur5"],
+    parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5"],
                         help="Target robot platform (default: kuka)")
     parser.add_argument("--compliant", action="store_true",
                         help="Use admittance control for fine insertion/extraction (UR5 only)")
     args = parser.parse_args()
 
     active_robot = args.robot.lower()
-    if active_robot == "ur5":
-        kin_params = KIN_UR5
-    elif active_robot == "kr8":
-        kin_params = KIN_KR8_R2100
-    else:
-        kin_params = KIN_KR210_R3100
+    kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR210_R3100
     joint_limits_deg = np.asarray(
         kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT), dtype=float
     )
@@ -726,8 +721,7 @@ def main():
     q_pre = Q_v_pre[:, 0]
 
     # --- Step 3: Dispenser Pose (robot-local frame, yaw=-1.6273) ---
-    # From user-placed yellow dot_dispenser: world [1.469, -12.220, 1.255]
-    DISPENSER_XYZ = np.array([0.205, 1.537, 0.963])
+    DISPENSER_XYZ = np.array([0.230, 1.459, 1.123])
     
     # For the dispenser, we use a 'face-the-target' orientation
     # Point the tool axis (+X) directly from the base to the target

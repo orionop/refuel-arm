@@ -117,10 +117,15 @@ All ROS 1 Noetic files (launch XML, catkin build files, rospy nodes) are preserv
 
 ```
 deprecated/
+├── docs/          # Old reports, outdated markdown specifications
+├── envs/          # Unused legacy environments and standalone asset chunks
 ├── ros1_build/    # ROS1 package.xml, CMakeLists.txt, xacro, URDF, world
 ├── ros1_launch/   # ROS1 XML launch files
-├── *.ros1.py      # ROS1 Python nodes (rospy)
-└── ...            # Legacy pipeline variants
+├── scripts/       # Old testing scripts, deprecated pipeline code, ROS1 Python nodes (.ros1.py)
+└── ...
+
+scratch_sdfs/
+├── *.sdf          # Assorted scratchpad SDF models for temporary world building
 ```
 
 ---
