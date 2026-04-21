@@ -7,7 +7,7 @@
     <link name="${prefix}base_link">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/base_link.stl"/>
+          <mesh filename="meshes/collision/base_link.stl"/>
         </geometry>
         <origin rpy="0.0 -0.0 0.0" xyz="0.0 0.0 0.0"/>
       </collision>
@@ -18,7 +18,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/base_link.dae"/>
+          <mesh filename="meshes/visual/base_link.dae"/>
         </geometry>
         <origin rpy="0.0 -0.0 0.0" xyz="0.0 0.0 0.0"/>
       </visual>
@@ -27,7 +27,7 @@
     <link name="${prefix}link_1">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/link_1.stl"/>
+          <mesh filename="meshes/collision/link_1.stl"/>
         </geometry>
         <origin rpy="-3.141592653589793 0.0 -0.0" xyz="0.0 -3.8294705409337735e-17 0.3127"/>
       </collision>
@@ -38,7 +38,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/link_1.dae"/>
+          <mesh filename="meshes/visual/link_1.dae"/>
         </geometry>
         <origin rpy="-3.141592653589793 0.0 -0.0" xyz="0.0 -3.8294705409337735e-17 0.3127"/>
       </visual>
@@ -46,7 +46,7 @@
     <link name="${prefix}link_2">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/link_2.stl"/>
+          <mesh filename="meshes/collision/link_2.stl"/>
         </geometry>
         <origin rpy="1.5707963267948968 -0.0 1.5707963267948966" xyz="-0.52 -0.15999999999999998 0.06430000000000007"/>
       </collision>
@@ -57,7 +57,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/link_2.dae"/>
+          <mesh filename="meshes/visual/link_2.dae"/>
         </geometry>
         <origin rpy="1.5707963267948968 -0.0 1.5707963267948966" xyz="-0.52 -0.15999999999999998 0.06430000000000007"/>
       </visual>
@@ -65,7 +65,7 @@
     <link name="${prefix}link_3">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/link_3.stl"/>
+          <mesh filename="meshes/collision/link_3.stl"/>
         </geometry>
         <origin rpy="1.5707963267948968 -0.0 -0.0" xyz="-0.16000000000000006 1.5 0.07660000000000007"/>
       </collision>
@@ -76,7 +76,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/link_3.dae"/>
+          <mesh filename="meshes/visual/link_3.dae"/>
         </geometry>
         <origin rpy="1.5707963267948968 -0.0 -0.0" xyz="-0.16000000000000006 1.5 0.07660000000000007"/>
       </visual>
@@ -84,7 +84,7 @@
     <link name="${prefix}link_4">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/link_4.stl"/>
+          <mesh filename="meshes/collision/link_4.stl"/>
         </geometry>
         <origin rpy="1.8369701987210297e-16 1.5707963267948966 0.0" xyz="-1.72 2.5041036069705178e-17 0.5766"/>
       </collision>
@@ -95,7 +95,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/link_4.dae"/>
+          <mesh filename="meshes/visual/link_4.dae"/>
         </geometry>
         <origin rpy="1.8369701987210297e-16 1.5707963267948966 0.0" xyz="-1.72 2.5041036069705178e-17 0.5766"/>
       </visual>
@@ -103,7 +103,7 @@
     <link name="${prefix}link_5">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/link_5.stl"/>
+          <mesh filename="meshes/collision/link_5.stl"/>
         </geometry>
         <origin rpy="1.5707963267948968 -3.749399456654644e-33 -6.123233995736766e-17" xyz="-1.0950000000000002 1.72 0.04149999999999999"/>
       </collision>
@@ -114,7 +114,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/link_5.dae"/>
+          <mesh filename="meshes/visual/link_5.dae"/>
         </geometry>
         <origin rpy="1.5707963267948968 -3.749399456654644e-33 -6.123233995736766e-17" xyz="-1.0950000000000002 1.72 0.04149999999999999"/>
       </visual>
@@ -122,7 +122,7 @@
     <link name="${prefix}link_6">
       <collision>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/collision/link_6.stl"/>
+          <mesh filename="meshes/collision/link_6.stl"/>
         </geometry>
         <origin rpy="1.2246467991473532e-16 1.5707963267948966 0.0" xyz="-1.7200000000000002 -8.833780868240262e-17 1.1614999999999998"/>
       </collision>
@@ -133,7 +133,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${package_name}/meshes/kr8_r2100_2_arc_hw/visual/link_6.dae"/>
+          <mesh filename="meshes/visual/link_6.dae"/>
         </geometry>
         <origin rpy="1.2246467991473532e-16 1.5707963267948966 0.0" xyz="-1.7200000000000002 -8.833780868240262e-17 1.1614999999999998"/>
       </visual>
