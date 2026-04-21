@@ -1,0 +1,4 @@
+source;share/kuka_kr6_gazebo/local_setup.bash
+source;share/kuka_kr6_gazebo/local_setup.dsv
+source;share/kuka_kr6_gazebo/local_setup.sh
+source;share/kuka_kr6_gazebo/local_setup.zsh

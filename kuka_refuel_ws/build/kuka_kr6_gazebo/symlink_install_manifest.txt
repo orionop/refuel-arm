@@ -1,0 +1,97 @@
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//launch/__pycache__/gazebo.launch.cpython-39.pyc
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//launch/__pycache__/rviz.launch.cpython-39.pyc
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//launch/gas_station.launch.py
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//launch/gazebo.launch.py
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//launch/refuel_sim.launch.py
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//launch/rviz.launch.py
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//urdf/kr6_r700.gazebo.xacro
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//urdf/kr6_r700_2_clean.urdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//worlds/refuel_gas_station.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//worlds/refuel_world.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//config/kuka_rviz.rviz
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//config/ros2_controllers.yaml
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/base_link.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/link_1.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/link_2.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/link_3.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/link_4.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/link_5.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/collision/link_6.stl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/base_link.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/link_1.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/link_2.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/link_3.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/link_4.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/link_5.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//meshes/visual/link_6.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade_Col.mtl
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade_Col.obj
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade_Diffuse.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade_Metal.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade_Normal.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/meshes/FoodCourtBarricade_Rough.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/model.config
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/model.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/thumbnails/1.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/thumbnails/2.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/thumbnails/3.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/thumbnails/4.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/FoodCourtBarricade/thumbnails/5.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/meshes/walk.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/model.config
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/model.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/thumbnails/1.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/thumbnails/2.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/thumbnails/3.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/thumbnails/4.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/Walking actor/thumbnails/5.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/materials/textures/Construction_Cone_Diffuse.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/meshes/construction_cone.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/model-1_3.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/model-1_4.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/model.config
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/model.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/thumbnails/1.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/thumbnails/2.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/thumbnails/3.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/thumbnails/4.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/construction_cone/thumbnails/5.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/materials/scripts/gas_station.material
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/materials/textures/GasStation_Diffuse.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/materials/textures/GasStation_Normal.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/materials/textures/GasStation_Spec.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/meshes/gas_station.dae
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/model-1_3.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/model-1_4.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/model.config
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/model.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/thumbnails/1.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/thumbnails/2.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/thumbnails/3.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/thumbnails/4.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/gas_station/thumbnails/5.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/model.config
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/model.sdf
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/thumbnails/1.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/thumbnails/2.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/thumbnails/3.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/thumbnails/4.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo//models/prius_hybrid/thumbnails/5.png
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/lib/kuka_kr6_gazebo/ik_geometric.py
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/lib/kuka_kr6_gazebo/refuel_mission_commander.py
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/ament_index/resource_index/package_run_dependencies/kuka_kr6_gazebo
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/ament_index/resource_index/parent_prefix_path/kuka_kr6_gazebo
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/environment/ament_prefix_path.sh
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/environment/ament_prefix_path.dsv
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/environment/path.sh
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/environment/path.dsv
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/local_setup.bash
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/local_setup.sh
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/local_setup.zsh
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/local_setup.dsv
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/package.dsv
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/ament_index/resource_index/packages/kuka_kr6_gazebo
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/cmake/kuka_kr6_gazeboConfig.cmake
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/cmake/kuka_kr6_gazeboConfig-version.cmake
+/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/install/kuka_kr6_gazebo/share/kuka_kr6_gazebo/package.xml

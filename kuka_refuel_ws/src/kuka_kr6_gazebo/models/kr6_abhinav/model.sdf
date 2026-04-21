@@ -1,0 +1,247 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <model name="kr6_abhinav">
+    <static>false</static>
+    <link name="base_link">
+      <inertial>
+        <pose>0 0 0.234 0 0 0</pose>
+        <mass>57.5</mass>
+        <inertia>
+          <ixx>0.574</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.574</iyy><iyz>0</iyz><izz>0.383</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/base_link.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/base_link.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="link_1">
+      <pose>0 0 0.626 0 0 0</pose>
+      <inertial>
+        <mass>46.0</mass>
+        <inertia>
+          <ixx>0.306</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.306</iyy><iyz>0</iyz><izz>0.2298</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/link_1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/link_1.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Candle Pose: Link 2 and above rotated -90 deg -->
+    <link name="link_2">
+      <pose>0.0391 0 0.626 0 -1.5708 0</pose>
+      <inertial>
+        <pose>0.234 0 0 0 0 0</pose>
+        <mass>38.3</mass>
+        <inertia>
+          <ixx>0.115</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>1.166</iyy><iyz>0</iyz><izz>1.166</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/link_2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/link_2.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="link_3">
+      <pose>0.0391 0 1.119 0 -1.5708 0</pose>
+      <inertial>
+        <pose>0 0 0.031 0 0 0</pose>
+        <mass>19.15</mass>
+        <inertia>
+          <ixx>0.076</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.076</iyy><iyz>0</iyz><izz>0.038</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/link_3.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/link_3.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="link_4">
+      <pose>0.0391 0 1.174 0 -1.5708 0</pose>
+      <inertial>
+        <pose>0.281 0 0 0 0 0</pose>
+        <mass>15.32</mass>
+        <inertia>
+          <ixx>0.019</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.191</iyy><iyz>0</iyz><izz>0.191</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/link_4.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/link_4.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="link_5">
+      <pose>0.0391 0 1.745 0 -1.5708 0</pose>
+      <inertial>
+        <mass>7.66</mass>
+        <inertia>
+          <ixx>0.011</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.011</iyy><iyz>0</iyz><izz>0.007</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/link_5.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/link_5.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="link_6">
+      <pose>0.0391 0 1.87 0 -1.5708 0</pose>
+      <inertial>
+        <mass>3.83</mass>
+        <inertia>
+          <ixx>0.003</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.003</iyy><iyz>0</iyz><izz>0.003</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/visual/link_6.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <scale>1.565 1.565 1.565</scale>
+            <uri>model://kr6_abhinav/meshes/collision/link_6.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="joint_1" type="revolute">
+      <parent>base_link</parent>
+      <child>link_1</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit><lower>-2.967</lower><upper>2.967</upper></limit>
+      </axis>
+    </joint>
+    <joint name="joint_2" type="revolute">
+      <parent>link_1</parent>
+      <child>link_2</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-3.316</lower><upper>0.785</upper></limit>
+      </axis>
+    </joint>
+    <joint name="joint_3" type="revolute">
+      <parent>link_2</parent>
+      <child>link_3</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-2.094</lower><upper>2.722</upper></limit>
+      </axis>
+    </joint>
+    <joint name="joint_4" type="revolute">
+      <parent>link_3</parent>
+      <child>link_4</child>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit><lower>-3.228</lower><upper>3.228</upper></limit>
+      </axis>
+    </joint>
+    <joint name="joint_5" type="revolute">
+      <parent>link_4</parent>
+      <child>link_5</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-2.094</lower><upper>2.094</upper></limit>
+      </axis>
+    </joint>
+    <joint name="joint_6" type="revolute">
+      <parent>link_5</parent>
+      <child>link_6</child>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit><lower>-6.108</lower><upper>6.108</upper></limit>
+      </axis>
+    </joint>
+  </model>
+</sdf>

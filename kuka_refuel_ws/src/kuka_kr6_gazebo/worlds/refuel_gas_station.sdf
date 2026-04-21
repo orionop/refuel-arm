@@ -11,7 +11,7 @@
     <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
 
     <light type="directional" name="sun">
-      <cast_shadows>true</cast_shadows>
+      <cast_shadows>false</cast_shadows>
       <pose>0 0 10 0 0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
@@ -31,57 +31,46 @@
       </link>
     </model>
 
-    <!-- Inclusion of the Gas Station (The Island) -->
+    <!-- Gas Station Island -->
     <include>
       <uri>model://gas_station</uri>
       <name>gas_station</name>
-      <pose>0 0 0 0 0 0</pose> 
+      <pose>2.100 -1.450 0 0 0 0</pose> 
     </include>
 
-    <!-- Realistic Car (Prius Hybrid) -->
+    <!-- Prius Hybrid (Snapped to Ground) -->
     <include>
-      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Prius Hybrid</uri>
+      <uri>model://prius_hybrid</uri>
       <name>prius_hybrid</name>
-      <pose>2.2 -3.0 0.01 0 0 1.5708</pose> <!-- Parked at the pump -->
+      <pose>2.1 -14.464 0.0 0 0 1.5708</pose> 
     </include>
 
-    <!-- Walking Human (The Dynamic Obstacle) -->
+    <!-- Static Human -->
     <actor name="walking_human">
-      <pose>0 -5.0 0 0 0 0</pose>
+      <pose>-1.0937 -13.4 0.01 0 0 0</pose>
       <skin>
-        <filename>https://fuel.gazebosim.org/1.0/chapulina/models/Walking actor/meshes/walking.dae</filename>
+        <filename>model://Walking actor/meshes/walk.dae</filename>
         <scale>1.0</scale>
       </skin>
       <animation name="walk">
-        <filename>https://fuel.gazebosim.org/1.0/chapulina/models/Walking actor/meshes/walking.dae</filename>
+        <filename>model://Walking actor/meshes/walk.dae</filename>
         <scale>1.0</scale>
         <interpolate_x>true</interpolate_x>
       </animation>
-      <script>
-        <loop>true</loop>
-        <delay_start>0.000000</delay_start>
-        <auto_start>true</auto_start>
-        <trajectory id="0" type="walk">
-          <waypoint><time>0</time><pose>0 -5 0 0 0 0</pose></waypoint>
-          <waypoint><time>5</time><pose>4 -5 0 0 0 0</pose></waypoint>
-          <waypoint><time>10</time><pose>0 -5 0 0 0 3.14</pose></waypoint>
-        </trajectory>
-      </script>
     </actor>
 
-    <!-- Barricade blocking the lane -->
+    <!-- Barricade -->
     <include>
-      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/FoodCourtBarricade</uri>
+      <uri>model://FoodCourtBarricade</uri>
       <name>barricade</name>
-      <pose>4.5 -3.0 0 0 0 1.57</pose>
+      <pose>4.832 -14.509 0.01 0 0 1.57</pose>
     </include>
 
-    <!-- Construction Cone marking the zone -->
+    <!-- Construction Cone -->
     <include>
-      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone</uri>
+      <uri>model://construction_cone</uri>
       <name>cone</name>
-      <pose>1.5 -2.0 0 0 0 0</pose>
+      <pose>1.1518 -13.111 0 0 0 -0.026</pose>
     </include>
-
   </world>
 </sdf>

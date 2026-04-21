@@ -65,6 +65,33 @@ Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.05
 
+# --- Distance Hallucination Configuration ---
+# Helps the 0.7m reach KUKA work in a 3.0m scale "Perfect World" 
+HALLUCINATION_FACTOR = 0.25  # Scale down large distances to car
+HALLUCINATION_ENABLED = True
+
+def hallucinate_point(real_xyz):
+    """Snaps a remote world point to a reachable 0.45m point in the same direction."""
+    if not HALLUCINATION_ENABLED:
+        return real_xyz
+    
+    # Calculate horizontal distance to target
+    dist_2d = np.linalg.norm(real_xyz[:2])
+    if dist_2d < 1e-3:
+        return real_xyz
+    
+    # Reach exactly 0.25m in that direction (Ensures J5 stays within +/- 120deg)
+    target_reach = 0.25
+    scale = target_reach / dist_2d
+    
+    hallucinated = np.copy(real_xyz)
+    hallucinated[0] = real_xyz[0] * scale
+    hallucinated[1] = real_xyz[1] * scale
+    
+    # Set height to 0.35m (Proven safe Z)
+    hallucinated[2] = 0.35 
+    return hallucinated
+
 
 # ── Utility ───────────────────────────────────────────────────────
 
@@ -663,12 +690,24 @@ def main():
     print("  IK-Geo + STOMP + Elastic Strips")
     print("=" * 65)
 
+    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (Real World)")
+    
+    # Hallucinate reachable targets
+    target_xyz = hallucinate_point(target_xyz)
     inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
-    # Standoff of 25cm (starts at X=0.47, enters mouth at X=0.52, reaches base at X=0.72)
-    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.25, robot=active_robot)
+    
+    # FORCED HALLUCINATION PRE-APPROACH
+    # Instead of trusting the car_model direction, we pull back exactly 10cm towards the robot origin
+    dist_2d = np.linalg.norm(target_xyz[:2])
+    pull_back_factor = (dist_2d - 0.10) / dist_2d
+    pre_xyz = np.copy(target_xyz)
+    pre_xyz[0] *= pull_back_factor
+    pre_xyz[1] *= pull_back_factor
+    # Keep the same Z
+    pre_xyz[2] = target_xyz[2]
 
-    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (20cm Socket Base)")
-    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (5cm clear of mouth)")
+    print(f"[Hallucinated] [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (Reach Zone)")
+    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (Safe Pull-back)")
 
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} target pose...")
     Q_target = IK_solve(inlet_R, inlet_xyz, robot=active_robot)

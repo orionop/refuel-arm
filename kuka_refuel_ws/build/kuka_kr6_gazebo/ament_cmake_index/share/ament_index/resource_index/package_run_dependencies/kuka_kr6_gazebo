@@ -1,0 +1,1 @@
+rclpy;std_msgs;sensor_msgs;geometry_msgs;trajectory_msgs;control_msgs;ros_gz_sim;gz_ros2_control;ros2_control;ros2_controllers;robot_state_publisher;joint_state_broadcaster;joint_trajectory_controller;xacro

@@ -54,7 +54,7 @@ def generate_launch_description():
     )
 
     # 4. Gz Sim
-    world_path = os.path.join(pkg, 'worlds', 'refuel_world.sdf')
+    world_path = os.path.join(pkg, 'worlds', 'refuel_gas_station.sdf')
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('ros_gz_sim'),
@@ -67,11 +67,18 @@ def generate_launch_description():
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
-        arguments=['-topic', '/robot_description', '-name', 'kr6_r700'],
+        arguments=[
+            '-topic', '/robot_description',
+            '-name', 'kr6_r700',
+            '-x', '0.2896',
+            '-y', '-12.1261',
+            '-z', '0.1'
+        ],
         output='screen',
     )
 
-    delayed_spawn = TimerAction(period=5.0, actions=[spawn_robot])
+    # Re-added small safety delay for Mac stability
+    delayed_spawn = TimerAction(period=2.0, actions=[spawn_robot])
 
     # 6. Bridge /clock from Gz Sim → ROS2 (required for use_sim_time)
     clock_bridge = Node(
@@ -111,7 +118,7 @@ def generate_launch_description():
         robot_state_publisher,
         gz_sim,
         clock_bridge,
-        delayed_spawn,
+        delayed_spawn, # 2s delay
         RegisterEventHandler(OnProcessExit(
             target_action=spawn_robot,
             on_exit=[load_jsb],
