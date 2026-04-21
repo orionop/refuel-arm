@@ -45,3 +45,4 @@ kuka_refuel_ws/install/
 kuka_refuel_ws/log/
 __pycache__/
 *.pyc
+scratch/

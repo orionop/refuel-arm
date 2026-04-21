@@ -74,6 +74,29 @@ KIN_KR210_R3100 = {
     ]).T,
 }
 
+# ── KUKA KR 8 R2100 arc HW Kinematic Parameters ─────────────────
+# Derived from kroshu/kuka_robot_descriptions kuka_cybertech_support
+# Same kinematic family as KR6 (IK_spherical_2_parallel)
+KIN_KR8_R2100 = {
+    'H': np.array([
+        [0, 0, -1],    # H1
+        [0, 1,  0],    # H2
+        [0, 1,  0],    # H3
+        [-1, 0, 0],    # H4
+        [0, 1,  0],    # H5
+        [-1, 0, 0],    # H6
+    ]).T,
+    'P': np.array([
+        [ 0.000000,  0.000000,  0.312700],   # base -> j1
+        [ 0.160000, -0.064300,  0.207300],   # j1 -> j2
+        [ 0.980000, -0.012300,  0.000000],   # j2 -> j3
+        [ 0.416600,  0.076600,  0.220000],   # j3 -> j4
+        [ 0.518400, -0.041500,  0.000000],   # j4 -> j5
+        [ 0.066500,  0.041500,  0.000000],   # j5 -> j6
+        [ 0.013500,  0.000000,  0.000000],   # j6 -> tool
+    ]).T,
+}
+
 # ── Official UR5 Kinematic Parameters (from rpiRobotics/ik-geo) ──────
 KIN_UR5 = {
     'H': np.array([
@@ -307,4 +330,6 @@ def IK_solve(R, p, robot="kuka"):
     """Unified solver interface."""
     if robot.lower() == "ur5":
         return IK_ur5(R, p, KIN_UR5)
+    if robot.lower() == "kr8":
+        return IK_spherical_2_parallel(R, p, KIN_KR8_R2100)
     return IK_spherical_2_parallel(R, p, KIN_KR210_R3100)

@@ -11,9 +11,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(
     'kuka_kr6_gazebo', 'scripts')))
 from ik_geometric import rot
 
-# Target: Refuel inlet position in robot-local frame (KR210 R3100, yaw=-1.6273)
-# Near the front of the Prius, reachable at ~2.5m along arm's +Y axis
-TARGET_XYZ_DEFAULT = np.array([0.1, 2.5, 0.5])
+# Target: Refuel inlet position in robot-local frame (KR8 R2100, yaw=-1.6273)
+# Derived from user-placed yellow dot_inlet in Gazebo
+# World: [0.563, -13.527, 1.007] -> Local: [1.561, 0.706, 0.715]
+TARGET_XYZ_DEFAULT = np.array([1.561, 0.706, 0.715])
 
 # EE orientation: tool axis pointing outward towards the car
 # Uses yaw towards target + slight downward tilt for natural reach
