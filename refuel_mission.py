@@ -48,10 +48,14 @@ from car_model import ( # type: ignore
     TARGET_XYZ_DEFAULT,
 )
 
-# ── KUKA default joint limits (backup) ──────────────────────────
+# ── KUKA KR210 R3100 joint limits ──────────────────────────
 JOINT_LIMITS_DEFAULT = np.array([
-    [-170.0, 170.0], [-190.0, 45.0], [-120.0, 156.0],
-    [-185.0, 185.0], [-120.0, 120.0], [-350.0, 350.0]
+    [-185.0, 185.0],
+    [-45.0, 85.0],
+    [-210.0, 65.0],
+    [-350.0, 350.0],
+    [-125.0, 125.0],
+    [-350.0, 350.0]
 ])
 # Legacy alias for internal functions
 JOINT_LIMITS = JOINT_LIMITS_DEFAULT
@@ -60,15 +64,15 @@ def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
     """Convert joint limits specified in degrees to radians (for clipping/cost)."""
     return np.radians(np.asarray(limits_deg, dtype=float))
 
-# Upright "Candle" home pose for KUKA (A2=-90, A3=0 as per URDF)
-Q_HOME     = np.array([0.0, -1.5708, 0.0, 0.0, 0.0, 0.0])
+# Upright "Candle" home pose for KUKA
+Q_HOME     = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 DWELL_TIME = 5.0
-OBS_RADIUS = 0.05
+OBS_RADIUS = 0.15
 
 # --- Distance Hallucination Configuration ---
 # Helps the 0.7m reach KUKA work in a 3.0m scale "Perfect World" 
-HALLUCINATION_FACTOR = 0.25  # Scale down large distances to car
-HALLUCINATION_ENABLED = True
+HALLUCINATION_FACTOR = 1.0
+HALLUCINATION_ENABLED = False
 
 def hallucinate_point(real_xyz):
     """Snaps a remote world point to a reachable 0.45m point in the same direction."""
@@ -386,8 +390,8 @@ def _ensure_ros_path():
 # ── Robot-specific ROS configuration ──────────────────────────────
 ROS_CONFIG = {
     'kuka': {
-        'controller': '/kr6_arm_controller/follow_joint_trajectory',
-        'joint_names': [f'joint_{i}' for i in range(1, 7)],
+        'controller': '/kuka_kr210_controller/follow_joint_trajectory',
+        'joint_names': [f'joint_a{i}' for i in range(1, 7)],
     },
     'ur5': {
         'controller': '/ur5_arm_controller/follow_joint_trajectory',

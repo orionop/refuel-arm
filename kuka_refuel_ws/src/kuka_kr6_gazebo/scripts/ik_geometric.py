@@ -12,6 +12,7 @@ import numpy as np # type: ignore
 from linearSubproblemSltns import sp1_lib as sp1 # type: ignore
 from linearSubproblemSltns import sp3_lib as sp3 # type: ignore
 from linearSubproblemSltns import sp4_lib as sp4 # type: ignore
+from scipy.optimize import least_squares # type: ignore
 
 
 def _ensure_iterable(x):
@@ -52,6 +53,27 @@ KIN_KR6_R700 = {
     ]).T,
 }
 
+# ── KUKA KR210 R3100 Prime Kinematic Parameters ─────────────────
+KIN_KR210_R3100 = {
+    'H': np.array([
+        [0, 0, 1],    # H1
+        [0, 1, 0],    # H2
+        [0, 1, 0],    # H3
+        [1, 0, 0],    # H4
+        [0, 1, 0],    # H5
+        [1, 0, 0],    # H6
+    ]).T,
+    'P': np.array([
+        [-2.6200e-03,  9.7586e-04,  3.3099e-01],
+        [ 3.5277e-01, -3.7476e-02,  4.1920e-01],
+        [-9.8483e-05, -1.4750e-01,  1.2499e+00],
+        [ 9.5795e-01,  1.8400e-01, -5.5059e-02],
+        [ 5.4200e-01,  0.0000e+00,  0.0000e+00],
+        [ 1.9250e-01,  0.0000e+00,  0.0000e+00],
+        [ 3.7500e-02,  0.0000e+00, -2.3900e-04]
+    ]).T,
+}
+
 # ── Official UR5 Kinematic Parameters (from rpiRobotics/ik-geo) ──────
 KIN_UR5 = {
     'H': np.array([
@@ -81,7 +103,7 @@ KIN_UR5 = {
 def fwd_kinematics(q, kin=None):
     """Forward kinematics: returns (R_06, p_0T) for joint vector q."""
     if kin is None:
-        kin = KIN_KR6_R700
+        kin = KIN_KR210_R3100
     H = kin['H']
     P = kin['P']
     R = np.eye(3, dtype=float)
@@ -95,10 +117,10 @@ def fwd_kinematics(q, kin=None):
 
 def IK_spherical_2_parallel(R_06, p_0T, kin=None):
     """
-    Exact algebraic IK for the KUKA KR6 R700 (Spherical-2-Parallel family).
+    Exact algebraic IK for Spherical-2-Parallel family arm.
     """
     if kin is None:
-        kin = KIN_KR6_R700
+        kin = KIN_KR210_R3100
 
     Q = []
     H_arr = np.array(kin['H'], dtype=float)
@@ -172,9 +194,30 @@ def IK_spherical_2_parallel(R_06, p_0T, kin=None):
                 
                 Q.append([q1, q2, q3, q4, q5, q6])
 
-    if not Q:
-        return np.empty((6, 0))
-    return np.array(Q).T
+    Q = np.array(Q).T
+
+    # --- LM POLISHER FOR ASYMMETRICAL CAD ---
+    if Q.size > 0:
+        Q_polished = []
+        def residuals(q_opt):
+            R_cur, p_cur = fwd_kinematics(q_opt, kin=kin)
+            err_pos = p_cur - p_0T
+            R_err = R_cur @ R_06.T
+            err_rot = np.array([R_err[2,1]-R_err[1,2], 
+                                R_err[0,2]-R_err[2,0], 
+                                R_err[1,0]-R_err[0,1]])
+            return np.concatenate((err_pos, err_rot))
+
+        for i in range(Q.shape[1]):
+            res = least_squares(residuals, Q[:, i], method='lm', ftol=1e-6, xtol=1e-6, max_nfev=50)
+            if np.linalg.norm(res.fun) < 1e-3:
+                Q_polished.append(res.x)
+        if Q_polished:
+            Q = np.array(Q_polished).T
+        else:
+            Q = np.array([[]])
+
+    return Q
 
 
 def IK_ur5(R_06, p_0T, kin=None):
