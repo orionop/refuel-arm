@@ -213,5 +213,28 @@
     <child link="Link1"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
+
+  <gazebo reference="base_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="link_1">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_2">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_3">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_4">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_5">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="link_6">
+    <material>Gazebo/Black</material>
+  </gazebo>
 </robot>
+
 
