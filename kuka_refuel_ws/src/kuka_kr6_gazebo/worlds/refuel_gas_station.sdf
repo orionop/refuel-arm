@@ -42,7 +42,7 @@
     <include>
       <uri>model://prius_hybrid</uri>
       <name>prius_hybrid</name>
-      <pose>2.1 -14.464 0.0 0 0 1.5708</pose> 
+      <pose>1.8371863365173322 -14.317000389099121 -1.3877787807814457e-17 0 0 1.5707999672671702</pose> 
     </include>
 
     <!-- Static Human -->
@@ -70,7 +70,14 @@
     <include>
       <uri>model://construction_cone</uri>
       <name>cone</name>
-      <pose>1.1518 -13.111 0 0 0 -0.026</pose>
+      <pose>1.1554228067398074 -12.971693992614744 0 0 0 -0.02600000713487723</pose>
+    </include>
+
+    <!-- Elevated KUKA KR 210 Prime Manipulator -->
+    <include>
+      <uri>model://kr210_prime</uri>
+      <name>kuka_kr210</name>
+      <pose>0.2800 -12.1123 0.150 0 0 0</pose>
     </include>
   </world>
 </sdf>
