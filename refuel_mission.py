@@ -729,8 +729,8 @@ def main():
         return
     q_pre = Q_v_pre[:, 0]
 
-    # --- Step 3: Dispenser Pose (moved to exact capsule hook spot) ---
-    DISPENSER_XYZ = np.array([1.390, -12.241, 1.415])
+    # --- Step 3: Dispenser Pose (robot-local frame, converted from world [1.390, -12.241, 1.415]) ---
+    DISPENSER_XYZ = np.array([-1.477, 0.004, 1.123])
     
     # For the dispenser, we use a 'face-the-target' orientation
     # Point the tool axis (+X) directly from the base to the target
@@ -761,10 +761,10 @@ def main():
 
     print("\n[Obstacles] Syncing spherical collision envelopes for static Gazebo meshes...")
     obs_list = [
-        # --- TRAFFIC CONE ---
-        (np.array([1.155, -12.971, 0.5]), 0.40),
-        # --- STATIONARY HUMAN ---
-        (np.array([-1.093, -13.400, 1.0]), 0.50),
+        # --- TRAFFIC CONE (world: 1.155, -12.971 -> local frame) ---
+        (np.array([-1.399, 0.767, 0.208]), 0.40),
+        # --- STATIONARY HUMAN (world: -1.093, -13.400 -> local frame) ---
+        (np.array([0.710, 1.655, 0.708]), 0.50),
     ]
 
     # ── Step 3: Refactored 4-Phase Mission Pipeline ──────────────────
