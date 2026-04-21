@@ -40,3 +40,8 @@ self_contribution_audit.md
 ik-geo/
 ik-geo-temp/
 ik_geo_final/
+kuka_refuel_ws/build/
+kuka_refuel_ws/install/
+kuka_refuel_ws/log/
+__pycache__/
+*.pyc
