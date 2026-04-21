@@ -11,15 +11,17 @@ sys.path.insert(0, os.path.abspath(os.path.join(
     'kuka_kr6_gazebo', 'scripts')))
 from ik_geometric import rot
 
-# Target: Base of a 20cm-deep socket (Center X=0.62 + 0.10)
-# Shifted target rightward (Y=0.40) so the arm (at Y=0) spawns further to the right.
-TARGET_XYZ_DEFAULT = np.array([0.439, 0.400, 0.647])
+# Target: Refuel inlet position in robot-local frame (KR210 R3100, yaw=-1.6273)
+# Near the front of the Prius, reachable at ~2.5m along arm's +Y axis
+TARGET_XYZ_DEFAULT = np.array([0.1, 2.5, 0.5])
 
-# EE orientation: tool axis pointing +Y (sideways into the socket)
-R_TOOL_INTO_CAR_KUKA = np.array([
-    [0., -1.,  0.],
-    [1.,  0.,  0.],
-    [0.,  0.,  1.]])
+# EE orientation: tool axis pointing outward towards the car
+# Uses yaw towards target + slight downward tilt for natural reach
+_target_yaw = np.arctan2(TARGET_XYZ_DEFAULT[1], TARGET_XYZ_DEFAULT[0])
+R_TOOL_INTO_CAR_KUKA = (
+    rot(np.array([0., 0., 1.]), _target_yaw) @
+    rot(np.array([0., 1., 0.]), -0.3)
+)
 
 R_TOOL_INTO_CAR_UR5 = np.array([
     [ 0.,  0., -1.],

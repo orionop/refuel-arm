@@ -39,7 +39,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 
 from ik_geometric import ( # type: ignore
     IK_spherical_2_parallel, fwd_kinematics, rot,
-    IK_solve, KIN_UR5, KIN_KR6_R700
+    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100
 )
 from stomp_collision import stomp_optimize # type: ignore
 from bubble_strips import bubble_strip_deform, set_kinematics as bs_set_kinematics # type: ignore
@@ -676,7 +676,7 @@ def main():
     args = parser.parse_args()
 
     active_robot = args.robot.lower()
-    kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR6_R700
+    kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR210_R3100
     joint_limits_deg = np.asarray(
         kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT), dtype=float
     )
@@ -694,24 +694,15 @@ def main():
     print("  IK-Geo + STOMP + Elastic Strips")
     print("=" * 65)
 
-    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (Real World)")
+    print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}]")
     
-    # Hallucinate reachable targets
-    target_xyz = hallucinate_point(target_xyz)
     inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
     
-    # FORCED HALLUCINATION PRE-APPROACH
-    # Instead of trusting the car_model direction, we pull back exactly 10cm towards the robot origin
-    dist_2d = np.linalg.norm(target_xyz[:2])
-    pull_back_factor = (dist_2d - 0.10) / dist_2d
-    pre_xyz = np.copy(target_xyz)
-    pre_xyz[0] *= pull_back_factor
-    pre_xyz[1] *= pull_back_factor
-    # Keep the same Z
-    pre_xyz[2] = target_xyz[2]
+    # Pre-approach: pull back 10cm along approach direction
+    pre_xyz, _ = get_preapproach_pose(inlet_xyz, inlet_R, standoff=0.10, robot=active_robot)
 
-    print(f"[Hallucinated] [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}] (Reach Zone)")
-    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}] (Safe Pull-back)")
+    print(f"[Inlet]        [{inlet_xyz[0]:.3f}, {inlet_xyz[1]:.3f}, {inlet_xyz[2]:.3f}]")
+    print(f"[Pre-approach] [{pre_xyz[0]:.3f}, {pre_xyz[1]:.3f}, {pre_xyz[2]:.3f}]")
 
     print(f"\n[IK-Geo] Solving for {active_robot.upper()} target pose...")
     Q_target = IK_solve(inlet_R, inlet_xyz, robot=active_robot)
@@ -729,8 +720,8 @@ def main():
         return
     q_pre = Q_v_pre[:, 0]
 
-    # --- Step 3: Dispenser Pose (robot-local frame, converted from world [1.390, -12.241, 1.415]) ---
-    DISPENSER_XYZ = np.array([-1.477, 0.004, 1.123])
+    # --- Step 3: Dispenser Pose (robot-local frame, yaw=-1.6273) ---
+    DISPENSER_XYZ = np.array([0.230, 1.459, 1.123])
     
     # For the dispenser, we use a 'face-the-target' orientation
     # Point the tool axis (+X) directly from the base to the target
@@ -761,10 +752,10 @@ def main():
 
     print("\n[Obstacles] Syncing spherical collision envelopes for static Gazebo meshes...")
     obs_list = [
-        # --- TRAFFIC CONE (world: 1.155, -12.971 -> local frame) ---
-        (np.array([-1.399, 0.767, 0.208]), 0.40),
-        # --- STATIONARY HUMAN (world: -1.093, -13.400 -> local frame) ---
-        (np.array([0.710, 1.655, 0.708]), 0.50),
+        # --- TRAFFIC CONE (world: 1.155, -12.971 -> local frame, yaw=-1.6273) ---
+        (np.array([0.972, 1.266, 0.208]), 0.40),
+        # --- STATIONARY HUMAN (world: -1.093, -13.400 -> local frame, yaw=-1.6273) ---
+        (np.array([1.527, -0.954, 0.708]), 0.50),
     ]
 
     # ── Step 3: Refactored 4-Phase Mission Pipeline ──────────────────

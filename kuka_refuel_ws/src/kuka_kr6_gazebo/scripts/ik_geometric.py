@@ -307,4 +307,4 @@ def IK_solve(R, p, robot="kuka"):
     """Unified solver interface."""
     if robot.lower() == "ur5":
         return IK_ur5(R, p, KIN_UR5)
-    return IK_spherical_2_parallel(R, p, KIN_KR6_R700)
+    return IK_spherical_2_parallel(R, p, KIN_KR210_R3100)
