@@ -164,7 +164,7 @@ def ee_positions(trajectory, kin=None):
 
 
 # ── Random obstacles along the path ──────────────────────────────
-NUM_OBSTACLES = 2
+NUM_OBSTACLES = 0
 
 def random_obstacles_on_path(trajectory, n_obs=NUM_OBSTACLES, rng=None, kin=None):
     """Place n_obs obstacles in non-overlapping zones along the path."""
