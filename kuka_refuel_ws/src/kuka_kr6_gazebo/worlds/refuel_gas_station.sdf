@@ -42,7 +42,7 @@
     <include>
       <uri>model://prius_hybrid</uri>
       <name>prius_hybrid</name>
-      <pose>1.8371863365173322 -14.317000389099121 -1.3877787807814457e-17 0 0 1.5707999672671702</pose> 
+      <pose>1.6266598701477071 -14.056509017944336 -6.9388939039072284e-18 0 0 1.5708003044429053</pose> 
     </include>
 
     <!-- Static Human -->
@@ -70,7 +70,7 @@
     <include>
       <uri>model://construction_cone</uri>
       <name>cone</name>
-      <pose>1.1554228067398074 -12.971693992614744 0 0 0 -0.02600000713487723</pose>
+      <pose>1.1719791889190674 -12.851659774780275 0.0052882102318108082 0 0 -0.026000007134877226</pose>
     </include>
 
     <!-- Elevated KUKA KR 210 Prime Manipulator -->
@@ -83,7 +83,7 @@
     <!-- MARKER DOT 1: Drag to DISPENSER nozzle position -->
     <model name="dot_dispenser">
       <static>false</static>
-      <pose>1.4688500165939331 -12.22054386138916 1.2551599740982056 0 0 0</pose>
+      <pose>1.2640416622161865 -12.185000419616699 1.2171000242233276 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>0.1</mass>
@@ -102,7 +102,7 @@
     <!-- MARKER DOT 2: Drag to CAR FUEL INLET position -->
     <model name="dot_inlet">
       <static>false</static>
-      <pose>0.56312501430511475 -13.526881217956543 1.0072900056838989 0 0 0</pose>
+      <pose>0.11403899639844894 -13.236710548400879 1.0072900056838989 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>0.1</mass>
