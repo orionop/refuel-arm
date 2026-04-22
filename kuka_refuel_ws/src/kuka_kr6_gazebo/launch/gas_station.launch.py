@@ -21,6 +21,12 @@ def generate_launch_description():
     robot_description = {'robot_description': kr8_urdf}
 
     # ── Environment ─────────────────────────────────────────────────
+    kr8_ctrl_cfg = os.path.join(pkg, 'models', 'kr8_r2100', 'config', 'ros2_controllers.yaml')
+    set_ctrl_cfg = SetEnvironmentVariable(
+        name='KR8_CTRL_CFG',
+        value=kr8_ctrl_cfg,
+    )
+
     set_plugin_path = SetEnvironmentVariable(
         name='GZ_SIM_SYSTEM_PLUGIN_PATH',
         value='/opt/ros/jazzy/lib:' + os.environ.get('GZ_SIM_SYSTEM_PLUGIN_PATH', ''),
@@ -81,6 +87,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        set_ctrl_cfg,
         set_plugin_path,
         set_resource_path,
         robot_state_publisher,
