@@ -1,5 +1,4 @@
 import os
-import shutil
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (IncludeLaunchDescription, RegisterEventHandler,
@@ -21,11 +20,10 @@ def generate_launch_description():
         kr8_urdf = f.read()
     robot_description = {'robot_description': kr8_urdf}
 
-    # gz_ros2_control reads <parameters> as a literal path passed to rcl --params-file.
-    # $ENV{} substitution does not work inside <plugin> content in libsdformat.
-    # Copy the yaml to a fixed absolute path so model.sdf can reference it unconditionally.
-    kr8_ctrl_cfg_src = os.path.join(pkg, 'models', 'kr8_r2100', 'config', 'ros2_controllers.yaml')
-    shutil.copy2(kr8_ctrl_cfg_src, '/tmp/kr8_ros2_controllers.yaml')
+    # Absolute path to controller params — passed to spawner via --param-file.
+    # model.sdf has no <parameters> tag; gz_ros2_control starts controller_manager
+    # with no pre-loaded config, and spawner registers each controller with its type.
+    ctrl_cfg = os.path.join(pkg, 'models', 'kr8_r2100', 'config', 'ros2_controllers.yaml')
 
     # ── Environment ─────────────────────────────────────────────────
     set_plugin_path = SetEnvironmentVariable(
@@ -61,14 +59,25 @@ def generate_launch_description():
         arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
     )
 
-    # Controllers — wait 10 s for Gz Sim + gz_ros2_control to finish init
+    # Controllers — wait 10 s for Gz Sim + gz_ros2_control to finish init.
+    # Pass --controller-type so spawner registers the type without needing
+    # a <parameters> file in model.sdf. Pass --param-file for joint config.
     load_jsb = Node(
         package='controller_manager', executable='spawner',
-        arguments=['joint_state_broadcaster'], output='screen',
+        arguments=[
+            'joint_state_broadcaster',
+            '--controller-type', 'joint_state_broadcaster/JointStateBroadcaster',
+        ],
+        output='screen',
     )
     load_arm = Node(
         package='controller_manager', executable='spawner',
-        arguments=['kr6_arm_controller'], output='screen',
+        arguments=[
+            'kr6_arm_controller',
+            '--controller-type', 'joint_trajectory_controller/JointTrajectoryController',
+            '--param-file', ctrl_cfg,
+        ],
+        output='screen',
     )
     delayed_controllers = TimerAction(period=10.0, actions=[load_jsb])
 

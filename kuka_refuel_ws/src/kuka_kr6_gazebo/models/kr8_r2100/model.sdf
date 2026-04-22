@@ -496,7 +496,7 @@
     </ros2_control>
 
     <plugin filename="/opt/ros/jazzy/lib/libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>/tmp/kr8_ros2_controllers.yaml</parameters>
+
       <controller_manager_name>controller_manager</controller_manager_name>
     </plugin>
   </model>
