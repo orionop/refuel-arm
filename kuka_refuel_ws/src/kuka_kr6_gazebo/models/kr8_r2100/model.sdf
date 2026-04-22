@@ -495,7 +495,7 @@
       </joint>
     </ros2_control>
 
-    <plugin filename="gz-sim-ros2-control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>config/ros2_controllers.yaml</parameters>
     </plugin>
   </model>
