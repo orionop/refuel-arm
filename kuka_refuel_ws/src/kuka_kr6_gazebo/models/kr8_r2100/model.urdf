@@ -223,7 +223,6 @@
   </gazebo>
   
   <gazebo>
-    <static>true</static>
   </gazebo>
 
 </robot>

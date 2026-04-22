@@ -1,0 +1,460 @@
+<sdf version='1.11'>
+  <model name='kuka_kr8_r2100'>
+    <link name='base_link'>
+      <inertial>
+        <pose>-0.046746461812104192 -0.0025079595810908188 0.1666242587055522 -1.8869481092927021 -0.74729416674196902 0.12567760797775956</pose>
+        <mass>65.216999999999999</mass>
+        <inertia>
+          <ixx>1.252976825674768</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.508736349819161</iyy>
+          <iyz>0</iyz>
+          <izz>1.800205080986532</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/base_link.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/base_link.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='joint_1' type='revolute'>
+      <pose relative_to='base_link'>0 0 0.31269999999999998 3.1415926535897931 0 0</pose>
+      <parent>base_link</parent>
+      <child>link_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.2288591124999999</lower>
+          <upper>3.2288591124999999</upper>
+          <effort>2001</effort>
+          <velocity>3.4906585039886591</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='link_1'>
+      <pose relative_to='joint_1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.050470572517724181 -0.022364893002957 -0.1312334918130322 -0.7660833907477963 -0.53198484515749633 2.768174874698055</pose>
+        <mass>84.207000000000008</mass>
+        <inertia>
+          <ixx>1.7259675580526079</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.427432874218951</iyy>
+          <iyz>0</iyz>
+          <izz>2.1211022213954802</izz>
+        </inertia>
+      </inertial>
+      <collision name='link_1_collision'>
+        <pose>0 -3.8294705409337741e-17 0.31269999999999998 -3.1415926535897931 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/link_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='link_1_visual'>
+        <pose>0 -3.8294705409337741e-17 0.31269999999999998 -3.1415926535897931 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/link_1.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Orange</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='joint_2' type='revolute'>
+      <pose relative_to='link_1'>0.16 0.064299999999999996 -0.20730000000000001 1.5707963267948959 0 0</pose>
+      <parent>link_1</parent>
+      <child>link_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.2288591124999999</lower>
+          <upper>1.1344640125000001</upper>
+          <effort>1750.7279369169439</effort>
+          <velocity>2.9948518456789461</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <initial_position>-1.5707963267948966</initial_position>
+      </axis>
+    </joint>
+    <link name='link_2'>
+      <pose relative_to='joint_2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.40207495993654591 0.0078946339252472589 -0.073148269954837558 -1.5492266158302022 -1.5309292421840535 -0.020762987371118615</pose>
+        <mass>61.777000000000001</mass>
+        <inertia>
+          <ixx>9.8488722185902962</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.89384150353377434</iyy>
+          <iyz>0</iyz>
+          <izz>10.208614788058471</izz>
+        </inertia>
+      </inertial>
+      <collision name='link_2_collision'>
+        <pose>-0.52000000000000002 -0.16 0.064300000000000065 1.570796326794897 2.2186712959340957e-31 1.5707963267948957</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/link_2.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='link_2_visual'>
+        <pose>-0.52000000000000002 -0.16 0.064300000000000065 1.570796326794897 2.2186712959340957e-31 1.5707963267948957</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/link_2.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Orange</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='joint_3' type='revolute'>
+      <pose relative_to='link_2'>0.97999999999999998 0 -0.0123 0 0 0</pose>
+      <parent>link_2</parent>
+      <child>link_3</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.4085543650000001</lower>
+          <upper>3.0543261875000001</upper>
+          <effort>910.06343021482007</effort>
+          <velocity>3.3161255787892259</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='link_3'>
+      <pose relative_to='joint_3'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.15308797734066609 -0.090110250599636219 0.017381438457181399 2.9715216784910652 0.19136626342049948 1.3935743021200311</pose>
+        <mass>33.579156324000003</mass>
+        <inertia>
+          <ixx>1.0471514730892619</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.46657895631733792</iyy>
+          <iyz>0</iyz>
+          <izz>1.365068194878363</izz>
+        </inertia>
+      </inertial>
+      <collision name='link_3_collision'>
+        <pose>-0.16000000000000009 1.5 0.076600000000000071 1.570796326794897 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/link_3.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='link_3_visual'>
+        <pose>-0.16000000000000009 1.5 0.076600000000000071 1.570796326794897 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/link_3.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Orange</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='joint_4' type='revolute'>
+      <pose relative_to='link_3'>0.41660000000000003 -0.22 0.076600000000000001 1.5707963267948959 5.5511151231257827e-17 -1.5707963267948959</pose>
+      <parent>link_3</parent>
+      <child>link_4</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.8797932624999998</lower>
+          <upper>2.8797932624999998</upper>
+          <effort>51.891734229999997</effort>
+          <velocity>7.5049157835756173</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='link_4'>
+      <pose relative_to='joint_4'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.022665330202187989 -0.0066666561658743351 -0.2233283807778223 0.67478944865236012 -1.4383210728090003 2.5823625869153575</pose>
+        <mass>17.459</mass>
+        <inertia>
+          <ixx>0.09715760182914325</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.56387718292264377</iyy>
+          <iyz>0</iyz>
+          <izz>0.60041662246437877</izz>
+        </inertia>
+      </inertial>
+      <collision name='link_4_collision'>
+        <pose>-1.72 2.5041036069705181e-17 0.5766 1.8369701987210299e-16 1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/link_4.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='link_4_visual'>
+        <pose>-1.72 2.5041036069705181e-17 0.5766 1.8369701987210299e-16 1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/link_4.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Orange</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='joint_5' type='revolute'>
+      <pose relative_to='link_4'>0 -0.041500000000000002 -0.51839999999999997 -1.5707963267948957 1.5707963267948966 0</pose>
+      <parent>link_4</parent>
+      <child>link_5</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.0071286375000001</lower>
+          <upper>2.44346095</upper>
+          <effort>36.942942428836332</effort>
+          <velocity>7.5049157835756173</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <initial_position>1.5707963267948966</initial_position>
+      </axis>
+    </joint>
+    <link name='link_5'>
+      <pose relative_to='joint_5'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.012999999999999999 0 0.0040000000000000001 -0.016921791085990932 -0.84073824617798865 -3.139045902023482</pose>
+        <mass>2.75</mass>
+        <inertia>
+          <ixx>0.003125545723099804</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0053848564812374452</iyy>
+          <iyz>0</iyz>
+          <izz>0.0060495977956627487</izz>
+        </inertia>
+      </inertial>
+      <collision name='link_5_collision'>
+        <pose>-1.095 1.72 0.041499999999999988 1.570796326794897 -2.3046035573553367e-33 -6.123233995736766e-17</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/link_5.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='link_5_visual'>
+        <pose>-1.095 1.72 0.041499999999999988 1.570796326794897 -2.3046035573553367e-33 -6.123233995736766e-17</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/link_5.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Orange</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='joint_6' type='revolute'>
+      <pose relative_to='link_5'>0.066500000000000004 0 0.041500000000000002 1.5707963267948959 5.5511151231257827e-17 -1.5707963267948959</pose>
+      <parent>link_5</parent>
+      <child>link_6</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-6.1086523750000001</lower>
+          <upper>6.1086523750000001</upper>
+          <effort>39.244799999999998</effort>
+          <velocity>10.995574287564279</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='link_6'>
+      <pose relative_to='joint_6'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0.00050000000000000001 0.012 -0.021124828875844014 0.00010529643005096691 -0.02858546926530265</pose>
+        <mass>0.84999999999999998</mass>
+        <inertia>
+          <ixx>0.00057401141623523359</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00055986174395488677</iyy>
+          <iyz>0</iyz>
+          <izz>0.00084412683980987979</izz>
+        </inertia>
+      </inertial>
+      <collision name='link_6_collision'>
+        <pose>-1.72 -8.8337808682402617e-17 1.1615 1.224646799147353e-16 1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/collision/link_6.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='link_6_visual'>
+        <pose>-1.72 -8.8337808682402617e-17 1.1615 1.224646799147353e-16 1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/visual/link_6.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <frame name='base_link-base' attached_to='base_link'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='base' attached_to='base_link-base'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='link6-flange' attached_to='link_6'>
+      <pose>0 0 -0.0135 0 1.5707963267948966 0</pose>
+    </frame>
+    <frame name='flange' attached_to='link6-flange'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='link6-tool0' attached_to='link_6'>
+      <pose>0 0 -0.0135 3.1415926535897931 1.224646799147353e-16 3.1415926535897931</pose>
+    </frame>
+    <frame name='tool0' attached_to='link6-tool0'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+  </model>
+</sdf>
