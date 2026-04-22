@@ -83,7 +83,7 @@
     <!-- MARKER DOT 1: Drag to DISPENSER nozzle position -->
     <model name="dot_dispenser">
       <static>false</static>
-      <pose>0 -12 5 0 0 0</pose>
+      <pose>1.4688500165939331 -12.22054386138916 1.2551599740982056 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>0.1</mass>
@@ -102,7 +102,7 @@
     <!-- MARKER DOT 2: Drag to CAR FUEL INLET position -->
     <model name="dot_inlet">
       <static>false</static>
-      <pose>2 -14 5 0 0 0</pose>
+      <pose>0.56312501430511475 -13.526881217956543 1.0072900056838989 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>0.1</mass>
