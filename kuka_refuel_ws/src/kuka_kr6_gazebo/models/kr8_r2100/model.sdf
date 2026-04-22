@@ -458,5 +458,45 @@
     <frame name="tool0" attached_to="link6-tool0">
       <pose>0 0 0 0 0 0</pose>
     </frame>
+
+    <ros2_control name="GazeboSimSystem" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+      <joint name="joint_1">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="joint_2">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="joint_3">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="joint_4">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="joint_5">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="joint_6">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+    </ros2_control>
+
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>/Users/anuragx/Desktop/Archives/projects/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/config/ros2_controllers.yaml</parameters>
+    </plugin>
   </model>
 </sdf>

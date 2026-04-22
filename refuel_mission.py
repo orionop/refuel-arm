@@ -1,29 +1,24 @@
 #!/usr/bin/env python3
 """
-KUKA KR6 R700 — Autonomous Refueling Mission
-==============================================
+KUKA KR 8 R2100 (Cybertech nano) — Autonomous Refueling Mission
+============================================================
 
-Hybrid C-Space / W-Space 4-phase mission architecture:
+Hybrid C-Space / W-Space 8-phase mission architecture:
 
-  Phase 1  HOME → Pre-approach     (C-Space: STOMP + Elastic Strips)
-  Phase 2  Pre-approach → Target   (W-Space: Cartesian straight-line + IK)
-  Phase 3  Target → Pre-approach   (W-Space: Cartesian straight-line + IK)
-  Phase 4  Pre-approach → HOME     (C-Space: STOMP + Elastic Strips)
+  Phase 1  REST → Dispenser        (C-Space: STOMP + Bubble Strips)
+  Phase 2  Dwell: Nozzle Fetch     (Wait 3s)
+  Phase 3  Dispenser → Pre-app     (C-Space: STOMP + Bubble Strips)
+  Phase 4  Pre-app → Fuel Inlet    (W-Space: Cartesian straight-line + IK)
+  Phase 5  Dwell: Active Refuel    (Wait 6s)
+  Phase 6  Fuel Inlet → Pre-app    (W-Space: Cartesian straight-line + IK)
+  Phase 7  Pre-app → Dispenser     (C-Space: STOMP + Bubble Strips)
+  Phase 8  Dispenser → REST        (C-Space: STOMP + Bubble Strips)
 
-Random obstacles (blue spheres) are placed along the gross-motion path.
-STOMP + Elastic Strips avoid them. Fine insertion/extraction use Cartesian
-interpolation with fixed orientation to guarantee a straight-line nozzle path.
+Random obstacles are avoided via STOMP. Fine insertion/extraction uses 
+Cartesian interpolation with fixed orientation for straight-line path.
 
-Outputs two graphs:
-  - EE workspace trajectory (3D)
-  - Joint angle trajectories (degrees) over the full mission
-
-Run locally:   python3 refuel_mission.py
-Run in Gazebo: python3 refuel_mission.py --ros
-Run in RViz:   python3 refuel_mission.py --rviz
-
-ROS2 migration: ROS1 (rospy/actionlib) → ROS2 (rclpy/action)
-ROS1 version:   deprecated/refuel_mission.ros1.py
+Run locally:   python3 refuel_mission.py --robot kr8
+Run in Gazebo: python3 refuel_mission.py --robot kr8 --ros
 """
 import sys
 import os
@@ -39,7 +34,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 
 from ik_geometric import ( # type: ignore
     IK_spherical_2_parallel, fwd_kinematics, rot,
-    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100
+    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100, KIN_KR8_R2100
 )
 from stomp_collision import stomp_optimize # type: ignore
 from bubble_strips import bubble_strip_deform, set_kinematics as bs_set_kinematics # type: ignore
@@ -66,6 +61,8 @@ def limits_deg_to_rad(limits_deg: np.ndarray) -> np.ndarray:
 
 # Upright "Candle" home pose for KUKA
 Q_HOME     = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+# "Bonkers" Spawn Pose (Rest) for KR8 (J5 shifted by +2pi to stay in limits)
+Q_REST     = np.array([1.607, -0.5, 0.5, 0.0, 3.203, 0.0])
 DWELL_TIME = 5.0
 OBS_RADIUS = 0.15
 
@@ -335,14 +332,15 @@ def plan_cartesian(pos_start, pos_goal, R_fixed, q_seed, name, n_wp=20, kin=None
     Uses platform-specific IK_solve for UR5 or KUKA.
     """
     print(f"\n  Planning: {name} (Cartesian, {n_wp} wp)")
-    # Determine robot type from kin params if possible
-    is_ur5 = False
+    active_bot = "kuka"
     if kin is not None and hasattr(kin, 'get'):
         # Check H1 axis orientation (UR5 is [0,0,1], KUKA is [0,0,-1])
         h_matrix = np.asarray(kin.get('H'))
-        is_ur5 = h_matrix[2, 0] > 0
+        if h_matrix[2, 0] > 0:
+            active_bot = "ur5"
+        elif kin.get('joint_limits', [])[1, 0] < -200: # Heuristic for KR8
+            active_bot = "kr8"
     
-    active_bot = "ur5" if is_ur5 else "kuka"
     traj = np.zeros((n_wp, 6))
     history = [q_seed.copy()]
     
@@ -392,6 +390,10 @@ ROS_CONFIG = {
     'kuka': {
         'controller': '/kuka_kr210_controller/follow_joint_trajectory',
         'joint_names': [f'joint_a{i}' for i in range(1, 7)],
+    },
+    'kr8': {
+        'controller': '/kr6_arm_controller/follow_joint_trajectory',
+        'joint_names': [f'joint_{i}' for i in range(1, 7)],
     },
     'ur5': {
         'controller': '/ur5_arm_controller/follow_joint_trajectory',
@@ -669,14 +671,20 @@ def main():
                         help="Random seed for obstacle placement (default: random)")
     parser.add_argument("--mirror-return", action="store_true",
                         help="Return along the reversed approach path instead of re-planning")
-    parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5"],
+    parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5", "kr8"],
                         help="Target robot platform (default: kuka)")
     parser.add_argument("--compliant", action="store_true",
                         help="Use admittance control for fine insertion/extraction (UR5 only)")
     args = parser.parse_args()
 
     active_robot = args.robot.lower()
-    kin_params = KIN_UR5 if active_robot == "ur5" else KIN_KR210_R3100
+    if active_robot == "ur5":
+        kin_params = KIN_UR5
+    elif active_robot == "kr8":
+        kin_params = KIN_KR8_R2100
+    else:
+        kin_params = KIN_KR210_R3100
+        
     joint_limits_deg = np.asarray(
         kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT), dtype=float
     )
@@ -695,6 +703,8 @@ def main():
     print("=" * 65)
 
     print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}]")
+    if active_robot == "kr8":
+        target_xyz = np.array([1.296, 0.095, 0.715])
     
     inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
     
@@ -721,7 +731,12 @@ def main():
     q_pre = Q_v_pre[:, 0]
 
     # --- Step 3: Dispenser Pose (robot-local frame, yaw=-1.6273) ---
-    DISPENSER_XYZ = np.array([0.230, 1.459, 1.123])
+    if active_robot == "kr8":
+        DISPENSER_XYZ = np.array([0.181, 1.329, 0.925])
+        TARGET_XYZ = np.array([1.296, 0.095, 0.715])
+    else:
+        DISPENSER_XYZ = np.array([0.230, 1.459, 1.123])
+        TARGET_XYZ = target_xyz
     
     # For the dispenser, we use a 'face-the-target' orientation
     # Point the tool axis (+X) directly from the base to the target
@@ -742,59 +757,61 @@ def main():
     print(f"     Target Joints:    {np.round(np.degrees(q_target), 1)} deg")
     print(f"     Target FK error:  {np.linalg.norm(p_chk - inlet_xyz):.2e} m")
 
-    # ── Step 2: Blind STOMP to find the path, then place obstacle ─
-    print("\n[STOMP] Blind plan HOME -> Pre-approach (to determine path)...")
-    seg_blind = stomp_optimize(
-        q_start=Q_HOME, q_goal=q_pre,
-        joint_limits=joint_limits_rad, simple_obstacles=None,
-        n_waypoints=n_wp, n_iterations=80, n_rollouts=10,
-        noise_stddev=0.08, verbose=False, kin=kin_params)
-
+    # ── Step 2: Obstacle Sync ──────────────────────────────────────
     print("\n[Obstacles] Syncing spherical collision envelopes for static Gazebo meshes...")
-    obs_list = [
-        # --- TRAFFIC CONE (world: 1.155, -12.971 -> local frame, yaw=-1.6273) ---
-        (np.array([0.972, 1.266, 0.208]), 0.40),
-        # --- STATIONARY HUMAN (world: -1.093, -13.400 -> local frame, yaw=-1.6273) ---
-        (np.array([1.527, -0.954, 0.708]), 0.50),
-    ]
+    if active_robot == "kr8":
+        obs_list = [
+            # --- TRAFFIC CONE (world: 1.172, -12.852) ---
+            (np.array([0.990, 1.218, 0.20]), 0.35),
+            # --- PRIUS FRONT CORNER (approximate keep-out) ---
+            (np.array([1.40, -0.50, 0.50]), 0.60),
+        ]
+    else:
+        obs_list = [
+            (np.array([0.972, 1.266, 0.208]), 0.40),
+            (np.array([1.527, -0.954, 0.708]), 0.50),
+        ]
 
-    # ── Step 3: Refactored 4-Phase Mission Pipeline ──────────────────
+    # ── Step 3: 8-Phase Mission Pipeline ─────────────────────────────
     
-    # Phase 1: HOME -> Dispenser
-    seg_fetch = plan_stomp(Q_HOME, q_disp, obs_list,
-                           "Phase 1: HOME -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
+    # Phase 1: REST -> Dispenser
+    seg_p1 = plan_stomp(Q_REST, q_disp, obs_list,
+                        "Phase 1: REST -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    # Phase 2: Dispenser -> Pre-approach
-    # Note: Using STOMP to avoid obstacles between Dispenser and Car
-    seg_approach = plan_stomp(q_disp, q_pre, obs_list,
-                              "Phase 2: Dispenser -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
+    # Phase 3: Dispenser -> Pre-approach
+    seg_p3 = plan_stomp(q_disp, q_pre, obs_list,
+                        "Phase 3: Dispenser -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    # Phase 3: Fine Insertion (Pre-approach -> Target)
-    seg_insert = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
-                                q_pre, "Phase 3: Pre-approach -> Target", n_wp=15, kin=kin_params)
+    # Phase 4: Fine Insertion (Pre-approach -> Target)
+    seg_p4 = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
+                            q_pre, "Phase 4: Pre-approach -> Target", n_wp=15, kin=kin_params)
                                 
-    # Phase 4a: Fine Extraction (Target -> Pre-approach)
-    seg_extract = plan_cartesian(inlet_xyz, pre_xyz, inlet_R, 
-                                 q_target, "Phase 4a: Target -> Pre-approach", n_wp=15, kin=kin_params)
+    # Phase 6: Fine Extraction (Target -> Pre-approach)
+    seg_p6 = plan_cartesian(inlet_xyz, pre_xyz, inlet_R, 
+                            q_target, "Phase 6: Target -> Pre-approach", n_wp=15, kin=kin_params)
 
-    # Phase 4b: Pre-approach -> HOME
-    seg_return = plan_stomp(q_pre, Q_HOME, obs_list,
-                            "Phase 4b: Pre-approach -> HOME", n_wp, limits=joint_limits_deg, kin=kin_params)
+    # Phase 7: Pre-approach -> Dispenser
+    seg_p7 = plan_stomp(q_pre, q_disp, obs_list,
+                        "Phase 7: Pre-approach -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
+
+    # Phase 8: Dispenser -> REST
+    seg_p8 = plan_stomp(q_disp, Q_REST, obs_list,
+                        "Phase 8: Dispenser -> REST", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # ── Step 4: Concatenate full trajectory ───────────────────────
-    full_traj = np.vstack([seg_fetch, seg_approach, seg_insert, seg_extract, seg_return])
+    full_traj = np.vstack([seg_p1, seg_p3, seg_p4, seg_p6, seg_p7, seg_p8])
 
-    # compliant_phases: which segments use admittance control
+    # segments definition for execution loop
     use_compliant = args.compliant and active_robot == 'ur5'
-    
     segments = [
-        ("Phase 1: HOME -> Dispenser",    seg_fetch,    7.0, False),
-        ("Pause: Grabbing Nozzle",        None,         2.0, False),
-        ("Phase 2: Dispenser -> Pre-app", seg_approach, 7.0, False),
-        ("Phase 3: Pre-app -> Inlet",     seg_insert,   4.0, use_compliant),
-        ("Pause: Active Fueling",         None,         6.0, False),
-        ("Phase 4a: Inlet -> Pre-app",    seg_extract,  4.0, use_compliant),
-        ("Phase 4b: Pre-app -> HOME",     seg_return,   7.0, False),
+        ("Phase 1: REST -> Dispenser",    seg_p1,    7.0, False),
+        ("Phase 2: Dwell (Fetch Nozzle)",  None,      3.0, False),
+        ("Phase 3: Dispenser -> Pre-app", seg_p3,    7.0, False),
+        ("Phase 4: Pre-app -> Inlet",     seg_p4,    4.0, use_compliant),
+        ("Phase 5: Dwell (Refueling)",    None,      6.0, False),
+        ("Phase 6: Inlet -> Pre-app",     seg_p6,    4.0, use_compliant),
+        ("Phase 7: Pre-app -> Dispenser", seg_p7,    7.0, False),
+        ("Phase 8: Dispenser -> REST",    seg_p8,    7.0, False),
     ]
     if use_compliant:
         print("\n[Admittance] Compliant mode ENABLED for fine insertion/extraction")

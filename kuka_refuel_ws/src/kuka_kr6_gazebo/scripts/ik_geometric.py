@@ -53,6 +53,31 @@ KIN_KR6_R700 = {
     ]).T,
 }
 
+# ── KUKA KR8 R2100 (Cybertech nano) Kinematic Parameters ────────
+KIN_KR8_R2100 = {
+    'H': np.array([
+        [0, 0, -1],    # H1
+        [0, 1, 0],     # H2
+        [0, 1, 0],     # H3
+        [-1, 0, 0],    # H4
+        [0, 1, 0],     # H5
+        [-1, 0, 0],    # H6
+    ]).T,
+    'P': np.array([
+        [0, 0, 0.3127],                # P1: base to j1
+        [0.16, 0.0643, -0.2073],       # P2: j1 to j2
+        [0.98, 0, -0.0123],            # P3: j2 to j3
+        [0.4166, -0.22, 0.0766],       # P4: j3 to j4
+        [0, -0.0415, -0.5184],         # P5: j4 to j5
+        [0.0665, 0, 0.0415],           # P6: j5 to j6
+        [0, 0, -0.0135],               # P7: j6 to tool0
+    ]).T,
+    'joint_limits': np.array([
+        [-185, 185], [-275, -25], [-138, 175],
+        [-165, 165], [-25, 230], [-350, 350]
+    ])
+}
+
 # ── KUKA KR210 R3100 Prime Kinematic Parameters ─────────────────
 KIN_KR210_R3100 = {
     'H': np.array([
@@ -305,6 +330,9 @@ def IK_ur5(R_06, p_0T, kin=None):
 
 def IK_solve(R, p, robot="kuka"):
     """Unified solver interface."""
-    if robot.lower() == "ur5":
+    r_lower = robot.lower()
+    if r_lower == "ur5":
         return IK_ur5(R, p, KIN_UR5)
+    if r_lower == "kr8":
+        return IK_spherical_2_parallel(R, p, KIN_KR8_R2100)
     return IK_spherical_2_parallel(R, p, KIN_KR210_R3100)
