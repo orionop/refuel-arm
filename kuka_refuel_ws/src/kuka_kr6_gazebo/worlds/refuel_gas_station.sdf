@@ -45,20 +45,6 @@
       <pose>1.6266598701477071 -14.056509017944336 -6.9388939039072284e-18 0 0 1.5708003044429053</pose> 
     </include>
 
-    <!-- Static Human -->
-    <actor name="walking_human">
-      <pose>-1.0937 -13.4 0.01 0 0 0</pose>
-      <skin>
-        <filename>model://Walking actor/meshes/walk.dae</filename>
-        <scale>1.0</scale>
-      </skin>
-      <animation name="walk">
-        <filename>model://Walking actor/meshes/walk.dae</filename>
-        <scale>1.0</scale>
-        <interpolate_x>true</interpolate_x>
-      </animation>
-    </actor>
-
     <!-- Barricade -->
     <include>
       <uri>model://FoodCourtBarricade</uri>
