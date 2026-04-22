@@ -1,4 +1,5 @@
 import os
+import shutil
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (IncludeLaunchDescription, RegisterEventHandler,
@@ -20,13 +21,13 @@ def generate_launch_description():
         kr8_urdf = f.read()
     robot_description = {'robot_description': kr8_urdf}
 
-    # ── Environment ─────────────────────────────────────────────────
-    kr8_ctrl_cfg = os.path.join(pkg, 'models', 'kr8_r2100', 'config', 'ros2_controllers.yaml')
-    set_ctrl_cfg = SetEnvironmentVariable(
-        name='KR8_CTRL_CFG',
-        value=kr8_ctrl_cfg,
-    )
+    # gz_ros2_control reads <parameters> as a literal path passed to rcl --params-file.
+    # $ENV{} substitution does not work inside <plugin> content in libsdformat.
+    # Copy the yaml to a fixed absolute path so model.sdf can reference it unconditionally.
+    kr8_ctrl_cfg_src = os.path.join(pkg, 'models', 'kr8_r2100', 'config', 'ros2_controllers.yaml')
+    shutil.copy2(kr8_ctrl_cfg_src, '/tmp/kr8_ros2_controllers.yaml')
 
+    # ── Environment ─────────────────────────────────────────────────
     set_plugin_path = SetEnvironmentVariable(
         name='GZ_SIM_SYSTEM_PLUGIN_PATH',
         value='/opt/ros/jazzy/lib:' + os.environ.get('GZ_SIM_SYSTEM_PLUGIN_PATH', ''),
@@ -87,7 +88,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        set_ctrl_cfg,
         set_plugin_path,
         set_resource_path,
         robot_state_publisher,
