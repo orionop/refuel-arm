@@ -1,5 +1,4 @@
 import os
-import shutil
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (IncludeLaunchDescription, RegisterEventHandler,
@@ -11,24 +10,20 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg = get_package_share_directory('kuka_kr6_gazebo')
 
-    # KR8 is already embedded in refuel_gas_station.sdf — do NOT spawn a
-    # separate robot. Publish its URDF so the controller_manager (started
-    # inside Gz Sim by the gz_ros2_control plugin) can resolve hardware
-    # interfaces.  Using the KR8 model.urdf (not the KR6 xacro) so link
-    # names match what RViz/tf expects.
+    # KR8 is embedded in refuel_gas_station.sdf — do NOT spawn separately.
+    # Publish URDF so controller_manager can resolve hardware interfaces.
     kr8_urdf_path = os.path.join(pkg, 'models', 'kr8_r2100', 'model.urdf')
     with open(kr8_urdf_path, 'r') as f:
         kr8_urdf = f.read()
     robot_description = {'robot_description': kr8_urdf}
 
-    # gz_ros2_control reads <parameters> as a literal path via rcl --params-file.
-    # libsdformat does not expand $ENV{} inside <plugin> content.
-    # Solution: copy the yaml to /tmp at launch time so model.sdf can use an
-    # absolute path (/tmp/kr8_ros2_controllers.yaml) that always resolves.
-    ctrl_cfg_src = os.path.join(pkg, 'models', 'kr8_r2100', 'config', 'ros2_controllers.yaml')
-    shutil.copy2(ctrl_cfg_src, '/tmp/kr8_ros2_controllers.yaml')
-
     # ── Environment ─────────────────────────────────────────────────
+    # Restrict DDS discovery to localhost — prevents noise from other
+    # ROS2/PX4 nodes running on the same machine or LAN.
+    set_dds_scope = SetEnvironmentVariable(
+        name='ROS_AUTOMATIC_DISCOVERY_RANGE',
+        value='LOCALHOST',
+    )
     set_plugin_path = SetEnvironmentVariable(
         name='GZ_SIM_SYSTEM_PLUGIN_PATH',
         value='/opt/ros/jazzy/lib:' + os.environ.get('GZ_SIM_SYSTEM_PLUGIN_PATH', ''),
@@ -63,8 +58,8 @@ def generate_launch_description():
     )
 
     # Controllers — wait 10 s for Gz Sim + gz_ros2_control to finish init.
-    # Controller types and joint params are declared in /tmp/kr8_ros2_controllers.yaml
-    # which gz_ros2_control loaded into controller_manager on startup.
+    # model.sdf has the absolute config path baked in via cmake configure_file,
+    # so controller_manager knows the controller types at startup.
     load_jsb = Node(
         package='controller_manager', executable='spawner',
         arguments=['joint_state_broadcaster'], output='screen',
@@ -75,8 +70,7 @@ def generate_launch_description():
     )
     delayed_controllers = TimerAction(period=10.0, actions=[load_jsb])
 
-    # Move KR8 to upright candle pose immediately after arm controller is ready.
-    # Prevents gravity from pulling the arm down before refuel_mission.py runs.
+    # Move KR8 to upright candle pose after arm controller activates.
     move_to_candle = ExecuteProcess(
         cmd=[
             'ros2', 'action', 'send_goal',
@@ -91,6 +85,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        set_dds_scope,
         set_plugin_path,
         set_resource_path,
         robot_state_publisher,
