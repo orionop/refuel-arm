@@ -25,7 +25,7 @@ with open(os.path.join(MODEL_DIR, "model.config"), "w") as f:
 <model>
   <name>ur20</name>
   <version>1.0</version>
-  <sdf version="1.9">model.sdf</sdf>
+  <sdf version="1.10">model.sdf</sdf>
   <description>Universal Robots UR20 Fixed</description>
 </model>
 """)
@@ -56,42 +56,54 @@ for p in list(model.findall("plugin")):
     if "gz_ros2_control" in p.attrib.get('filename', ''):
         model.remove(p)
 
-# ── 2. Handle world→base_link fixed joints ───────────────────────────────────
-world_joints = [
-    j for j in model.findall("joint")
-    if (j.find("parent") is not None and j.find("child") is not None
-        and j.find("parent").text in ("world", "world::world")
-        and j.find("child").text in ("base_link", "ur20::base_link"))
-]
+# ── 2. Strip the internal "world" link and rewire the world joint ─────────────
+# gz sdf -p converts the URDF <link name="world"/> into an actual SDF link
+# inside the model. That link is NOT the Gazebo world frame — it's just a
+# floating rigid body, so the whole arm falls from its base when physics runs.
+# Fix: remove the internal world link and all world→base_link joints, clear any
+# relative_to references that pointed at them, then add one clean world_joint
+# (now "world" in the joint refers to the real Gazebo world frame).
 
-if FREE_MODE:
-    # Remove ALL world joints so the arm is a free body — translate/rotate
-    # tool in Gazebo can then drag it.  Pause physics before dragging.
-    removed_joint_names = set()
-    for j in world_joints:
+# Collect the internal world link names that gz sdf -p creates
+internal_world_links = [
+    l.attrib.get('name', '') for l in model.findall('link')
+    if l.attrib.get('name', '') in ('world', 'ur::world', 'base')
+       and l.find('collision') is None and l.find('visual') is None
+]
+for lname in internal_world_links:
+    for l in list(model.findall('link')):
+        if l.attrib.get('name', '') == lname:
+            model.remove(l)
+            print(f"  Removed internal world link: {lname}")
+
+# Remove all fixed joints whose parent is the (now-removed) world link or "world"
+removed_joint_names = set()
+for j in list(model.findall('joint')):
+    p_el = j.find('parent')
+    c_el = j.find('child')
+    if p_el is None or c_el is None:
+        continue
+    parent_name = p_el.text or ''
+    if parent_name in ('world', 'ur::world') or parent_name in internal_world_links:
         removed_joint_names.add(j.attrib.get('name', ''))
         model.remove(j)
-        print(f"  FREE MODE — removed world joint: {j.attrib.get('name')}")
-    # Fix dangling relative_to on base_link — gz sdf -p emits
-    # <pose relative_to="base_joint"> on base_link; removing the joint
-    # breaks the pose graph. Clear the attribute so it falls back to model frame.
-    for link in model.findall('link'):
-        pose = link.find('pose')
-        if pose is not None and pose.get('relative_to', '') in removed_joint_names:
-            del pose.attrib['relative_to']
-            print(f"  Cleared dangling relative_to on link: {link.attrib.get('name')}")
+        print(f"  Removed old world joint: {j.attrib.get('name')}")
+
+# Clear any link pose that had relative_to pointing at the removed joints
+for link in model.findall('link'):
+    pose = link.find('pose')
+    if pose is not None and pose.get('relative_to', '') in removed_joint_names:
+        del pose.attrib['relative_to']
+        print(f"  Cleared dangling relative_to on: {link.attrib.get('name')}")
+
+if not FREE_MODE:
+    # Add one authoritative fixed joint that welds base_link to the real world frame
+    wj = ET.SubElement(model, 'joint', name='world_joint', type='fixed')
+    ET.SubElement(wj, 'parent').text = 'world'
+    ET.SubElement(wj, 'child').text  = 'base_link'
+    print("  Added world_joint (world → base_link)")
 else:
-    # Normal mode: keep exactly one world joint, remove duplicates
-    for j in world_joints[1:]:
-        model.remove(j)
-        print(f"  Removed duplicate world joint: {j.attrib.get('name')}")
-    if world_joints:
-        print(f"  Kept world joint: {world_joints[0].attrib.get('name')}")
-    else:
-        wj = ET.SubElement(model, "joint", name="world_joint", type="fixed")
-        ET.SubElement(wj, "parent").text = "world"
-        ET.SubElement(wj, "child").text = "base_link"
-        print("  Added missing world_joint")
+    print("  FREE MODE — no world_joint, arm is draggable (pause physics first)")
 
 # ── 3. Set joint friction + bake initial spawn angles ────────────────────────
 friction_val = '5.0' if FREE_MODE else '500.0'   # low friction in free mode so arm moves easily
@@ -104,6 +116,13 @@ for joint in model.findall('joint'):
     axis = joint.find('axis')
     if axis is None:
         continue
+
+    # Bake upright spawn angle — valid in SDFormat 1.10 (model.config now declares 1.10)
+    if jname in UPRIGHT_JOINTS:
+        ip = axis.find('initial_position')
+        if ip is None:
+            ip = ET.SubElement(axis, 'initial_position')
+        ip.text = f"{UPRIGHT_JOINTS[jname]:.10f}"
 
     dynamics = axis.find('dynamics')
     if dynamics is None:
