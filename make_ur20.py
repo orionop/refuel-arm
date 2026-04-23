@@ -14,27 +14,21 @@ with open(os.path.join(MODEL_DIR, "model.config"), "w") as f:
 </model>
 """)
 
-# Wrapper: world link + world_joint so the arm is fixed to the world frame.
-# ur_gz.urdf.xacro from ur_simulation_gz may also emit a world_joint —
-# we deduplicate in the patch step below.
-wrapper_xacro = """<?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur20_world">
-  <link name="world" />
-  <xacro:include filename="$(find ur_simulation_gz)/urdf/ur_gz.urdf.xacro" />
-  <joint name="world_joint" type="fixed">
-    <parent link="world" />
-    <child link="base_link" />
-  </joint>
-</robot>
-"""
-with open("wrapper.xacro", "w") as f:
-    f.write(wrapper_xacro)
-
 print("Generating UR20 URDF...")
-os.system("xacro wrapper.xacro name:=ur ur_type:=ur20 safety_limits:=true > ur20.urdf")
+# Call ur_gz.urdf.xacro directly — it already defines the world link
+# internally, so no wrapper needed (a wrapper with <link name="world"/>
+# would create a duplicate and crash gz sdf -p).
+ret = os.system(
+    "xacro $(ros2 pkg prefix --share ur_simulation_gz)/urdf/ur_gz.urdf.xacro"
+    " name:=ur ur_type:=ur20 safety_limits:=true > ur20.urdf"
+)
+if ret != 0:
+    raise RuntimeError("xacro failed — is ur_simulation_gz installed?")
 
 print("Converting to SDF...")
-os.system("gz sdf -p ur20.urdf > ur20_raw.sdf")
+ret = os.system("gz sdf -p ur20.urdf > ur20_raw.sdf")
+if ret != 0:
+    raise RuntimeError("gz sdf -p failed")
 
 print("Patching SDF...")
 tree = ET.parse("ur20_raw.sdf")
