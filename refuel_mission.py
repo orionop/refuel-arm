@@ -406,6 +406,23 @@ ROS_CONFIG = {
 }
 
 
+def send_trajectory_gazebo(trajectory, dt=0.15, robot='ur20'):
+    """Drive Gazebo joints via gz transport topics (no ROS2 required)."""
+    import time
+    GZ_BIN = "/opt/homebrew/bin/gz" if os.path.exists("/opt/homebrew/bin/gz") else "gz"
+    joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+              'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+    topics = [f"/model/{robot}/joint/{j}/0/cmd_pos" for j in joints]
+
+    step_dt = dt / max(len(trajectory), 1)
+    for q in trajectory:
+        cmds = [f"{GZ_BIN} topic -t {topics[i]} -m gz.msgs.Double -p 'data: {float(v)}'"
+                for i, v in enumerate(q)]
+        os.system("(" + " & ".join(cmds) + " & wait) >/dev/null 2>&1")
+        time.sleep(step_dt)
+    return True
+
+
 def send_trajectory_ros(trajectory, dt=0.15, robot='kuka'):
     """Send a joint trajectory via ROS2 FollowJointTrajectory action.
 
@@ -659,6 +676,8 @@ def plot_joint_angles(all_traj, save_path):
 def main():
     parser = argparse.ArgumentParser(
         description="KUKA KR6 R700 Autonomous Refueling Mission")
+    parser.add_argument("--gazebo", action="store_true",
+                        help="Execute in Gazebo via gz transport (no ROS2 required)")
     parser.add_argument("--ros", action="store_true",
                         help="Execute on ROS Noetic + Gazebo")
     parser.add_argument("--rviz", action="store_true",
@@ -848,7 +867,24 @@ def main():
     plot_joint_angles(full_traj, "output_graphs/joint_angle_trajectories.png")
 
     # ── Step 7: Execute motion ────────────────────────────────────
-    if use_ros:
+    if args.gazebo:
+        import time as _time
+        Q_HOME_GZ = (np.array([0.0, -np.pi/2, np.pi/2, -np.pi/2, -np.pi/2, 0.0])
+                     if active_robot == 'ur20' else Q_HOME)
+        print(f"\n  Settling at home pose...")
+        for _ in range(5):
+            send_trajectory_gazebo(Q_HOME_GZ.reshape(1, -1), dt=0.2, robot=active_robot)
+        _time.sleep(2.0)
+        for i, (label, traj, dt, _compliant) in enumerate(segments, 1):
+            print(f"\n  Step {i}/{len(segments)}: {label}")
+            if traj is None:
+                print(f"     Holding for {dt:.0f}s...")
+                _time.sleep(dt)
+            else:
+                print(f"     Animating {len(traj)} waypoints over {dt:.1f}s...")
+                send_trajectory_gazebo(traj, dt=dt, robot=active_robot)
+                print(f"     done")
+    elif use_ros:
         import time as _time  # ensure available regardless of ROS state
         try:
             for i, (label, traj, dt, compliant) in enumerate(segments, 1):
