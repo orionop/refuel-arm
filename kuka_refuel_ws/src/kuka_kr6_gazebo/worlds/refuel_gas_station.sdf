@@ -59,11 +59,11 @@
       <pose>1.1719791889190674 -12.851659774780275 0.0052882102318108082 0 0 -0.026000007134877226</pose>
     </include>
 
-    <!-- Universal Robots UR20 -->
+    <!-- Universal Robots UR20 — on gas station pedestal beside dispenser -->
     <include>
       <uri>model://ur20</uri>
       <name>ur20</name>
-      <pose>-0.05396429821849047 -11.928999900817871 0.05 0 0 -1.6273313478183193</pose>
+      <pose>0.253 -12.760 0.426 0 0 0</pose>
     </include>
 
 

@@ -78,6 +78,11 @@ GZ_BIN = "/opt/homebrew/bin/gz" if os.path.exists("/opt/homebrew/bin/gz") else "
 
 active_robot = "ur20"
 
+# UR20 upright "candle" pose — must match UPRIGHT_JOINTS in make_ur20.py
+# so the PID initial_position baked into the SDF and this home pose agree.
+# [shoulder_pan, shoulder_lift, elbow, wrist_1, wrist_2, wrist_3]
+Q_HOME_UR20 = np.array([0.0, -np.pi/2, np.pi/2, -np.pi/2, -np.pi/2, 0.0])
+
 if active_robot == "ur20":
     joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
     JOINT_TOPICS = [f"/model/ur20/joint/{j}/0/cmd_pos" for j in joints]
@@ -191,7 +196,8 @@ def main():
     ]
 
     # ── 8-Phase Mission Pipeline ──────────────────────────────────
-    seg_p1 = plan_stomp(Q_HOME, q_disp, obs_list,
+    q_home = Q_HOME_UR20 if active_robot == "ur20" else Q_HOME
+    seg_p1 = plan_stomp(q_home, q_disp, obs_list,
                         "Phase 1: REST -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     seg_p3 = plan_stomp(q_disp, q_pre, obs_list,
@@ -206,7 +212,7 @@ def main():
     seg_p7 = plan_stomp(q_pre, q_disp, obs_list,
                         "Phase 7: Pre-approach -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
 
-    seg_p8 = plan_stomp(q_disp, Q_HOME, obs_list,
+    seg_p8 = plan_stomp(q_disp, q_home, obs_list,
                         "Phase 8: Dispenser -> REST", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     full_traj = np.vstack([seg_p1, seg_p3, seg_p4, seg_p6, seg_p7, seg_p8])
@@ -250,10 +256,11 @@ def main():
     print("  (Make sure Gazebo is running and PLAYING)")
     print(f"{'=' * 65}")
 
-    # Set initial pose
-    print("\n  Settling at REST pose...")
-    for _ in range(5):  # Send multiple times to ensure it registers
-        gz_set_joints(Q_HOME)
+    # Set initial pose — use UR20 upright home, not the generic Q_HOME (all zeros = drooped)
+    home_q = Q_HOME_UR20 if active_robot == "ur20" else Q_HOME
+    print(f"\n  Settling at home pose {np.round(np.degrees(home_q), 1)} deg...")
+    for _ in range(5):
+        gz_set_joints(home_q)
         time.sleep(0.2)
     time.sleep(2.0)
 
