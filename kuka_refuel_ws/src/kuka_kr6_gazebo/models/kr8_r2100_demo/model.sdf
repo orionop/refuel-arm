@@ -59,14 +59,15 @@
           <velocity>3.4906585039886591</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <spring_reference>1.607</spring_reference>
+          <spring_stiffness>5000</spring_stiffness>
           <damping>10</damping>
+          <friction>500</friction>
         </dynamics>
       </axis>
     </joint>
     <link name="link_1">
-      <pose relative_to="joint_1">0 0 0 0 0 0</pose>
+      <pose relative_to="joint_1">0 0 0 0 0 1.607</pose>
       <inertial>
         <pose>0.050470572517724181 -0.022364893002957 -0.1312334918130322 -0.7660833907477963 -0.53198484515749633 2.768174874698055</pose>
         <mass>84.207000000000008</mass>
@@ -126,13 +127,14 @@
         </limit>
         <dynamics>
           <spring_reference>-0.5</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <spring_stiffness>5000</spring_stiffness>
           <damping>10</damping>
+          <friction>500</friction>
         </dynamics>
       </axis>
     </joint>
     <link name="link_2">
-      <pose relative_to="joint_2">0 0 0 0 0 0</pose>
+      <pose relative_to="joint_2">0 0 0 0 0 -0.5</pose>
       <inertial>
         <pose>0.40207495993654591 0.0078946339252472589 -0.073148269954837558 -1.5492266158302022 -1.5309292421840535 -0.020762987371118615</pose>
         <mass>61.777000000000001</mass>
@@ -191,14 +193,15 @@
           <velocity>3.3161255787892259</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <spring_reference>0.5</spring_reference>
+          <spring_stiffness>5000</spring_stiffness>
           <damping>10</damping>
+          <friction>500</friction>
         </dynamics>
       </axis>
     </joint>
     <link name="link_3">
-      <pose relative_to="joint_3">0 0 0 0 0 0</pose>
+      <pose relative_to="joint_3">0 0 0 0 0 0.5</pose>
       <inertial>
         <pose>0.15308797734066609 -0.090110250599636219 0.017381438457181399 2.9715216784910652 0.19136626342049948 1.3935743021200311</pose>
         <mass>33.579156324000003</mass>
@@ -257,8 +260,10 @@
           <velocity>7.5049157835756173</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
+          <spring_reference>0.0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>10</damping>
+          <friction>500</friction>
         </dynamics>
       </axis>
     </joint>
@@ -322,14 +327,15 @@
           <velocity>7.5049157835756173</velocity>
         </limit>
         <dynamics>
-          <spring_reference>-3.08</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <spring_reference>3.203</spring_reference>
+          <spring_stiffness>5000</spring_stiffness>
           <damping>10</damping>
+          <friction>500</friction>
         </dynamics>
       </axis>
     </joint>
     <link name="link_5">
-      <pose relative_to="joint_5">0 0 0 0 0 0</pose>
+      <pose relative_to="joint_5">0 0 0 0 0 3.203</pose>
       <inertial>
         <pose>0.012999999999999999 0 0.0040000000000000001 -0.016921791085990932 -0.84073824617798865 -3.139045902023482</pose>
         <mass>2.75</mass>
@@ -388,8 +394,10 @@
           <velocity>10.995574287564279</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
+          <spring_reference>0.0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>10</damping>
+          <friction>500</friction>
         </dynamics>
       </axis>
     </joint>
@@ -460,42 +468,88 @@
     </frame>
 
 
-    <!-- FIX BASE TO WORLD -->
     <joint name="world_joint" type="fixed">
       <parent>world</parent>
       <child>base_link</child>
     </joint>
 
-    <!-- Native Joint Position Controllers -->
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
       <joint_name>joint_1</joint_name>
       <topic>/kuka_cmd/j1</topic>
-      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
+      <initial_position>1.607</initial_position>
+      <p_gain>50000</p_gain>
+      <i_gain>1</i_gain>
+      <d_gain>1000</d_gain>
+      <i_max>1000</i_max>
+      <i_min>-1000</i_min>
+      <cmd_max>1000000</cmd_max>
+      <cmd_min>-1000000</cmd_min>
     </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
       <joint_name>joint_2</joint_name>
       <topic>/kuka_cmd/j2</topic>
-      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
+      <initial_position>-0.5</initial_position>
+      <p_gain>50000</p_gain>
+      <i_gain>1</i_gain>
+      <d_gain>1000</d_gain>
+      <i_max>1000</i_max>
+      <i_min>-1000</i_min>
+      <cmd_max>1000000</cmd_max>
+      <cmd_min>-1000000</cmd_min>
     </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
       <joint_name>joint_3</joint_name>
       <topic>/kuka_cmd/j3</topic>
-      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
+      <initial_position>0.5</initial_position>
+      <p_gain>50000</p_gain>
+      <i_gain>1</i_gain>
+      <d_gain>1000</d_gain>
+      <i_max>1000</i_max>
+      <i_min>-1000</i_min>
+      <cmd_max>1000000</cmd_max>
+      <cmd_min>-1000000</cmd_min>
     </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
       <joint_name>joint_4</joint_name>
       <topic>/kuka_cmd/j4</topic>
-      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>50000</p_gain>
+      <i_gain>1</i_gain>
+      <d_gain>1000</d_gain>
+      <i_max>1000</i_max>
+      <i_min>-1000</i_min>
+      <cmd_max>1000000</cmd_max>
+      <cmd_min>-1000000</cmd_min>
     </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
       <joint_name>joint_5</joint_name>
       <topic>/kuka_cmd/j5</topic>
-      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
+      <initial_position>3.203</initial_position>
+      <p_gain>50000</p_gain>
+      <i_gain>1</i_gain>
+      <d_gain>1000</d_gain>
+      <i_max>1000</i_max>
+      <i_min>-1000</i_min>
+      <cmd_max>1000000</cmd_max>
+      <cmd_min>-1000000</cmd_min>
     </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
       <joint_name>joint_6</joint_name>
       <topic>/kuka_cmd/j6</topic>
-      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>50000</p_gain>
+      <i_gain>1</i_gain>
+      <d_gain>1000</d_gain>
+      <i_max>1000</i_max>
+      <i_min>-1000</i_min>
+      <cmd_max>1000000</cmd_max>
+      <cmd_min>-1000000</cmd_min>
     </plugin>
   </model>
 </sdf>

@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="refuel_gas_station">
+    <physics name="4ms" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Gas Station Island -->
+    <include>
+      <uri>model://gas_station</uri>
+      <name>gas_station</name>
+      <pose>2.100 -1.450 0 0 0 0</pose> 
+    </include>
+
+    <!-- Prius Hybrid (Snapped to Ground) -->
+    <include>
+      <uri>model://prius_hybrid</uri>
+      <name>prius_hybrid</name>
+      <pose>1.6266598701477071 -14.056509017944336 -6.9388939039072284e-18 0 0 1.5708003044429053</pose> 
+    </include>
+
+    <!-- Barricade -->
+    <include>
+      <uri>model://FoodCourtBarricade</uri>
+      <name>barricade</name>
+      <pose>4.832 -14.509 0.01 0 0 1.57</pose>
+    </include>
+
+    <!-- Construction Cone -->
+    <include>
+      <uri>model://construction_cone</uri>
+      <name>cone</name>
+      <pose>1.1719791889190674 -12.851659774780275 0.0052882102318108082 0 0 -0.026000007134877226</pose>
+    </include>
+
+    <!-- KUKA KR 8 R2100 (Cybertech nano) — STANDALONE DEMO (No ROS) -->
+    <include>
+      <uri>model://kr8_r2100_demo</uri>
+      <name>kuka_kr8</name>
+      <pose>-0.05396429821849047 -11.928999900817871 0.29215899109840393 0 0 -1.6273313478183193</pose>
+    </include>
+
+    <!-- MARKER DOT 1: Dispenser nozzle position -->
+    <model name='dot_dispenser'>
+      <static>true</static>
+      <pose>1.2640416622161865 -12.185000419616699 1.2171000242233276 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.1</mass>
+          <inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia>
+        </inertial>
+        <collision name="col">
+          <geometry><sphere><radius>0.12</radius></sphere></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><sphere><radius>0.12</radius></sphere></geometry>
+          <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- MARKER DOT 2: Car fuel inlet position -->
+    <model name='dot_inlet'>
+      <static>true</static>
+      <pose>0.11403899639844894 -13.236710548400879 1.0072900056838989 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.1</mass>
+          <inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia>
+        </inertial>
+        <collision name="col">
+          <geometry><sphere><radius>0.12</radius></sphere></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><sphere><radius>0.12</radius></sphere></geometry>
+          <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

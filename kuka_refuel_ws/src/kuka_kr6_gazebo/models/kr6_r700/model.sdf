@@ -2,6 +2,13 @@
 <sdf version="1.9">
   <model name="kr6_r700">
     <static>false</static>
+
+    <!-- Bolt to floor so it doesn't blast into space -->
+    <joint name="world_joint" type="fixed">
+      <parent>world</parent>
+      <child>base_link</child>
+    </joint>
+
     <link name="base_link">
       <inertial>
         <pose>0 0 0.15 0 0 0</pose>
@@ -205,15 +212,43 @@
         <limit><lower>-6.108</lower><upper>6.108</upper></limit>
       </axis>
     </joint>
-    <plugin
-      filename="gz-sim-joint-trajectory-controller-system"
-      name="gz::sim::systems::JointTrajectoryController">
-      <topic>/model/kuka_kr6/joint_trajectory</topic>
-    </plugin>
+    
     <plugin
       filename="gz-sim-joint-state-publisher-system"
       name="gz::sim::systems::JointStatePublisher">
       <topic>/model/kuka_kr6/joint_states</topic>
     </plugin>
+  
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>joint_1</joint_name>
+      <topic>/kuka_cmd/j1</topic>
+      <p_gain>100</p_gain><i_gain>0.5</i_gain><d_gain>10</d_gain>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>joint_2</joint_name>
+      <topic>/kuka_cmd/j2</topic>
+      <p_gain>100</p_gain><i_gain>0.5</i_gain><d_gain>10</d_gain>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>joint_3</joint_name>
+      <topic>/kuka_cmd/j3</topic>
+      <p_gain>100</p_gain><i_gain>0.5</i_gain><d_gain>10</d_gain>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>joint_4</joint_name>
+      <topic>/kuka_cmd/j4</topic>
+      <p_gain>20</p_gain><i_gain>0.1</i_gain><d_gain>2</d_gain>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>joint_5</joint_name>
+      <topic>/kuka_cmd/j5</topic>
+      <p_gain>20</p_gain><i_gain>0.1</i_gain><d_gain>2</d_gain>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>joint_6</joint_name>
+      <topic>/kuka_cmd/j6</topic>
+      <p_gain>20</p_gain><i_gain>0.1</i_gain><d_gain>2</d_gain>
+    </plugin>
+
   </model>
 </sdf>

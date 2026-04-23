@@ -333,6 +333,36 @@ def IK_solve(R, p, robot="kuka"):
     r_lower = robot.lower()
     if r_lower == "ur5":
         return IK_ur5(R, p, KIN_UR5)
-    if r_lower == "kr8":
-        return IK_spherical_2_parallel(R, p, KIN_KR8_R2100)
-    return IK_spherical_2_parallel(R, p, KIN_KR210_R3100)
+    elif r_lower == "kr8":
+        Q = IK_spherical_2_parallel(R, p, KIN_KR8_R2100)
+        kin = KIN_KR8_R2100
+    elif r_lower == "kr6":
+        Q = IK_spherical_2_parallel(R, p, KIN_KR6_R700)
+        kin = KIN_KR6_R700
+    else:
+        Q = IK_spherical_2_parallel(R, p, KIN_KR210_R3100)
+        kin = KIN_KR210_R3100
+
+    if Q.size == 0:
+        # Fallback numerical IK
+        from scipy.optimize import least_squares
+        import numpy as np
+        Q_num = []
+        def residuals(q_opt):
+            R_cur, p_cur = fwd_kinematics(q_opt, kin=kin)
+            err_pos = p_cur - p
+            R_err = R_cur @ R.T
+            err_rot = np.array([R_err[2,1]-R_err[1,2], 
+                                R_err[0,2]-R_err[2,0], 
+                                R_err[1,0]-R_err[0,1]])
+            return np.concatenate((err_pos, err_rot))
+        
+        for _ in range(30):
+            q_guess = np.random.uniform(-np.pi, np.pi, 6)
+            res = least_squares(residuals, q_guess, method='lm', ftol=1e-6, xtol=1e-6, max_nfev=150)
+            if np.linalg.norm(res.fun) < 1e-3:
+                Q_num.append(res.x)
+        if Q_num:
+            return np.array(Q_num).T
+            
+    return Q
