@@ -32,8 +32,15 @@ for p in model.findall("plugin"):
     if "gz_ros2_control-system" in p.attrib.get('filename', ''):
         model.remove(p)
 
+# Inject fixed world joint so it doesn't fall down
+world_joint = ET.Element("joint", name="world_joint", type="fixed")
+ET.SubElement(world_joint, "parent").text = "world"
+ET.SubElement(world_joint, "child").text = "base_link"
+model.append(world_joint)
+
 # Inject native PID controllers
 joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+
 for j in joints:
     plugin = ET.Element("plugin", filename="gz-sim-joint-position-controller-system", name="gz::sim::systems::JointPositionController")
     ET.SubElement(plugin, "joint_name").text = j
