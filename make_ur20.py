@@ -67,9 +67,19 @@ world_joints = [
 if FREE_MODE:
     # Remove ALL world joints so the arm is a free body — translate/rotate
     # tool in Gazebo can then drag it.  Pause physics before dragging.
+    removed_joint_names = set()
     for j in world_joints:
+        removed_joint_names.add(j.attrib.get('name', ''))
         model.remove(j)
         print(f"  FREE MODE — removed world joint: {j.attrib.get('name')}")
+    # Fix dangling relative_to on base_link — gz sdf -p emits
+    # <pose relative_to="base_joint"> on base_link; removing the joint
+    # breaks the pose graph. Clear the attribute so it falls back to model frame.
+    for link in model.findall('link'):
+        pose = link.find('pose')
+        if pose is not None and pose.get('relative_to', '') in removed_joint_names:
+            del pose.attrib['relative_to']
+            print(f"  Cleared dangling relative_to on link: {link.attrib.get('name')}")
 else:
     # Normal mode: keep exactly one world joint, remove duplicates
     for j in world_joints[1:]:
@@ -94,12 +104,6 @@ for joint in model.findall('joint'):
     axis = joint.find('axis')
     if axis is None:
         continue
-
-    if jname in UPRIGHT_JOINTS:
-        ip = axis.find('initial_position')
-        if ip is None:
-            ip = ET.SubElement(axis, 'initial_position')
-        ip.text = f"{UPRIGHT_JOINTS[jname]:.10f}"
 
     dynamics = axis.find('dynamics')
     if dynamics is None:
