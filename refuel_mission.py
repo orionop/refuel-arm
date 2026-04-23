@@ -335,11 +335,16 @@ def plan_cartesian(pos_start, pos_goal, R_fixed, q_seed, name, n_wp=20, kin=None
     print(f"\n  Planning: {name} (Cartesian, {n_wp} wp)")
     active_bot = "kuka"
     if kin is not None and hasattr(kin, 'get'):
-        # Check H1 axis orientation (UR5 is [0,0,1], KUKA is [0,0,-1])
         h_matrix = np.asarray(kin.get('H'))
+        lims = kin.get('joint_limits', [])
         if h_matrix[2, 0] > 0:
-            active_bot = "ur5"
-        elif kin.get('joint_limits', [])[1, 0] < -200: # Heuristic for KR8
+            # UR family — distinguish UR20 (large upper-arm) from UR5
+            p_matrix = np.asarray(kin.get('P'))
+            if p_matrix[0, 2] > 0.5:   # upper-arm length > 0.5 m → UR20
+                active_bot = "ur20"
+            else:
+                active_bot = "ur5"
+        elif len(lims) >= 2 and lims[1][0] < -200:
             active_bot = "kr8"
     
     traj = np.zeros((n_wp, 6))
@@ -404,6 +409,45 @@ ROS_CONFIG = {
         ],
     },
 }
+
+
+def spawn_dots_gazebo(world_name='test_ur20'):
+    """Spawn yellow dispenser and inlet marker dots matching refuel_gas_station.sdf."""
+    import subprocess, tempfile
+    dots = [
+        ('dot_dispenser', 1.2640416622161865, -12.185000419616699, 1.2171000242233276),
+        ('dot_inlet',     0.11403899639844894, -13.236710548400879, 1.0072900056838989),
+    ]
+    for name, x, y, z in dots:
+        sdf = f"""<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="{name}">
+    <static>true</static>
+    <pose>{x} {y} {z} 0 0 0</pose>
+    <link name="link">
+      <visual name="vis">
+        <geometry><sphere><radius>0.12</radius></sphere></geometry>
+        <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+      </visual>
+      <collision name="col">
+        <geometry><sphere><radius>0.12</radius></sphere></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>"""
+        sdf_path = os.path.join(tempfile.gettempdir(), f"{name}.sdf")
+        with open(sdf_path, 'w') as f:
+            f.write(sdf)
+        result = subprocess.run(
+            ['gz', 'service', '-s', f'/world/{world_name}/create',
+             '--reqtype', 'gz.msgs.EntityFactory',
+             '--reptype', 'gz.msgs.Boolean',
+             '--timeout', '5000',
+             '--req', f'sdf_filename: "{sdf_path}" name: "{name}"'],
+            capture_output=True, text=True, timeout=15,
+        )
+        print(f"  Spawned {name} at [{x:.3f}, {y:.3f}, {z:.3f}]"
+              + ('' if result.returncode == 0 else f' [warn: {result.stderr.strip()}]'))
 
 
 def send_trajectory_gazebo(trajectory, dt=0.15, robot='ur20'):
@@ -695,6 +739,8 @@ def main():
                         help="Target robot platform (default: kuka)")
     parser.add_argument("--compliant", action="store_true",
                         help="Use admittance control for fine insertion/extraction (UR5 only)")
+    parser.add_argument("--world", type=str, default="test_ur20",
+                        help="Gz Sim world name for dot spawning (default: test_ur20)")
     args = parser.parse_args()
 
     active_robot = args.robot.lower()
@@ -871,6 +917,8 @@ def main():
     # ── Step 7: Execute motion ────────────────────────────────────
     if args.gazebo:
         import time as _time
+        print(f"\n[Dots] Spawning marker dots in world '{args.world}'...")
+        spawn_dots_gazebo(world_name=args.world)
         Q_HOME_GZ = (np.array([0.0, -np.pi/2, np.pi/2, -np.pi/2, -np.pi/2, 0.0])
                      if active_robot == 'ur20' else Q_HOME)
         print(f"\n  Settling at home pose...")

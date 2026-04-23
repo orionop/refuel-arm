@@ -124,14 +124,28 @@ KIN_UR5 = {
     ])
 }
 
-# UR20 Kinematics (approx scaled up UR10e)
+# UR20 Kinematics — derived from ur_description/config/ur20/ YAML files
+# H axes identical to all UR robots; P from default_kinematics.yaml + physical_parameters.yaml
 KIN_UR20 = {
-    'type': 'ur',
-    'd': [0.2363, 0.0, 0.0, 0.201, 0.165, 0.274],
-    'a': [0.0, -1.040, -0.850, 0.0, 0.0, 0.0],
-    'alpha': [np.pi/2, 0.0, 0.0, np.pi/2, -np.pi/2, 0.0],
+    'H': np.array([
+        [0, 0,  1],   # shoulder_pan:  Z
+        [0, 1,  0],   # shoulder_lift: Y
+        [0, 1,  0],   # elbow:         Y
+        [0, 1,  0],   # wrist_1:       Y
+        [0, 0, -1],   # wrist_2:      -Z
+        [0, 1,  0],   # wrist_3:       Y
+    ]).T,
+    'P': np.array([
+        [0,      0,      0.2363],   # base → shoulder_pan     (d1)
+        [0,      0.260,  0     ],   # shoulder_pan → lift      (shoulder_offset)
+        [0.862, -0.043,  0     ],   # lift → elbow             (upper_arm, -elbow_offset)
+        [0.7287, 0,      0     ],   # elbow → wrist_1          (forearm)
+        [0,      0.1593, -0.165],   # wrist_1 → wrist_2        (d4_eff, -d5)
+        [0,      0,      0     ],   # wrist_2 → wrist_3
+        [0,      0.1543, 0     ],   # wrist_3 → tool           (d6)
+    ]).T,
     'joint_limits': np.array([
-        [-360, 360], [-360, 360], [-360, 360],
+        [-360, 360], [-360, 360], [-180, 180],
         [-360, 360], [-360, 360], [-360, 360]
     ])
 }
