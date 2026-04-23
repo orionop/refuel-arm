@@ -117,13 +117,6 @@ for joint in model.findall('joint'):
     if axis is None:
         continue
 
-    # Bake upright spawn angle — valid in SDFormat 1.10 (model.config now declares 1.10)
-    if jname in UPRIGHT_JOINTS:
-        ip = axis.find('initial_position')
-        if ip is None:
-            ip = ET.SubElement(axis, 'initial_position')
-        ip.text = f"{UPRIGHT_JOINTS[jname]:.10f}"
-
     dynamics = axis.find('dynamics')
     if dynamics is None:
         dynamics = ET.SubElement(axis, 'dynamics')
@@ -134,7 +127,49 @@ for joint in model.findall('joint'):
         else:
             el.text = val
 
-# ── 4. Inject JointPositionController plugins (skipped in --free mode) ───────
+# ── 4. Bake upright spawn angles via child-link pose (relative_to joint frame) ─
+# <axis>/<initial_position> is not in this system's sdformat schema so it is
+# silently ignored. The correct SDF approach: set each child link's
+# <pose relative_to="joint_name"> to encode the desired initial angle.
+# For a Y-axis revolute at angle θ: pose = "0 0 0 0 θ 0"
+# For a Z-axis revolute at angle θ: pose = "0 0 0 0 0 θ"
+# (UR link origins coincide with their joint frame, so translation is 0.)
+
+joint_map = {j.attrib.get('name', ''): j for j in model.findall('joint')}
+link_map   = {l.attrib.get('name', ''): l for l in model.findall('link')}
+
+for jname, angle in UPRIGHT_JOINTS.items():
+    if abs(angle) < 1e-9:
+        continue
+    j_el = joint_map.get(jname)
+    if j_el is None:
+        continue
+    child_name = (j_el.find('child').text or '').strip()
+    child_link = link_map.get(child_name)
+    if child_link is None:
+        print(f"  WARNING: link '{child_name}' not found for {jname}")
+        continue
+
+    # Determine dominant axis from the joint definition
+    axis_el = j_el.find('axis')
+    xyz_el  = axis_el.find('xyz') if axis_el is not None else None
+    xyz_str = (xyz_el.text or '0 0 1').strip() if xyz_el is not None else '0 0 1'
+    vals    = [float(v) for v in xyz_str.split()]
+    if abs(vals[1]) > 0.5:          # Y-dominant → pitch
+        pose_text = f"0 0 0 0 {angle:.10f} 0"
+    elif abs(vals[2]) > 0.5:        # Z-dominant → yaw
+        pose_text = f"0 0 0 0 0 {angle:.10f}"
+    else:                            # X-dominant → roll
+        pose_text = f"0 0 0 {angle:.10f} 0 0"
+
+    pose_el = child_link.find('pose')
+    if pose_el is None:
+        pose_el = ET.SubElement(child_link, 'pose')
+    pose_el.attrib['relative_to'] = jname
+    pose_el.text = pose_text
+    print(f"  Pose baked: {child_name} relative_to {jname} = [{pose_text}]")
+
+# ── 5. Inject JointPositionController plugins (skipped in --free mode) ───────
 if FREE_MODE:
     print("  FREE MODE — no PID controllers, arm moves freely")
 else:
