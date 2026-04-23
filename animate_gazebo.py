@@ -118,15 +118,17 @@ def main():
     print("=" * 65)
 
     # KR8 hardcoded target (Inlet Local)
-    target_xyz = np.array([1.296, 0.242, 0.715])
+    # The world target is [1.32, 2.5, 0.715]. Because the KR8 is permanently rotated
+    # by -93 degrees in Gazebo, the local coordinate is exactly:
+    target_xyz = np.array([-2.570, 1.176, 0.715])
     print(f"\n[Target]       [{target_xyz[0]:.3f}, {target_xyz[1]:.3f}, {target_xyz[2]:.3f}]")
 
     
-    inlet_xyz, inlet_R = get_inlet_pose(target_xyz, robot=active_robot)
-    if active_robot == "kr6":
-        # Neutral orientation pointing towards target
-        yaw = np.arctan2(target_xyz[1], target_xyz[0])
-        inlet_R = rot(np.array([0, 0, 1]), yaw)
+    inlet_xyz, _ = get_inlet_pose(target_xyz, robot=active_robot)
+    # Point the end-effector directly at the local target coordinate
+    yaw = np.arctan2(target_xyz[1], target_xyz[0])
+    # KUKA tool X-axis points outward; pitch down slightly for realistic pose
+    inlet_R = rot(np.array([0, 0, 1]), yaw) @ rot(np.array([0, 1, 0]), 0.2)
 
 
     # Pre-approach: pull back 10cm along approach direction
