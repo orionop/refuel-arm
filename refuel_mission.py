@@ -34,8 +34,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(
 
 from ik_geometric import ( # type: ignore
     IK_spherical_2_parallel, fwd_kinematics, rot,
-    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100, KIN_KR8_R2100
+    IK_solve, KIN_UR5, KIN_KR6_R700, KIN_KR210_R3100, KIN_KR8_R2100, KIN_UR20
 )
+
 from stomp_collision import stomp_optimize # type: ignore
 from bubble_strips import bubble_strip_deform, set_kinematics as bs_set_kinematics # type: ignore
 from car_model import ( # type: ignore
@@ -671,7 +672,7 @@ def main():
                         help="Random seed for obstacle placement (default: random)")
     parser.add_argument("--mirror-return", action="store_true",
                         help="Return along the reversed approach path instead of re-planning")
-    parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5", "kr8"],
+    parser.add_argument("--robot", type=str, default="kuka", choices=["kuka", "ur5", "kr8", "ur20"],
                         help="Target robot platform (default: kuka)")
     parser.add_argument("--compliant", action="store_true",
                         help="Use admittance control for fine insertion/extraction (UR5 only)")
@@ -680,6 +681,8 @@ def main():
     active_robot = args.robot.lower()
     if active_robot == "ur5":
         kin_params = KIN_UR5
+    elif active_robot == "ur20":
+        kin_params = KIN_UR20
     elif active_robot == "kr8":
         kin_params = KIN_KR8_R2100
     else:

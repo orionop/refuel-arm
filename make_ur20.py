@@ -1,4 +1,21 @@
-import os, subprocess, xml.etree.ElementTree as ET
+import os
+import subprocess
+import xml.etree.ElementTree as ET
+
+MODEL_DIR = "kuka_refuel_ws/src/kuka_kr6_gazebo/models/ur20"
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+# Create model.config
+config = f"""<?xml version="1.0"?>
+<model>
+  <name>ur20</name>
+  <version>1.0</version>
+  <sdf version="1.9">model.sdf</sdf>
+  <description>Universal Robots UR20 Fixed</description>
+</model>
+"""
+with open(os.path.join(MODEL_DIR, "model.config"), "w") as f:
+    f.write(config)
 
 print("Generating UR20 URDF...")
 os.system("xacro /opt/ros/jazzy/share/ur_simulation_gz/urdf/ur_gz.urdf.xacro name:=ur ur_type:=ur20 safety_limits:=true > ur20.urdf")
@@ -27,5 +44,5 @@ for j in joints:
     ET.SubElement(plugin, "cmd_min").text = "-1000.0"
     model.append(plugin)
 
-tree.write("ur20_fixed.sdf")
-print("Saved ur20_fixed.sdf! Ready to spawn in ROS 2.")
+tree.write(os.path.join(MODEL_DIR, "model.sdf"))
+print("Saved ur20 model into Gas Station models directory! Ready to spawn in ROS 2.")
