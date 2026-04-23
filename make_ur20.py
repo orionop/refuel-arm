@@ -191,11 +191,11 @@ else:
         ET.SubElement(plugin, "initial_position").text = f"{UPRIGHT_JOINTS[j]:.10f}"
         ET.SubElement(plugin, "p_gain").text  = "500000.0"
         ET.SubElement(plugin, "i_gain").text  = "500.0"
-        ET.SubElement(plugin, "d_gain").text  = "20000.0"
-        ET.SubElement(plugin, "i_max").text   = "10000.0"
-        ET.SubElement(plugin, "i_min").text   = "-10000.0"
-        ET.SubElement(plugin, "cmd_max").text = "1000000.0"
-        ET.SubElement(plugin, "cmd_min").text = "-1000000.0"
+        ET.SubElement(plugin, "d_gain").text  = "50000.0"
+        ET.SubElement(plugin, "i_max").text   = "500.0"
+        ET.SubElement(plugin, "i_min").text   = "-500.0"
+        ET.SubElement(plugin, "cmd_max").text = "1000.0"
+        ET.SubElement(plugin, "cmd_min").text = "-1000.0"
         model.append(plugin)
 
 tree.write(os.path.join(MODEL_DIR, "model.sdf"))
