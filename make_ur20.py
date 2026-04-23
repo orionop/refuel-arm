@@ -63,7 +63,27 @@ else:
     ET.SubElement(wj, "child").text = "base_link"
     print("  Added missing world_joint")
 
-# ── 3. Inject JointPositionController plugins ─────────────────────────────
+# ── 3. Set high joint friction so arm holds against gravity passively ────────
+# Without gravity compensation, the arm falls the moment physics starts.
+# Coulomb friction of 500 N·m gives a passive hold; the PID (cmd_max=1M)
+# easily overcomes it when moving.
+for joint in model.findall('joint'):
+    if joint.attrib.get('type') not in ('revolute', 'continuous'):
+        continue
+    axis = joint.find('axis')
+    if axis is None:
+        continue
+    dynamics = axis.find('dynamics')
+    if dynamics is None:
+        dynamics = ET.SubElement(axis, 'dynamics')
+    for tag, val in [('damping', '200.0'), ('friction', '500.0')]:
+        el = dynamics.find(tag)
+        if el is None:
+            ET.SubElement(dynamics, tag).text = val
+        else:
+            el.text = val
+
+# ── 4. Inject JointPositionController plugins ─────────────────────────────
 joints = [
     'shoulder_pan_joint',
     'shoulder_lift_joint',
