@@ -124,6 +124,19 @@ KIN_UR5 = {
     ])
 }
 
+# UR20 Kinematics (approx scaled up UR10e)
+KIN_UR20 = {
+    'type': 'ur',
+    'd': [0.2363, 0.0, 0.0, 0.201, 0.165, 0.274],
+    'a': [0.0, -1.040, -0.850, 0.0, 0.0, 0.0],
+    'alpha': [np.pi/2, 0.0, 0.0, np.pi/2, -np.pi/2, 0.0],
+    'joint_limits': np.array([
+        [-360, 360], [-360, 360], [-360, 360],
+        [-360, 360], [-360, 360], [-360, 360]
+    ])
+}
+
+
 
 def fwd_kinematics(q, kin=None):
     """Forward kinematics: returns (R_06, p_0T) for joint vector q."""
@@ -339,6 +352,9 @@ def IK_solve(R, p, robot="kuka"):
     elif r_lower == "kr6":
         Q = IK_spherical_2_parallel(R, p, KIN_KR6_R700)
         kin = KIN_KR6_R700
+    elif r_lower == "ur20":
+        Q = np.array([])  # Force numerical fallback for UR20
+        kin = KIN_UR20
     else:
         Q = IK_spherical_2_parallel(R, p, KIN_KR210_R3100)
         kin = KIN_KR210_R3100

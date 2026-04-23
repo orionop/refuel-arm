@@ -59,12 +59,13 @@
       <pose>1.1719791889190674 -12.851659774780275 0.0052882102318108082 0 0 -0.026000007134877226</pose>
     </include>
 
-    <!-- KUKA KR 8 R2100 (Cybertech nano) -->
+    <!-- Universal Robots UR20 -->
     <include>
-      <uri>model://kr8_r2100</uri>
-      <name>kuka_kr8</name>
-      <pose>-0.05396429821849047 -11.928999900817871 0.29215899109840393 0 0 -1.6273313478183193</pose>
+      <uri>model://ur20</uri>
+      <name>ur20</name>
+      <pose>-0.05396429821849047 -11.928999900817871 0.05 0 0 -1.6273313478183193</pose>
     </include>
+
 
     <!-- MARKER DOT 1: Drag to DISPENSER nozzle position -->
     <model name='dot_dispenser'>

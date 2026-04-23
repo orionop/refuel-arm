@@ -75,10 +75,16 @@ from refuel_mission import (
 # ── Gazebo Transport ──────────────────────────────────────────────
 # Auto-detect gz path (Mac homebrew vs Ubuntu standard)
 GZ_BIN = "/opt/homebrew/bin/gz" if os.path.exists("/opt/homebrew/bin/gz") else "gz"
-JOINT_TOPICS = [f"/kuka_cmd/j{i}" for i in range(1, 7)]
+
+active_robot = "ur20"
+
+if active_robot == "ur20":
+    joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+    JOINT_TOPICS = [f"/model/ur20/joint/{j}/0/cmd_pos" for j in joints]
+else:
+    JOINT_TOPICS = [f"/kuka_cmd/j{i}" for i in range(1, 7)]
+
 PUBLISH_RATE = 3  # Hz — PID controller smooths the motion between updates
-
-
 
 def gz_set_joints(q):
     """Publish all 6 joints in parallel via a single shell call for max speed."""
@@ -98,8 +104,14 @@ def animate_segment(traj, duration, rate=PUBLISH_RATE):
 
 # ── Main ──────────────────────────────────────────────────────────
 def main():
-    active_robot = "kr8"
-    kin_params = KIN_KR8_R2100
+    # active_robot is defined globally above
+    if active_robot == "ur20":
+        from ik_geometric import KIN_UR20 # type: ignore
+        kin_params = KIN_UR20
+    elif active_robot == "kr8":
+        kin_params = KIN_KR8_R2100
+    else:
+        kin_params = KIN_KR6_R700
 
     joint_limits_deg = np.asarray(
         kin_params.get('joint_limits', JOINT_LIMITS_DEFAULT), dtype=float
