@@ -32,14 +32,22 @@ for p in model.findall("plugin"):
     if "gz_ros2_control-system" in p.attrib.get('filename', ''):
         model.remove(p)
 
+# Auto-detect root link (a link that is never a child in any joint)
+child_links = set(j.find('child').text for j in model.findall('joint') if j.find('child') is not None)
+all_links = set(l.attrib.get('name') for l in model.findall('link'))
+root_links = list(all_links - child_links)
+root_link = root_links[0] if root_links else "base_link"
+print(f"Auto-detected root link: {root_link}")
+
 # Inject fixed world joint so it doesn't fall down
 world_joint = ET.Element("joint", name="world_joint", type="fixed")
 ET.SubElement(world_joint, "parent").text = "world"
-ET.SubElement(world_joint, "child").text = "base_link"
+ET.SubElement(world_joint, "child").text = root_link
 model.append(world_joint)
 
 # Inject native PID controllers
 joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+
 
 for j in joints:
     plugin = ET.Element("plugin", filename="gz-sim-joint-position-controller-system", name="gz::sim::systems::JointPositionController")
