@@ -454,9 +454,15 @@ def send_trajectory_gazebo(trajectory, dt=0.15, robot='ur20'):
     """Drive Gazebo joints via gz transport topics (no ROS2 required)."""
     import time
     GZ_BIN = "/opt/homebrew/bin/gz" if os.path.exists("/opt/homebrew/bin/gz") else "gz"
-    joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-              'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-    topics = [f"/model/{robot}/joint/{j}/0/cmd_pos" for j in joints]
+
+    if robot in ('kr6', 'kr8', 'kr6_r700'):
+        model_name = 'kr6_r700'
+        joints = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
+        topics = [f"/model/{model_name}/joint/{j}/0/cmd_pos" for j in joints]
+    else:
+        joints = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+                  'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+        topics = [f"/model/{robot}/joint/{j}/0/cmd_pos" for j in joints]
 
     step_dt = dt / max(len(trajectory), 1)
     for q in trajectory:
