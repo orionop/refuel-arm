@@ -33,7 +33,7 @@
 
     <!-- KUKA KR6 R700 — welded to world via world_joint in model.sdf -->
     <include>
-      <uri>model://kr6_r700</uri>
+      <uri>file:///home/syscon/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/models/kr6_r700</uri>
       <name>kr6_r700</name>
       <pose>0 0 0 0 0 0</pose>
     </include>
