@@ -795,9 +795,11 @@ def main():
         ]
 
     # ── Step 3: 8-Phase Mission Pipeline ─────────────────────────────
-    
+    q_home = (np.array([0.0, -np.pi/2, np.pi/2, -np.pi/2, -np.pi/2, 0.0])
+              if active_robot == 'ur20' else Q_REST)
+
     # Phase 1: REST -> Dispenser
-    seg_p1 = plan_stomp(Q_REST, q_disp, obs_list,
+    seg_p1 = plan_stomp(q_home, q_disp, obs_list,
                         "Phase 1: REST -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # Phase 3: Dispenser -> Pre-approach
@@ -805,11 +807,11 @@ def main():
                         "Phase 3: Dispenser -> Pre-approach", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # Phase 4: Fine Insertion (Pre-approach -> Target)
-    seg_p4 = plan_cartesian(pre_xyz, inlet_xyz, inlet_R, 
+    seg_p4 = plan_cartesian(pre_xyz, inlet_xyz, inlet_R,
                             q_pre, "Phase 4: Pre-approach -> Target", n_wp=15, kin=kin_params)
-                                
+
     # Phase 6: Fine Extraction (Target -> Pre-approach)
-    seg_p6 = plan_cartesian(inlet_xyz, pre_xyz, inlet_R, 
+    seg_p6 = plan_cartesian(inlet_xyz, pre_xyz, inlet_R,
                             q_target, "Phase 6: Target -> Pre-approach", n_wp=15, kin=kin_params)
 
     # Phase 7: Pre-approach -> Dispenser
@@ -817,7 +819,7 @@ def main():
                         "Phase 7: Pre-approach -> Dispenser", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # Phase 8: Dispenser -> REST
-    seg_p8 = plan_stomp(q_disp, Q_REST, obs_list,
+    seg_p8 = plan_stomp(q_disp, q_home, obs_list,
                         "Phase 8: Dispenser -> REST", n_wp, limits=joint_limits_deg, kin=kin_params)
 
     # ── Step 4: Concatenate full trajectory ───────────────────────
