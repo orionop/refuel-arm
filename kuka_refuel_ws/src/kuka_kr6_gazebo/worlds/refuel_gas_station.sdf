@@ -33,53 +33,37 @@
 
     <!-- Gas Station Island -->
     <include>
-      <uri>file:///home/syscon/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/models/gas_station</uri>
+      <uri>model://gas_station</uri>
       <name>gas_station</name>
-      <pose>2.100 -1.450 0 0 0 0</pose>
+      <pose>2.100 -1.450 0 0 0 0</pose> 
     </include>
 
-    <!-- Prius Hybrid — static prop, disables steering plugin -->
+    <!-- Prius Hybrid -->
     <include>
-      <uri>file:///home/syscon/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/models/prius_hybrid</uri>
+      <uri>model://prius_hybrid</uri>
       <name>prius_hybrid</name>
-      <pose>1.6266598701477071 -14.056509017944336 -6.9388939039072284e-18 0 0 1.5708003044429053</pose>
-      <static>true</static>
+      <pose>1.6266598701477071 -14.056509017944336 0.01 0 0 1.5708</pose> 
     </include>
 
     <!-- Barricade -->
     <include>
-      <uri>file:///home/syscon/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/models/FoodCourtBarricade</uri>
+      <uri>model://FoodCourtBarricade</uri>
       <name>barricade</name>
       <pose>4.832 -14.509 0.01 0 0 1.57</pose>
     </include>
 
-    <!-- Construction Cone -->
+    <!-- KUKA KR6 R700 -->
     <include>
-      <uri>file:///home/syscon/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/models/construction_cone</uri>
-      <name>cone</name>
-      <pose>1.1719791889190674 -12.851659774780275 0.0052882102318108082 0 0 -0.026000007134877226</pose>
+      <uri>model://kr6_r700</uri>
+      <name>kr6_r700</name>
+      <pose>-0.05396429821849047 -11.928999900817871 0.0 0 0 -1.6273313478183193</pose>
     </include>
 
-    <!-- Universal Robots UR20 — on gas station pedestal beside dispenser -->
-    <include>
-      <uri>file:///home/syscon/Desktop/anurag_ws/src/refuel-arm/kuka_refuel_ws/src/kuka_kr6_gazebo/models/ur20</uri>
-      <name>ur20</name>
-      <pose>-0.09054180234670639 -12.046500205993652 0.29032400250434875 0 0 -1.5332110364943754</pose>
-    </include>
-
-
-    <!-- MARKER DOT 1: Drag to DISPENSER nozzle position -->
+    <!-- MARKER DOT 1: Dispenser nozzle position -->
     <model name='dot_dispenser'>
       <static>true</static>
       <pose>1.2640416622161865 -12.185000419616699 1.2171000242233276 0 0 0</pose>
       <link name="link">
-        <inertial>
-          <mass>0.1</mass>
-          <inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia>
-        </inertial>
-        <collision name="col">
-          <geometry><sphere><radius>0.12</radius></sphere></geometry>
-        </collision>
         <visual name="vis">
           <geometry><sphere><radius>0.12</radius></sphere></geometry>
           <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
@@ -87,21 +71,14 @@
       </link>
     </model>
 
-    <!-- MARKER DOT 2: Drag to CAR FUEL INLET position -->
+    <!-- MARKER DOT 2: Car fuel inlet position -->
     <model name='dot_inlet'>
       <static>true</static>
       <pose>0.11403899639844894 -13.236710548400879 1.0072900056838989 0 0 0</pose>
       <link name="link">
-        <inertial>
-          <mass>0.1</mass>
-          <inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia>
-        </inertial>
-        <collision name="col">
-          <geometry><sphere><radius>0.12</radius></sphere></geometry>
-        </collision>
         <visual name="vis">
           <geometry><sphere><radius>0.12</radius></sphere></geometry>
-          <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+          <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse></material>
         </visual>
       </link>
     </model>
