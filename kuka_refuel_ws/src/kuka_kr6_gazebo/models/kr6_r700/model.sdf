@@ -26,10 +26,12 @@
         </geometry>
       </visual>
       <collision name="collision">
+        <pose>0 0 0.075 0 0 0</pose>
         <geometry>
-          <mesh>
-            <uri>model://kr6_r700/meshes/collision/base_link.stl</uri>
-          </mesh>
+          <cylinder>
+            <radius>0.2</radius>
+            <length>0.15</length>
+          </cylinder>
         </geometry>
       </collision>
     </link>
