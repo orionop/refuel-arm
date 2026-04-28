@@ -173,7 +173,6 @@
         <xyz>0 0 -1</xyz>
         <limit><lower>-2.967</lower><upper>2.967</upper><effort>200</effort></limit>
         <dynamics><damping>10.0</damping><friction>5.0</friction></dynamics>
-        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_2" type="revolute">
@@ -183,7 +182,6 @@
         <xyz>0 1 0</xyz>
         <limit><lower>-3.316</lower><upper>0.785</upper><effort>200</effort></limit>
         <dynamics><damping>10.0</damping><friction>5.0</friction></dynamics>
-        <initial_position>-1.5708</initial_position>
       </axis>
     </joint>
     <joint name="joint_3" type="revolute">
@@ -193,7 +191,6 @@
         <xyz>0 1 0</xyz>
         <limit><lower>-2.094</lower><upper>2.722</upper><effort>200</effort></limit>
         <dynamics><damping>10.0</damping><friction>5.0</friction></dynamics>
-        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_4" type="revolute">
@@ -203,7 +200,6 @@
         <xyz>-1 0 0</xyz>
         <limit><lower>-3.228</lower><upper>3.228</upper><effort>100</effort></limit>
         <dynamics><damping>5.0</damping><friction>2.0</friction></dynamics>
-        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_5" type="revolute">
@@ -213,7 +209,6 @@
         <xyz>0 1 0</xyz>
         <limit><lower>-2.094</lower><upper>2.094</upper><effort>100</effort></limit>
         <dynamics><damping>5.0</damping><friction>2.0</friction></dynamics>
-        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_6" type="revolute">
@@ -223,7 +218,6 @@
         <xyz>-1 0 0</xyz>
         <limit><lower>-6.108</lower><upper>6.108</upper><effort>50</effort></limit>
         <dynamics><damping>2.0</damping><friction>1.0</friction></dynamics>
-        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     

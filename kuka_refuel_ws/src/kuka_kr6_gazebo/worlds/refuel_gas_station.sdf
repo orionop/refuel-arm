@@ -23,6 +23,11 @@
       <link name="link">
         <collision name="collision">
           <geometry><plane><normal>0 0 1</normal></plane></geometry>
+          <surface>
+            <friction>
+              <ode><mu>100</mu><mu2>50</mu2></ode>
+            </friction>
+          </surface>
         </collision>
         <visual name="visual">
           <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
@@ -42,7 +47,7 @@
     <include>
       <uri>model://prius_hybrid</uri>
       <name>prius_hybrid</name>
-      <pose>1.6266598701477071 -14.056509017944336 0.0 0 0 1.5708</pose> 
+      <pose>1.6266598701477071 -14.056509017944336 0.01 0 0 1.5708</pose> 
     </include>
 
     <!-- Barricade -->
