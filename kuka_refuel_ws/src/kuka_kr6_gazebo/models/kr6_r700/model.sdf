@@ -169,7 +169,9 @@
       <child>link_1</child>
       <axis>
         <xyz>0 0 -1</xyz>
-        <limit><lower>-2.967</lower><upper>2.967</upper></limit>
+        <limit><lower>-2.967</lower><upper>2.967</upper><effort>200</effort></limit>
+        <dynamics><damping>10.0</damping><friction>5.0</friction></dynamics>
+        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_2" type="revolute">
@@ -177,7 +179,9 @@
       <child>link_2</child>
       <axis>
         <xyz>0 1 0</xyz>
-        <limit><lower>-3.316</lower><upper>0.785</upper></limit>
+        <limit><lower>-3.316</lower><upper>0.785</upper><effort>200</effort></limit>
+        <dynamics><damping>10.0</damping><friction>5.0</friction></dynamics>
+        <initial_position>-1.5708</initial_position>
       </axis>
     </joint>
     <joint name="joint_3" type="revolute">
@@ -185,7 +189,9 @@
       <child>link_3</child>
       <axis>
         <xyz>0 1 0</xyz>
-        <limit><lower>-2.094</lower><upper>2.722</upper></limit>
+        <limit><lower>-2.094</lower><upper>2.722</upper><effort>200</effort></limit>
+        <dynamics><damping>10.0</damping><friction>5.0</friction></dynamics>
+        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_4" type="revolute">
@@ -193,7 +199,9 @@
       <child>link_4</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <limit><lower>-3.228</lower><upper>3.228</upper></limit>
+        <limit><lower>-3.228</lower><upper>3.228</upper><effort>100</effort></limit>
+        <dynamics><damping>5.0</damping><friction>2.0</friction></dynamics>
+        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_5" type="revolute">
@@ -201,7 +209,9 @@
       <child>link_5</child>
       <axis>
         <xyz>0 1 0</xyz>
-        <limit><lower>-2.094</lower><upper>2.094</upper></limit>
+        <limit><lower>-2.094</lower><upper>2.094</upper><effort>100</effort></limit>
+        <dynamics><damping>5.0</damping><friction>2.0</friction></dynamics>
+        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     <joint name="joint_6" type="revolute">
@@ -209,7 +219,9 @@
       <child>link_6</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <limit><lower>-6.108</lower><upper>6.108</upper></limit>
+        <limit><lower>-6.108</lower><upper>6.108</upper><effort>50</effort></limit>
+        <dynamics><damping>2.0</damping><friction>1.0</friction></dynamics>
+        <initial_position>0.0</initial_position>
       </axis>
     </joint>
     
@@ -221,27 +233,33 @@
   
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>joint_1</joint_name>
-      <p_gain>100</p_gain><i_gain>0.5</i_gain><d_gain>10</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
     </plugin>
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>joint_2</joint_name>
-      <p_gain>100</p_gain><i_gain>0.5</i_gain><d_gain>10</d_gain>
+      <initial_position>-1.5708</initial_position>
+      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
     </plugin>
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>joint_3</joint_name>
-      <p_gain>100</p_gain><i_gain>0.5</i_gain><d_gain>10</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>5000</p_gain><i_gain>50</i_gain><d_gain>500</d_gain>
     </plugin>
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>joint_4</joint_name>
-      <p_gain>20</p_gain><i_gain>0.1</i_gain><d_gain>2</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>2000</p_gain><i_gain>20</i_gain><d_gain>200</d_gain>
     </plugin>
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>joint_5</joint_name>
-      <p_gain>20</p_gain><i_gain>0.1</i_gain><d_gain>2</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>2000</p_gain><i_gain>20</i_gain><d_gain>200</d_gain>
     </plugin>
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>joint_6</joint_name>
-      <p_gain>20</p_gain><i_gain>0.1</i_gain><d_gain>2</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>2000</p_gain><i_gain>20</i_gain><d_gain>200</d_gain>
     </plugin>
 
   </model>
