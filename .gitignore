@@ -43,6 +43,12 @@ ik_geo_final/
 kuka_refuel_ws/build/
 kuka_refuel_ws/install/
 kuka_refuel_ws/log/
+refueling/kuka_refuel_ws/build/
+refueling/kuka_refuel_ws/install/
+refueling/kuka_refuel_ws/log/
+
+# Cloned third-party robot descriptions (re-cloneable: git clone https://github.com/kroshu/kuka_robot_descriptions.git)
+obstacle/kuka_robot_descriptions/
 __pycache__/
 *.pyc
 scratch/

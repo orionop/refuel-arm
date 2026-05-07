@@ -1,3 +1,3 @@
-[submodule "final_version/bcr_arm"]
-	path = final_version/bcr_arm
+[submodule "deprecated/final_version/bcr_arm"]
+	path = deprecated/final_version/bcr_arm
 	url = https://github.com/blackcoffeerobotics/bcr_arm.git
