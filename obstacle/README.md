@@ -1,39 +1,58 @@
 # Obstacle Workspace
 
-Dynamic-obstacle safety system for the KR6 R700, separate from the autonomous
-refueling pipeline in `../refueling/`.
+Dynamic-obstacle safety system for the KUKA KR6 R700, fully independent from
+the autonomous refueling pipeline in `../refueling/`.
 
-## Phase 0 — arm + Gazebo smoke test
+## Stack
+
+- **OS:** Ubuntu 24.04
+- **ROS2:** Jazzy
+- **Simulator:** gz sim Harmonic
+- **Robot description + sim launch:** [kroshu/kuka_robot_descriptions](https://github.com/kroshu/kuka_robot_descriptions) (master branch, Jazzy + Harmonic supported)
+- **Control:** `gz_ros2_control` (no raw `gz topic` hacks)
+
+## Setup (Ubuntu 24 + ROS2 Jazzy)
+
+```bash
+# system deps
+sudo apt install ros-jazzy-gz-ros2-control ros-jazzy-ros-gz* \
+                 ros-jazzy-ros2-control ros-jazzy-ros2-controllers \
+                 ros-jazzy-xacro
+
+# fresh ROS2 workspace (separate from this repo)
+mkdir -p ~/kuka_ws/src && cd ~/kuka_ws/src
+git clone -b master https://github.com/kroshu/kuka_robot_descriptions.git
+
+cd ~/kuka_ws
+rosdep install --from-paths src -y --ignore-src
+colcon build --symlink-install
+source install/setup.bash
+```
+
+## Phase 0 — bring-up smoke test
+
+```bash
+source ~/kuka_ws/install/setup.bash
+ros2 launch kuka_resources gazebo_startup.launch.py \
+     robot_model:=kr6_r700_sixx robot_family:=kr_agilus
+```
+
+Verify:
+- Arm comes up stable, no tipping
+- `ros2 topic list | grep controller` shows controller topics
+- `ros2 control list_controllers` shows running controllers
+
+Once Phase 0 passes, the obstacle/ scripts will be written to talk to those
+controllers (joint trajectory action / forward position controller).
+
+## Layout
 
 ```
 obstacle/
-├── models/kr6_r700/        # KUKA KR6 R700 SDF + meshes (copied from refueling/)
-├── worlds/obstacle_test.sdf # ground plane + arm, no obstacles yet
-├── scripts/
-│   ├── joint_control.py     # gz topic publisher helpers
-│   └── test_arm.py          # joint sweep smoke test
-└── launch.sh                # gz sim launcher
+├── kuka_robot_descriptions/   # gitignored, cloned from kroshu
+└── README.md
 ```
 
-### Run
-
-Terminal A — Gazebo:
-```bash
-./obstacle/launch.sh
-```
-
-Terminal B — joint sweep:
-```bash
-python3 obstacle/scripts/test_arm.py
-```
-
-You should see the arm settle at `J2 = -π/2`, then sweep each joint one at a
-time, then return home.
-
-### Notes
-
-- `kuka_robot_descriptions/` (cloned from kroshu) is gitignored. We copied the
-  proven `kr6_r700` model from `refueling/kuka_refuel_ws/` for now; the kroshu
-  xacros will be revisited when we need the full URDF for kinematics.
-- The arm uses `JointPositionController` plugins (one per joint); each listens
-  on `/model/kr6_r700/joint/joint_N/0/cmd_pos` (`gz.msgs.Double`).
+Scripts, worlds, and models will be added once the kroshu launch is verified
+working on the Ubuntu box. Everything from the earlier refueling-derived
+attempt has been moved to `../deprecated/obstacle_phase0_from_refueling/`.
