@@ -1,20 +1,19 @@
-"""Forward kinematics + Jacobian for the Universal Robots UR5.
+"""Forward kinematics + Jacobian for the Elephant Robotics myCobot 280.
 
-DH parameters from Universal Robots' public datasheet (UR5e variant
-parameters are similar — adjust if you switch arms). The UR family uses
-classic Denavit-Hartenberg with the following table:
+DH parameters extracted from the official myCobot 280 URDF (Elephant Robotics).
+All 6 joints are revolute around the Z-axis. Max reach ~0.28 m.
 
     i |   a (m)    |  d (m)   | alpha (rad) | theta (rad)
     --+------------+----------+-------------+-------------
-    1 |  0.0       | 0.089159 |  +π/2       | q1
-    2 | -0.425     | 0.0      |   0         | q2
-    3 | -0.39225   | 0.0      |   0         | q3
-    4 |  0.0       | 0.10915  |  +π/2       | q4
-    5 |  0.0       | 0.09465  |  −π/2       | q5
-    6 |  0.0       | 0.0823   |   0         | q6
+    1 |  0.0       | 0.13156  |  +π/2       | q1
+    2 |  0.1104    | 0.0      |   0         | q2
+    3 |  0.096     | 0.0      |   0         | q3
+    4 |  0.0       | 0.06062  |  +π/2       | q4
+    5 |  0.0       | 0.0      |  −π/2       | q5
+    6 |  0.0456    | 0.07318  |   0         | q6
 
-The Jacobian is computed by finite difference over FK. At 6 DoF with a 1e-6
-perturbation that's 13 FK evaluations per Jacobian — fine for 100 Hz control.
+The Jacobian is computed by finite difference over FK (more robust than
+hand-derived form for a smaller arm where numerical precision matters).
 """
 from __future__ import annotations
 
@@ -23,14 +22,14 @@ from dataclasses import dataclass
 import numpy as np
 
 
-# UR5 DH parameters (Universal Robots, public datasheet)
-_DH_A = np.array([0.0, -0.425, -0.39225, 0.0, 0.0, 0.0])
-_DH_D = np.array([0.089159, 0.0, 0.0, 0.10915, 0.09465, 0.0823])
+# myCobot 280 DH parameters (Elephant Robotics URDF)
+_DH_A = np.array([0.0, 0.1104, 0.096, 0.0, 0.0, 0.0456])
+_DH_D = np.array([0.13156, 0.0, 0.0, 0.06062, 0.0, 0.07318])
 _DH_ALPHA = np.array([np.pi / 2, 0.0, 0.0, np.pi / 2, -np.pi / 2, 0.0])
 
-# UR5 joint velocity / acceleration limits (rad/s, rad/s²) — datasheet
-JOINT_VEL_LIMITS = np.array([3.15, 3.15, 3.15, 3.20, 3.20, 3.20])
-JOINT_ACC_LIMITS = np.array([15.0, 15.0, 15.0, 28.0, 28.0, 28.0])
+# myCobot 280 joint velocity / acceleration limits (rad/s, rad/s²)
+JOINT_VEL_LIMITS = np.array([2.793, 2.793, 2.793, 2.793, 2.793, 2.793])
+JOINT_ACC_LIMITS = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
 
 
 def _dh_transform(a: float, d: float, alpha: float, theta: float) -> np.ndarray:
@@ -89,8 +88,8 @@ def jacobian(q: np.ndarray) -> np.ndarray:
 
 
 @dataclass
-class UR5Kinematics:
-    name: str = "ur5"
+class MyCobotKinematics:
+    name: str = "mycobot_280"
 
     def fk(self, q):
         return fk(q)
@@ -105,3 +104,6 @@ class UR5Kinematics:
     @property
     def acc_limits(self):
         return JOINT_ACC_LIMITS.copy()
+
+
+UR5Kinematics = MyCobotKinematics  # alias for backwards compat

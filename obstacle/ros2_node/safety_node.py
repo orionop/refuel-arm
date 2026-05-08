@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""ROS2 safety supervisor node for UR5 in gz sim.
+"""ROS2 safety supervisor node for myCobot 280 in gz sim.
 
 Topology:
 
     /joint_states                  ── sensor_msgs/JointState   (from gz_ros2_control)
     /obstacle_pose                 ── geometry_msgs/PoseStamped (from obstacle_simulator)
-    /forward_velocity_controller/  ── std_msgs/Float64MultiArray (we publish here)
+    /arm_controller/               ── trajectory_msgs/JointTrajectory (we publish here)
         commands
 
 This node:
-1. Tracks the latest UR5 joint state.
+1. Tracks the latest myCobot 280 joint state.
 2. Tracks the latest obstacle pose + estimates velocity by finite difference.
-3. At a fixed control rate, computes (FK, Jacobian) for the UR5, builds a
+3. At a fixed control rate, computes (FK, Jacobian) for the myCobot, builds a
    RobotState + Obstacle, and asks the chosen safety method for a qdot.
-4. Publishes the qdot to the forward velocity controller.
+4. Publishes the qdot to the arm controller.
 
 The nominal qdot the safety method tries to track is provided as a ROS
 parameter (`nominal_qdot`) — replace with whatever your refueling planner
 publishes once integrated.
 
-Usage (on Ubuntu 24 + ROS2 Jazzy + gz sim Harmonic):
+Usage (on Ubuntu 24 + ROS2 Jazzy + gz sim Harmonic with mycobot_ros2):
 
     ros2 run obstacle safety_node \\
         --ros-args -p method:=hocbf -p control_rate:=50.0
@@ -49,7 +49,7 @@ except ImportError:                                          # pragma: no cover
     print("[safety_node] rclpy not available — run on ROS2 Jazzy box.")
     raise
 
-from safety.kinematics import UR5Kinematics
+from safety.kinematics import MyCobotKinematics
 from safety.methods import (
     APFCircularFields,
     DistanceThreshold,
@@ -66,14 +66,14 @@ METHOD_REGISTRY = {
     "hocbf": HOCBFFilter,
 }
 
-# Joint names exposed by the UR5 in Universal_Robots_ROS2_GZ_Simulation.
-UR5_JOINT_ORDER = [
-    "shoulder_pan_joint",
-    "shoulder_lift_joint",
-    "elbow_joint",
-    "wrist_1_joint",
-    "wrist_2_joint",
-    "wrist_3_joint",
+# Joint names exposed by the myCobot 280 in mycobot_ros2 Gazebo simulation.
+MYCOBOT_JOINT_ORDER = [
+    "link1_to_link2",
+    "link2_to_link3",
+    "link3_to_link4",
+    "link4_to_link5",
+    "link5_to_link6",
+    "link6_to_link6_flange",
 ]
 
 
@@ -96,7 +96,7 @@ class SafetyNode(Node):
             raise ValueError(f"unknown method '{method_name}', "
                              f"choose from {list(METHOD_REGISTRY)}")
         self.method = METHOD_REGISTRY[method_name]()
-        self.kin = UR5Kinematics()
+        self.kin = MyCobotKinematics()
 
         rate = float(self.get_parameter("control_rate").value)
         self.dt = 1.0 / rate
@@ -160,9 +160,9 @@ class SafetyNode(Node):
     def _on_joint_state(self, msg: JointState) -> None:
         if self._joint_index is None:
             try:
-                self._joint_index = [msg.name.index(j) for j in UR5_JOINT_ORDER]
+                self._joint_index = [msg.name.index(j) for j in MYCOBOT_JOINT_ORDER]
             except ValueError as e:
-                self.get_logger().warn(f"joint state missing UR5 joint: {e}")
+                self.get_logger().warn(f"joint state missing myCobot joint: {e}")
                 return
         self.q = np.array([msg.position[i] for i in self._joint_index], dtype=float)
         if msg.velocity and len(msg.velocity) >= len(msg.position):

@@ -21,10 +21,10 @@ import numpy as np
 from ..types import Obstacle
 
 
-# UR5 home pose EE position, precomputed from kinematics.fk(q_home).
+# myCobot 280 home pose EE position at q=0 (all joints zero).
 # Hardcoded so scenarios.py has no kinematics import (avoids a circular
 # dependency at module import time).
-P_EE_HOME = np.array([-0.487, -0.109, 0.432])
+P_EE_HOME = np.array([0.252, -0.1338, 0.13156])
 
 ObstacleTraj = Callable[[float], Obstacle]
 
@@ -82,22 +82,22 @@ def _along_x(offset_x: float, side_y: float = 0.0, dz: float = 0.0) -> np.ndarra
 def head_on(speed: float = 0.8) -> Scenario:
     """Head-on approach toward EE home along +x → −x.
 
-    Starts 1.5 m away (well outside influence radius), aims at EE_home, ends
-    0.3 m past EE_home so a passive arm would be hit.
+    Starts 0.35 m away (well outside influence radius), aims at EE_home, ends
+    0.08 m past EE_home so a passive arm would be hit.
     """
-    duration = 1.8 / max(speed, 0.1) + 0.5  # slight slack so it overruns past EE
+    duration = 0.43 / max(speed, 0.1) + 0.5  # slight slack so it overruns past EE
     return Scenario(
         name=f"head_on_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=_along_x(+1.5),
-            end=_along_x(-0.3),
+            start=_along_x(+0.35),
+            end=_along_x(-0.08),
             duration=duration,
-            radius=0.10,
+            radius=0.08,
             label="child",
         ),
         nominal_qdot=_NOM_REFUEL_LIKE.copy(),
-        description="Head-on approach, axis-aligned, real refueling-like nominal motion.",
+        description="Head-on approach toward EE, myCobot 280 scaled.",
     )
 
 
@@ -105,91 +105,91 @@ def oblique(speed: float = 0.8, angle_deg: float = 45.0) -> Scenario:
     """Diagonal approach toward EE home from +x/+y quadrant."""
     a = np.deg2rad(angle_deg)
     direction = np.array([-np.cos(a), -np.sin(a), 0.0])
-    duration = 1.8 / max(speed, 0.1) + 0.5
-    start = P_EE_HOME - direction * 1.5
-    end = P_EE_HOME + direction * 0.3
+    duration = 0.43 / max(speed, 0.1) + 0.5
+    start = P_EE_HOME - direction * 0.35
+    end = P_EE_HOME + direction * 0.08
     return Scenario(
         name=f"oblique_{int(angle_deg)}_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(start=start, end=end, duration=duration,
-                                      radius=0.10),
+                                      radius=0.08),
         nominal_qdot=_NOM_REFUEL_LIKE.copy(),
-        description=f"Oblique approach {angle_deg}° from frontal axis.",
+        description=f"Oblique approach {angle_deg}° from frontal axis, myCobot scaled.",
     )
 
 
 def passing(speed: float = 1.0) -> Scenario:
-    """Obstacle passes by ~0.8 m to the side — should NOT trigger any method.
+    """Obstacle passes by ~0.25 m to the side — should NOT trigger any method.
 
     This is the false-positive test: a person walking past the arm at safe
     distance should leave the nominal motion unchanged.
     """
     duration = 3.0
-    side = 0.8
+    side = 0.25
     return Scenario(
         name=f"passing_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=P_EE_HOME + np.array([+0.1, +side, 0.0]) - np.array([0, speed * duration / 2, 0]),
-            end=P_EE_HOME + np.array([+0.1, +side, 0.0]) + np.array([0, speed * duration / 2, 0]),
+            start=P_EE_HOME + np.array([+0.05, +side, 0.0]) - np.array([0, speed * duration / 2, 0]),
+            end=P_EE_HOME + np.array([+0.05, +side, 0.0]) + np.array([0, speed * duration / 2, 0]),
             duration=duration,
-            radius=0.10,
+            radius=0.08,
             label="passerby",
         ),
         nominal_qdot=_NOM_REFUEL_LIKE.copy(),
-        description="Walks past 0.8 m to the side without entering danger zone.",
+        description="Passes 0.25 m to the side without entering danger zone, myCobot scaled.",
     )
 
 
 def fast_dash(speed: float = 1.5) -> Scenario:
     """Worst-case dynamic: child sprints toward EE.
 
-    Starts 2 m away (gives ~0.5 s approach phase even at 1.5 m/s), larger
-    safety bubble (0.15 m).
+    Starts 0.4 m away (gives ~0.27 s approach phase even at 1.5 m/s), larger
+    safety bubble (0.12 m).
     """
-    duration = 2.0 / max(speed, 0.1) + 0.3
+    duration = 0.48 / max(speed, 0.1) + 0.3
     return Scenario(
         name=f"fast_dash_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=_along_x(+2.0),
-            end=_along_x(-0.5),
+            start=_along_x(+0.4),
+            end=_along_x(-0.08),
             duration=duration,
-            radius=0.15,
+            radius=0.12,
             label="child_running",
         ),
         nominal_qdot=_NOM_REFUEL_LIKE.copy(),
-        description="Fast head-on sprint, larger bubble.",
+        description="Fast head-on sprint, larger bubble, myCobot scaled.",
     )
 
 
 def static_in_path() -> Scenario:
-    """Stationary obstacle 0.3 m in front of EE — must brake for it."""
-    p = P_EE_HOME + np.array([+0.3, 0.0, 0.0])
+    """Stationary obstacle 0.1 m in front of EE — must brake for it."""
+    p = P_EE_HOME + np.array([+0.1, 0.0, 0.0])
     return Scenario(
         name="static_in_path",
         duration=2.5,
-        obstacle_traj=stationary_obstacle(p, radius=0.10, label="drum"),
+        obstacle_traj=stationary_obstacle(p, radius=0.08, label="drum"),
         nominal_qdot=_NOM_REFUEL_LIKE.copy(),
-        description="Drum 0.3 m in front of EE, intersects nominal motion.",
+        description="Drum 0.1 m in front of EE, intersects nominal motion, myCobot scaled.",
     )
 
 
 def vertical_drop(speed: float = 1.0) -> Scenario:
     """Object falls toward EE from above (e.g. dropped tool). Tests +z axis."""
-    duration = 1.6 / max(speed, 0.1) + 0.2
+    duration = 0.5 / max(speed, 0.1) + 0.2
     return Scenario(
         name=f"vertical_drop_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=P_EE_HOME + np.array([0.0, 0.0, +1.5]),
-            end=P_EE_HOME + np.array([0.0, 0.0, -0.3]),
+            start=P_EE_HOME + np.array([0.0, 0.0, +0.4]),
+            end=P_EE_HOME + np.array([0.0, 0.0, -0.08]),
             duration=duration,
             radius=0.08,
             label="dropped_tool",
         ),
         nominal_qdot=_NOM_REFUEL_LIKE.copy(),
-        description="Falling object, tests +z axis avoidance.",
+        description="Falling object, tests +z axis avoidance, myCobot scaled.",
     )
 
 
