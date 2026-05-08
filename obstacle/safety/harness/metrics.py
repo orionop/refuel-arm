@@ -3,19 +3,22 @@
 A run produces a list of (t, state, obstacle, qdot_cmd, info) tuples. From
 that we compute:
 
-- min_separation         minimum point-to-obstacle clearance over the run
+- min_separation         minimum point-to-obstacle clearance over the run [m]
 - collision              True if min_separation went negative
 - reaction_time          time from "obstacle entered danger zone" to
-                         "method commanded a deviation from nominal qdot"
-- deviation_l2           total ‖qdot_cmd − qdot_nominal‖ over the run
+                         "method commanded a deviation from nominal qdot" [s]
+- deviation_l2           total ‖qdot_cmd − qdot_nominal‖ over the run [rad/s]
                          (proxy for mission disruption)
-- smoothness_jerk        proxy via ‖Δqdot_cmd‖ summed over the run
+- total_vel_variation    total ‖Δqdot_cmd‖ summed over the run [rad/s]
+                         (smoothness penalty — lower = smoother)
+- peak_jerk              max ‖d²(qdot)/dt²‖ across the run [rad/s³]
+                         (true physical jerk — third time derivative of position)
+- mean_acceleration      mean ‖Δqdot/dt‖ across the run [rad/s²]
+                         (proper acceleration magnitude)
 - false_positive         True if the method braked when obstacle never
-                         actually entered the danger zone (used with the
-                         "passing" scenario)
+                         actually entered the danger zone
 
-All metrics are scalar floats / bools. Logging the full trajectory tape stays
-the responsibility of the runner; metrics are post-processed once.
+All metrics are scalar floats / bools.
 """
 from __future__ import annotations
 
@@ -28,11 +31,13 @@ import numpy as np
 class RunMetrics:
     scenario: str
     method: str
-    min_separation: float
+    min_separation: float        # m
     collision: bool
-    reaction_time: float        # NaN if method never deviated
-    deviation_l2: float
-    smoothness_jerk: float
+    reaction_time: float         # s, NaN if method never deviated
+    deviation_l2: float          # rad/s, summed
+    total_vel_variation: float   # rad/s, summed |Δqdot|
+    peak_jerk: float             # rad/s³, true jerk
+    mean_acceleration: float     # rad/s², |Δqdot/dt|
     false_positive: bool
 
 
@@ -43,11 +48,11 @@ def compute_metrics(
     times: np.ndarray,
     ee_positions: np.ndarray,        # (T,3)
     obstacle_positions: np.ndarray,  # (T,3)
-    obstacle_radii: np.ndarray,      # (T,) — usually constant
+    obstacle_radii: np.ndarray,      # (T,)
     qdot_cmds: np.ndarray,           # (T,n_joints)
     qdot_nominals: np.ndarray,       # (T,n_joints)
     danger_distance: float,
-    expect_collision: bool = True,   # True for "must brake", False for passing
+    expect_collision: bool = True,
 ) -> RunMetrics:
     delta = ee_positions - obstacle_positions
     separations = np.linalg.norm(delta, axis=1) - obstacle_radii
@@ -68,13 +73,26 @@ def compute_metrics(
 
     deviation_l2 = float(np.sum(np.linalg.norm(qdot_cmds - qdot_nominals, axis=1)))
 
-    if qdot_cmds.shape[0] > 1:
+    # smoothness metrics
+    if qdot_cmds.shape[0] > 2 and len(times) > 2:
+        dt = float(np.median(np.diff(times)))
+        if dt <= 0:
+            dt = 1e-3
+        # 1st diff: velocity changes (rad/s)
         dq = np.diff(qdot_cmds, axis=0)
-        smoothness_jerk = float(np.sum(np.linalg.norm(dq, axis=1)))
+        total_vel_variation = float(np.sum(np.linalg.norm(dq, axis=1)))
+        # acceleration (rad/s²) = dq/dt
+        accel = dq / dt
+        mean_acceleration = float(np.mean(np.linalg.norm(accel, axis=1)))
+        # jerk (rad/s³) = d(accel)/dt = d²(qdot)/dt²
+        jerk_arr = np.diff(accel, axis=0) / dt
+        peak_jerk = float(np.max(np.linalg.norm(jerk_arr, axis=1))) if len(jerk_arr) else 0.0
     else:
-        smoothness_jerk = 0.0
+        total_vel_variation = 0.0
+        peak_jerk = 0.0
+        mean_acceleration = 0.0
 
-    # false positive: braked (qdot dropped to ~0) when obstacle never entered danger
+    # false positive: braked when obstacle never entered danger
     braked = np.linalg.norm(qdot_cmds, axis=1) < 1e-3
     false_positive = bool((not expect_collision) and np.any(braked))
 
@@ -85,6 +103,8 @@ def compute_metrics(
         collision=collision,
         reaction_time=reaction_time,
         deviation_l2=deviation_l2,
-        smoothness_jerk=smoothness_jerk,
+        total_vel_variation=total_vel_variation,
+        peak_jerk=peak_jerk,
+        mean_acceleration=mean_acceleration,
         false_positive=false_positive,
     )

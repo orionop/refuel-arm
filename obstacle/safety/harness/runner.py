@@ -116,12 +116,15 @@ def run_benchmark(
 
 
 def print_metrics_table(rows: Sequence[RunMetrics]) -> None:
-    header = f"{'scenario':<20s} {'method':<14s} {'min_sep':>8s} {'coll':>5s} {'reac_t':>8s} {'dev_l2':>8s} {'jerk':>8s} {'fp':>4s}"
+    header = (f"{'scenario':<20s} {'method':<14s} {'min_sep':>8s} {'coll':>5s} "
+              f"{'reac_t':>8s} {'dev_l2':>8s} {'tvv':>8s} {'pk_jerk':>10s} "
+              f"{'mean_a':>8s} {'fp':>4s}")
     print(header)
     print("-" * len(header))
     for r in rows:
         rt = f"{r.reaction_time:.3f}" if not np.isnan(r.reaction_time) else "  -  "
         print(f"{r.scenario:<20s} {r.method:<14s} "
               f"{r.min_separation:>8.3f} {str(r.collision):>5s} "
-              f"{rt:>8s} {r.deviation_l2:>8.2f} {r.smoothness_jerk:>8.2f} "
-              f"{str(r.false_positive):>4s}")
+              f"{rt:>8s} {r.deviation_l2:>8.2f} "
+              f"{r.total_vel_variation:>8.2f} {r.peak_jerk:>10.1f} "
+              f"{r.mean_acceleration:>8.2f} {str(r.false_positive):>4s}")

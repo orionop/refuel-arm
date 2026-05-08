@@ -74,14 +74,15 @@ def _name_from_path(p: Path) -> tuple[str, str]:
 def _print_table(rows):
     header = (f"{'file':<35s} {'method':<10s} {'scenario':<14s} "
               f"{'min_sep':>8s} {'coll':>5s} {'reac_t':>8s} "
-              f"{'dev_l2':>8s} {'jerk':>8s}")
+              f"{'dev_l2':>8s} {'tvv':>8s} {'pk_jerk':>10s}")
     print(header)
     print("-" * len(header))
     for path, m in rows:
         rt = f"{m.reaction_time:.3f}" if not np.isnan(m.reaction_time) else "  -  "
         print(f"{path.name[:34]:<35s} {m.method:<10s} {m.scenario:<14s} "
               f"{m.min_separation:>8.3f} {str(m.collision):>5s} "
-              f"{rt:>8s} {m.deviation_l2:>8.2f} {m.smoothness_jerk:>8.2f}")
+              f"{rt:>8s} {m.deviation_l2:>8.2f} "
+              f"{m.total_vel_variation:>8.2f} {m.peak_jerk:>10.1f}")
 
 
 def _maybe_plot(df: pd.DataFrame, label: str) -> None:
