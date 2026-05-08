@@ -26,7 +26,10 @@ Usage (on Ubuntu 24 + ROS2 Jazzy + gz sim Harmonic):
 """
 from __future__ import annotations
 
+import csv
+import json
 import sys
+import time
 from pathlib import Path
 
 # Allow running both as a ROS2 package script and directly via python3.
@@ -84,6 +87,9 @@ class SafetyNode(Node):
         self.declare_parameter("nominal_qdot", [0.0] * 6)
         self.declare_parameter("controller_topic",
                                "/forward_velocity_controller/commands")
+        # CSV logging — written under <log_dir>/<method>_<timestamp>.csv
+        self.declare_parameter("log_dir", "")
+        self.declare_parameter("run_tag", "")
 
         method_name = self.get_parameter("method").get_parameter_value().string_value
         if method_name not in METHOD_REGISTRY:
@@ -99,6 +105,31 @@ class SafetyNode(Node):
         self.qdot_nominal = np.asarray(nominal, dtype=float)
 
         controller_topic = self.get_parameter("controller_topic").value
+
+        # ── CSV logger setup ────────────────────────────────────────────
+        log_dir = self.get_parameter("log_dir").get_parameter_value().string_value
+        run_tag = self.get_parameter("run_tag").get_parameter_value().string_value
+        self._log_file = None
+        self._log_writer = None
+        self._t_run_start = None
+        if log_dir:
+            ldir = Path(log_dir).expanduser().resolve()
+            ldir.mkdir(parents=True, exist_ok=True)
+            stamp = time.strftime("%Y%m%d_%H%M%S")
+            tag = f"_{run_tag}" if run_tag else ""
+            path = ldir / f"{method_name}{tag}_{stamp}.csv"
+            self._log_file = path.open("w", newline="")
+            self._log_writer = csv.writer(self._log_file)
+            self._log_writer.writerow([
+                "t",
+                "q1", "q2", "q3", "q4", "q5", "q6",
+                "ee_x", "ee_y", "ee_z",
+                "obs_x", "obs_y", "obs_z",
+                "obs_vx", "obs_vy", "obs_vz",
+                "qdot1", "qdot2", "qdot3", "qdot4", "qdot5", "qdot6",
+                "min_d", "safe", "info_json",
+            ])
+            self.get_logger().info(f"logging to {path}")
 
         # state caches
         self.q = None         # type: ignore
@@ -179,6 +210,31 @@ class SafetyNode(Node):
                 f"unsafe: min_d={out.info.get('min_d', float('nan')):.3f} "
                 f"info={out.info}")
 
+        # ── log row ─────────────────────────────────────────────────────
+        if self._log_writer is not None:
+            now_s = self.get_clock().now().nanoseconds * 1e-9
+            if self._t_run_start is None:
+                self._t_run_start = now_s
+            t_rel = now_s - self._t_run_start
+            obs_p = self._obs_p if self._obs_p is not None else np.full(3, np.nan)
+            obs_v = self._obs_v if self._obs_p is not None else np.zeros(3)
+            min_d = float(out.info.get("min_d", float("nan")))
+            row = [
+                f"{t_rel:.4f}",
+                *[f"{v:.6f}" for v in self.q.tolist()],
+                f"{p_ee[0]:.6f}", f"{p_ee[1]:.6f}", f"{p_ee[2]:.6f}",
+                f"{obs_p[0]:.6f}", f"{obs_p[1]:.6f}", f"{obs_p[2]:.6f}",
+                f"{obs_v[0]:.6f}", f"{obs_v[1]:.6f}", f"{obs_v[2]:.6f}",
+                *[f"{v:.6f}" for v in out.qdot_cmd.tolist()],
+                f"{min_d:.6f}",
+                int(out.safe),
+                json.dumps({k: v for k, v in out.info.items() if k != "min_d"}),
+            ]
+            self._log_writer.writerow(row)
+            # flush every ~50 rows so a crash doesn't lose the whole tape
+            if int(t_rel * (1.0 / self.dt)) % 50 == 0:
+                self._log_file.flush()
+
 
 def main(args=None) -> None:
     rclpy.init(args=args)
@@ -186,6 +242,9 @@ def main(args=None) -> None:
     try:
         rclpy.spin(node)
     finally:
+        if node._log_file is not None:
+            node._log_file.flush()
+            node._log_file.close()
         node.destroy_node()
         rclpy.shutdown()
 

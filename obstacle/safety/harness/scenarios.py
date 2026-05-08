@@ -1,45 +1,57 @@
 """Test scenarios for the safety method benchmark.
 
-Each scenario is a deterministic obstacle trajectory expressed in the world
-frame, parameterised by (start_pos, end_pos, speed, radius). The arm is
-assumed to be running its nominal refueling motion in the background.
+All scenarios are anchored to the UR5 home pose end-effector position
+(`p_ee = [-0.487, -0.109, 0.432]`, computed from `kinematics.fk(q_home)`).
+Obstacle trajectories are constructed in EE-relative offsets so the obstacle
+actually approaches the arm rather than drifting through empty space.
 
-Scenarios are kept simple and reproducible so we can quote concrete numbers
-in the paper without hidden randomness.
+Each scenario starts the obstacle OUTSIDE the typical influence radius
+(0.5–0.6 m for NEO/HOCBF) so methods get a real "approach phase" to react to.
+
+Scenarios are kept deterministic — fixed start/end, fixed speed, fixed nominal
+joint motion — so we can quote concrete numbers in the paper.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable, Optional, Sequence
+from typing import Callable
 
 import numpy as np
 
 from ..types import Obstacle
 
 
-ObstacleTraj = Callable[[float], Obstacle]   # t [s] -> obstacle at time t
+# UR5 home pose EE position, precomputed from kinematics.fk(q_home).
+# Hardcoded so scenarios.py has no kinematics import (avoids a circular
+# dependency at module import time).
+P_EE_HOME = np.array([-0.487, -0.109, 0.432])
+
+ObstacleTraj = Callable[[float], Obstacle]
 
 
 @dataclass
 class Scenario:
     name: str
-    duration: float                        # seconds
+    duration: float
     obstacle_traj: ObstacleTraj
     nominal_qdot: np.ndarray = field(default_factory=lambda: np.zeros(6))
     description: str = ""
 
 
+# ── obstacle trajectory builders ──────────────────────────────────────
+
 def linear_obstacle(start: np.ndarray, end: np.ndarray, duration: float,
-                    radius: float = 0.10, label: str = "child") -> ObstacleTraj:
-    """Constant-velocity straight-line obstacle from start to end over duration."""
+                    radius: float = 0.10, label: str = "obstacle") -> ObstacleTraj:
     start = np.asarray(start, dtype=float)
     end = np.asarray(end, dtype=float)
     v = (end - start) / duration
 
     def at(t: float) -> Obstacle:
-        t = max(0.0, min(t, duration))
-        p = start + v * t
-        return Obstacle(p=p.copy(), v=v.copy(), radius=radius, label=label)
+        t_clamped = max(0.0, min(t, duration))
+        p = start + v * t_clamped
+        # report zero velocity once the obstacle has stopped at end pose
+        v_now = v if 0.0 <= t <= duration else np.zeros(3)
+        return Obstacle(p=p.copy(), v=v_now.copy(), radius=radius, label=label)
 
     return at
 
@@ -55,94 +67,142 @@ def stationary_obstacle(p: np.ndarray, radius: float = 0.10,
     return at
 
 
-# Default arm nominal velocity: small forward motion in joint 1 to mimic the
-# refueling pipeline's coarse approach segment. Replace with a recorded
-# nominal trajectory once we have one from the actual UR5 mission.
-_DEFAULT_NOM = np.array([0.0, 0.1, 0.0, 0.0, 0.0, 0.0])
+# ── nominal arm motions ───────────────────────────────────────────────
+# Richer than "shoulder-lift drift" — exercises shoulder, elbow and wrist so
+# the EE actually traces a meaningful arc and the Jacobian rows interact.
+_NOM_REFUEL_LIKE = np.array([0.10, 0.15, -0.20, 0.10, 0.05, 0.0])
+
+
+# ── concrete scenarios ────────────────────────────────────────────────
+
+def _along_x(offset_x: float, side_y: float = 0.0, dz: float = 0.0) -> np.ndarray:
+    return P_EE_HOME + np.array([offset_x, side_y, dz])
 
 
 def head_on(speed: float = 0.8) -> Scenario:
-    """Obstacle approaches the EE along +x → -x at constant speed."""
+    """Head-on approach toward EE home along +x → −x.
+
+    Starts 1.5 m away (well outside influence radius), aims at EE_home, ends
+    0.3 m past EE_home so a passive arm would be hit.
+    """
+    duration = 1.8 / max(speed, 0.1) + 0.5  # slight slack so it overruns past EE
     return Scenario(
         name=f"head_on_{speed:.1f}",
-        duration=3.0,
+        duration=duration,
         obstacle_traj=linear_obstacle(
-            start=np.array([1.5, 0.0, 0.5]),
-            end=np.array([1.5 - speed * 3.0, 0.0, 0.5]),
-            duration=3.0,
+            start=_along_x(+1.5),
+            end=_along_x(-0.3),
+            duration=duration,
+            radius=0.10,
+            label="child",
         ),
-        nominal_qdot=_DEFAULT_NOM.copy(),
-        description="Head-on approach, axis-aligned",
+        nominal_qdot=_NOM_REFUEL_LIKE.copy(),
+        description="Head-on approach, axis-aligned, real refueling-like nominal motion.",
     )
 
 
 def oblique(speed: float = 0.8, angle_deg: float = 45.0) -> Scenario:
-    """Obstacle approaches at an angle to the arm's frontal plane."""
+    """Diagonal approach toward EE home from +x/+y quadrant."""
     a = np.deg2rad(angle_deg)
     direction = np.array([-np.cos(a), -np.sin(a), 0.0])
-    start = np.array([1.5, -1.0, 0.5])
-    end = start + direction * speed * 3.0
+    duration = 1.8 / max(speed, 0.1) + 0.5
+    start = P_EE_HOME - direction * 1.5
+    end = P_EE_HOME + direction * 0.3
     return Scenario(
         name=f"oblique_{int(angle_deg)}_{speed:.1f}",
-        duration=3.0,
-        obstacle_traj=linear_obstacle(start=start, end=end, duration=3.0),
-        nominal_qdot=_DEFAULT_NOM.copy(),
-        description=f"Oblique approach {angle_deg}° from frontal axis",
+        duration=duration,
+        obstacle_traj=linear_obstacle(start=start, end=end, duration=duration,
+                                      radius=0.10),
+        nominal_qdot=_NOM_REFUEL_LIKE.copy(),
+        description=f"Oblique approach {angle_deg}° from frontal axis.",
     )
 
 
 def passing(speed: float = 1.0) -> Scenario:
-    """Obstacle passes by (does NOT collide) — tests false-positive rate."""
+    """Obstacle passes by ~0.8 m to the side — should NOT trigger any method.
+
+    This is the false-positive test: a person walking past the arm at safe
+    distance should leave the nominal motion unchanged.
+    """
+    duration = 3.0
+    side = 0.8
     return Scenario(
         name=f"passing_{speed:.1f}",
-        duration=3.0,
+        duration=duration,
         obstacle_traj=linear_obstacle(
-            start=np.array([1.0, -2.0, 0.5]),
-            end=np.array([1.0, +1.0, 0.5]),
-            duration=3.0,
+            start=P_EE_HOME + np.array([+0.1, +side, 0.0]) - np.array([0, speed * duration / 2, 0]),
+            end=P_EE_HOME + np.array([+0.1, +side, 0.0]) + np.array([0, speed * duration / 2, 0]),
+            duration=duration,
+            radius=0.10,
+            label="passerby",
         ),
-        nominal_qdot=_DEFAULT_NOM.copy(),
-        description="Passes by 1m in front of arm without colliding",
+        nominal_qdot=_NOM_REFUEL_LIKE.copy(),
+        description="Walks past 0.8 m to the side without entering danger zone.",
     )
 
 
 def fast_dash(speed: float = 1.5) -> Scenario:
-    """Worst-case fast head-on approach (e.g. a child running)."""
+    """Worst-case dynamic: child sprints toward EE.
+
+    Starts 2 m away (gives ~0.5 s approach phase even at 1.5 m/s), larger
+    safety bubble (0.15 m).
+    """
+    duration = 2.0 / max(speed, 0.1) + 0.3
     return Scenario(
         name=f"fast_dash_{speed:.1f}",
-        duration=2.0,
+        duration=duration,
         obstacle_traj=linear_obstacle(
-            start=np.array([2.0, 0.0, 0.5]),
-            end=np.array([2.0 - speed * 2.0, 0.0, 0.5]),
-            duration=2.0,
+            start=_along_x(+2.0),
+            end=_along_x(-0.5),
+            duration=duration,
             radius=0.15,
             label="child_running",
         ),
-        nominal_qdot=_DEFAULT_NOM.copy(),
-        description="Fast head-on dash, larger safety bubble",
+        nominal_qdot=_NOM_REFUEL_LIKE.copy(),
+        description="Fast head-on sprint, larger bubble.",
     )
 
 
-def static_obstacle_in_path(p: Optional[Sequence[float]] = None) -> Scenario:
-    """Static obstacle the nominal path would hit. Sanity check for false stops."""
-    p = np.array([0.5, 0.0, 0.5]) if p is None else np.asarray(p, dtype=float)
+def static_in_path() -> Scenario:
+    """Stationary obstacle 0.3 m in front of EE — must brake for it."""
+    p = P_EE_HOME + np.array([+0.3, 0.0, 0.0])
     return Scenario(
-        name=f"static_obstacle",
-        duration=3.0,
-        obstacle_traj=stationary_obstacle(p),
-        nominal_qdot=_DEFAULT_NOM.copy(),
-        description="Stationary drum in the way",
+        name="static_in_path",
+        duration=2.5,
+        obstacle_traj=stationary_obstacle(p, radius=0.10, label="drum"),
+        nominal_qdot=_NOM_REFUEL_LIKE.copy(),
+        description="Drum 0.3 m in front of EE, intersects nominal motion.",
+    )
+
+
+def vertical_drop(speed: float = 1.0) -> Scenario:
+    """Object falls toward EE from above (e.g. dropped tool). Tests +z axis."""
+    duration = 1.6 / max(speed, 0.1) + 0.2
+    return Scenario(
+        name=f"vertical_drop_{speed:.1f}",
+        duration=duration,
+        obstacle_traj=linear_obstacle(
+            start=P_EE_HOME + np.array([0.0, 0.0, +1.5]),
+            end=P_EE_HOME + np.array([0.0, 0.0, -0.3]),
+            duration=duration,
+            radius=0.08,
+            label="dropped_tool",
+        ),
+        nominal_qdot=_NOM_REFUEL_LIKE.copy(),
+        description="Falling object, tests +z axis avoidance.",
     )
 
 
 def all_scenarios() -> list[Scenario]:
-    """Default benchmark suite."""
+    """Default benchmark suite — diverse coverage of speed, angle, axis."""
     return [
-        head_on(speed=0.8),
+        head_on(speed=0.5),
+        head_on(speed=1.0),
         head_on(speed=1.5),
-        oblique(angle_deg=45.0, speed=0.8),
         oblique(angle_deg=30.0, speed=1.0),
+        oblique(angle_deg=60.0, speed=1.0),
         passing(speed=1.0),
-        fast_dash(speed=1.5),
-        static_obstacle_in_path(),
+        fast_dash(speed=1.8),
+        static_in_path(),
+        vertical_drop(speed=1.2),
     ]

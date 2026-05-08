@@ -82,7 +82,8 @@ def run_scenario(
         obstacle_positions=obs_p, obstacle_radii=obs_r,
     )
 
-    expect_collision = "passing" not in scenario.name and "static" not in scenario.name
+    # only "passing" scenarios are false-positive tests; static_in_path is a real threat.
+    expect_collision = "passing" not in scenario.name
     metrics = compute_metrics(
         scenario_name=scenario.name,
         method_name=method.name,

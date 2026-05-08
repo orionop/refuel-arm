@@ -8,12 +8,14 @@ from .scenarios import (
     head_on,
     oblique,
     passing,
-    static_obstacle_in_path,
+    static_in_path,
+    vertical_drop,
 )
 
 __all__ = [
     "Scenario",
-    "all_scenarios", "fast_dash", "head_on", "oblique", "passing", "static_obstacle_in_path",
+    "all_scenarios", "fast_dash", "head_on", "oblique", "passing",
+    "static_in_path", "vertical_drop",
     "RunMetrics", "compute_metrics",
     "RunLog", "run_scenario", "run_benchmark", "print_metrics_table",
 ]
