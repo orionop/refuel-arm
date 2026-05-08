@@ -47,8 +47,9 @@ refueling/kuka_refuel_ws/build/
 refueling/kuka_refuel_ws/install/
 refueling/kuka_refuel_ws/log/
 
-# Cloned third-party robot descriptions (re-cloneable: git clone https://github.com/kroshu/kuka_robot_descriptions.git)
+# Cloned third-party robot stacks (re-cloneable from upstream)
 obstacle/kuka_robot_descriptions/
+obstacle/Universal_Robots_ROS2_GZ_Simulation/
 __pycache__/
 *.pyc
 scratch/
