@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+  Launch obstacle spawner and NEO controller together via roslaunch.
+
+  Prerequisites running in other terminals:
+    1. roslaunch franka_gazebo panda.launch
+    2. rosrun controller_manager spawner effort_joint_trajectory_controller
+
+  Then:
+    roslaunch ~/Desktop/anurag_ws/refuel-arm/obstacle/ros1_neo/neo_demo.launch
+-->
+<launch>
+
+  <arg name="controller_topic" default="/effort_joint_trajectory_controller/command" />
+  <arg name="control_rate"     default="100.0" />
+  <arg name="influence_dist"   default="0.30" />
+  <arg name="stop_dist"        default="0.05" />
+
+  <!-- Obstacle spawner: run as raw python3 (not in a catkin package) -->
+  <node name="obstacle_spawner_panda"
+        pkg="rosbash"
+        type="rosrun"
+        args="--"
+        output="screen"
+        launch-prefix="bash -c 'cd $(dirname $(find $0 -name neo_demo.launch 2>/dev/null | head -1)) || cd ~/Desktop/anurag_ws/refuel-arm/obstacle/ros1_neo; exec python3 obstacle_spawner_panda.py'"
+        if="false" />
+
+  <!--
+    The line above is messy because <node> wants a catkin pkg/type. Easier to use
+    the bash script (neo_demo.sh) instead of this roslaunch file. Keeping this
+    file as a placeholder; prefer:
+
+        bash neo_demo.sh
+  -->
+
+  <!-- Use the bash script approach for actual execution. This launch file is here
+       as documentation. -->
+
+</launch>
