@@ -250,7 +250,13 @@ class NEONode:
 
             with self.joint_lock:
                 q_now = self.q.copy()
-            q_next = q_now + qd * dt
+
+            # Use a longer trajectory horizon than the publish period so the
+            # JointTrajectoryController PID has time to actually track the goal.
+            # Integrating qd over `horizon` and giving the controller `horizon`
+            # seconds to reach it (re-targeted every 1/control_rate seconds).
+            horizon = max(5.0 * dt, 0.05)
+            q_next = q_now + qd * horizon
 
             msg = JointTrajectory()
             msg.header.stamp = rospy.Time.now()
@@ -258,7 +264,7 @@ class NEONode:
             pt = JointTrajectoryPoint()
             pt.positions = q_next.tolist()
             pt.velocities = qd.tolist()
-            pt.time_from_start = rospy.Duration.from_sec(dt)
+            pt.time_from_start = rospy.Duration.from_sec(horizon)
             msg.points.append(pt)
             self.cmd_pub.publish(msg)
 
