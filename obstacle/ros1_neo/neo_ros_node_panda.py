@@ -99,6 +99,18 @@ class NEONode:
         self.obstacles = {}
         self.obs_lock = threading.Lock()
 
+        # For estimating obstacle velocity from successive pose readings.
+        # Gazebo reports zero twist for kinematically-positioned obstacles
+        # (set_model_state), so we recover velocity by finite difference.
+        # Maps name -> ((x, y, z), timestamp_seconds)
+        self.obstacle_last_pose = {}
+        # Smoothed velocity per obstacle (low-pass to reduce 30 Hz quantization noise)
+        # Maps name -> (vx, vy, vz)
+        self.obstacle_smoothed_v = {}
+        # Smoothing factor (0 = no smoothing, 1 = ignore new readings).
+        # 0.7 = ~3-sample exponential decay. Tunable.
+        self.v_smooth_alpha = 0.7
+
         # Target pose: keep orientation from initial fkine, set xyz from param
         self.Tep = self.robot.fkine(self.q)
         self.Tep.A[:3, 3] = np.array(target_xyz)
@@ -131,21 +143,54 @@ class NEONode:
             self.have_joint_state = True
 
     def model_states_cb(self, msg: ModelStates):
-        """Pick up obstacles by name prefix; record pose and velocity."""
+        """Pick up obstacles by name prefix.
+
+        Position comes from Gazebo's pose.
+        Velocity is ESTIMATED via finite difference on successive pose
+        readings, because Gazebo reports zero twist for kinematically-positioned
+        models (those moved via set_model_state). Without this estimate, NEO's
+        velocity damper sees stationary obstacles and never engages.
+        """
+        t_now = rospy.Time.now().to_sec()
         with self.obs_lock:
             for i, name in enumerate(msg.name):
                 if not name.startswith(self.obstacle_prefix):
                     continue
                 p = msg.pose[i].position
-                v = msg.twist[i].linear
                 pose = sm.SE3(p.x, p.y, p.z)
+
+                # Finite-difference velocity estimate
+                if name in self.obstacle_last_pose:
+                    last_pos, last_t = self.obstacle_last_pose[name]
+                    dt_obs = t_now - last_t
+                    if dt_obs > 1e-4:
+                        vx_raw = (p.x - last_pos[0]) / dt_obs
+                        vy_raw = (p.y - last_pos[1]) / dt_obs
+                        vz_raw = (p.z - last_pos[2]) / dt_obs
+                    else:
+                        vx_raw = vy_raw = vz_raw = 0.0
+                else:
+                    vx_raw = vy_raw = vz_raw = 0.0
+
+                # Exponential moving average for noise smoothing
+                if name in self.obstacle_smoothed_v:
+                    sx, sy, sz = self.obstacle_smoothed_v[name]
+                    a = self.v_smooth_alpha
+                    vx = a * sx + (1 - a) * vx_raw
+                    vy = a * sy + (1 - a) * vy_raw
+                    vz = a * sz + (1 - a) * vz_raw
+                else:
+                    vx, vy, vz = vx_raw, vy_raw, vz_raw
+
+                self.obstacle_last_pose[name] = ((p.x, p.y, p.z), t_now)
+                self.obstacle_smoothed_v[name] = (vx, vy, vz)
 
                 if name not in self.obstacles:
                     sph = sg.Sphere(radius=self.obs_radius, pose=pose)
                 else:
                     sph = self.obstacles[name]
                     sph.T = pose.A
-                sph.v = [v.x, v.y, v.z, 0.0, 0.0, 0.0]
+                sph.v = [vx, vy, vz, 0.0, 0.0, 0.0]
                 self.obstacles[name] = sph
 
     # ---- NEO QP step ----
