@@ -152,6 +152,13 @@ class NEONode:
         velocity damper sees stationary obstacles and never engages.
         """
         t_now = rospy.Time.now().to_sec()
+        # Debug: confirm callback is firing and what it sees
+        matching = [n for n in msg.name if n.startswith(self.obstacle_prefix)]
+        rospy.loginfo_throttle(
+            2.0,
+            "[neo] model_states_cb fired: %d models, matching_prefix(%s): %s",
+            len(msg.name), self.obstacle_prefix, matching,
+        )
         with self.obs_lock:
             for i, name in enumerate(msg.name):
                 if not name.startswith(self.obstacle_prefix):
