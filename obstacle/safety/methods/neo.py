@@ -49,11 +49,11 @@ from ._qp import solve_qp_box
 
 @dataclass
 class NEOParams:
-    d_s: float = 0.10        # hard stop distance [m]
-    d_i: float = 0.50        # influence distance [m]
+    d_s: float = 0.05        # hard stop distance [m] (scaled for KR6 R700)
+    d_i: float = 0.40        # influence distance [m] (~57% of reach)
     xi: float = 1.0          # damper gain
     lam: float = 1e-3        # QP regularisation
-    qdot_max: float = 1.5    # per-joint velocity bound [rad/s]
+    qdot_max: float = 5.59   # per-joint velocity bound [rad/s] (KR6 R700 slowest axis)
 
 
 class NEOVelocityDamper(SafetyMethod):

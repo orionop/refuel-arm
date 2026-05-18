@@ -54,10 +54,10 @@ from ._qp import solve_qp_box
 
 @dataclass
 class HOCBFParams:
-    r_safe: float = 0.30      # safety radius added to obstacle.radius
+    r_safe: float = 0.15      # safety radius added to obstacle.radius (KR6 R700)
     alpha_1: float = 5.0      # class-K gain on h
     alpha_2: float = 5.0      # class-K gain on ḣ (reserved for full HOCBF)
-    qdot_max: float = 1.5     # per-joint velocity bound [rad/s]
+    qdot_max: float = 5.59    # per-joint velocity bound [rad/s] (KR6 R700 slowest axis)
     lam: float = 0.0          # optional regularisation
     slack_weight: float = 1e4  # cost on slack — high so slack is only used when truly infeasible
 

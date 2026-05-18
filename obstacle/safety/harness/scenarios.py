@@ -1,21 +1,24 @@
 """Test scenarios for the safety method benchmark.
 
-All scenarios are anchored to the myCobot 280 home pose end-effector position
-(`p_ee = [0.252, -0.1338, 0.13156]`, computed from `kinematics.fk(q_home)`).
+All scenarios are anchored to the KUKA KR6 R700 candle-pose end-effector
+position (`p_ee = [0.48, 0, 0.715]`), computed from
+`kinematics.fk(q_candle)` where `q_candle = [0, -π/2, π/2, 0, 0, 0]`.
 
-Design principle (revised): scenarios use **zero nominal motion** by default
-so the robot is stationary and methods MUST react to any threat. This avoids
-the case where nominal task motion accidentally avoids the obstacle and the
-safety method appears to do nothing.
+Design principles:
+  1. Every scenario MUST force at least one method to deviate from nominal.
+     No null tests.
+  2. Obstacles start OUTSIDE the influence radius and approach, so methods
+     get a real "detection → reaction" window.
+  3. Nominal joint velocity is nonzero (multi-joint refueling arc), so the
+     benchmark tests "moving arm vs moving obstacle" rather than the trivial
+     "stationary arm" case.
+  4. One explicit false-positive test (passing) where methods must NOT brake.
+  5. All trajectories are deterministic — fixed start, end, speed.
 
-For task-disruption tests we provide an `adversarial` variant where nominal
-qdot points EE toward the obstacle — the safety method must override task.
-
-Each scenario starts the obstacle OUTSIDE the typical influence radius
-(~0.25 m for myCobot scaled NEO/HOCBF) so methods get a real "approach phase".
-
-Scenarios are deterministic — fixed start/end, fixed speed, fixed nominal
-joint motion — so we can quote concrete numbers in the paper.
+KUKA KR6 R700 workspace reference:
+  - Max reach: ~0.70 m (extended)
+  - Candle EE:  [0.48, 0, 0.715]
+  - Obstacle radii: 0.10 m (adult) or 0.15 m (child running)
 """
 from __future__ import annotations
 
@@ -27,8 +30,8 @@ import numpy as np
 from ..types import Obstacle
 
 
-# myCobot 280 home pose EE position at q=0.
-P_EE_HOME = np.array([0.252, -0.1338, 0.13156])
+# KUKA KR6 R700 candle-pose EE position at q = [0, -π/2, π/2, 0, 0, 0]
+P_EE_HOME = np.array([0.48, 0.0, 0.715])
 
 ObstacleTraj = Callable[[float], Obstacle]
 
@@ -45,7 +48,8 @@ class Scenario:
 # ── obstacle trajectory builders ──────────────────────────────────────
 
 def linear_obstacle(start: np.ndarray, end: np.ndarray, duration: float,
-                    radius: float = 0.08, label: str = "obstacle") -> ObstacleTraj:
+                    radius: float = 0.10, label: str = "obstacle") -> ObstacleTraj:
+    """Constant-velocity straight-line obstacle from start to end."""
     start = np.asarray(start, dtype=float)
     end = np.asarray(end, dtype=float)
     v = (end - start) / duration
@@ -59,8 +63,9 @@ def linear_obstacle(start: np.ndarray, end: np.ndarray, duration: float,
     return at
 
 
-def stationary_obstacle(p: np.ndarray, radius: float = 0.08,
+def stationary_obstacle(p: np.ndarray, radius: float = 0.10,
                         label: str = "drum") -> ObstacleTraj:
+    """Fixed obstacle at position p."""
     p = np.asarray(p, dtype=float)
     zero = np.zeros(3)
 
@@ -70,152 +75,157 @@ def stationary_obstacle(p: np.ndarray, radius: float = 0.08,
     return at
 
 
-# Adversarial nominal motion: small EE +x drift (toward obstacle in head-on).
-# Used for "task pulls toward danger" variants. ~0.05 m/s EE motion via shoulder.
-_NOM_DRIFT_X = np.array([0.0, 0.0, 0.0, -0.5, 0.0, 0.0])  # wrist1 ≈ EE +x
+# Nominal refueling motion: multi-joint arc that moves the EE forward and
+# slightly downward — mimics the coarse approach segment of a refueling mission.
+# ~0.05 m/s EE velocity via joints 2 and 4.
+_NOM_REFUEL = np.array([0.0, 0.1, -0.05, 0.0, 0.1, 0.0])
 
 
 # ── concrete scenarios ────────────────────────────────────────────────
 
-def _along_x(offset_x: float, side_y: float = 0.0, dz: float = 0.0) -> np.ndarray:
-    return P_EE_HOME + np.array([offset_x, side_y, dz])
+def _offset(dx: float = 0, dy: float = 0, dz: float = 0) -> np.ndarray:
+    """Helper: offset from home EE position."""
+    return P_EE_HOME + np.array([dx, dy, dz])
 
 
 def head_on(speed: float = 0.5) -> Scenario:
-    """Head-on approach toward stationary EE.
+    """Obstacle approaches the EE head-on along +x.
 
-    Robot at rest; obstacle aimed straight at EE_home from +x. End point is
-    0.10 m past EE so a passive arm WILL be hit (sphere radius 0.08 m).
+    Start: 0.60 m ahead of EE (well outside all influence radii).
+    End: 0.10 m behind EE (guaranteed collision if arm stays put).
     """
-    duration = 0.45 / max(speed, 0.1) + 0.5
+    duration = 0.70 / max(speed, 0.1)
     return Scenario(
         name=f"head_on_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=_along_x(+0.35),
-            end=_along_x(-0.10),
+            start=_offset(dx=+0.60),
+            end=_offset(dx=-0.10),
             duration=duration,
-            radius=0.08,
+            radius=0.10,
             label="head_on",
         ),
-        nominal_qdot=_NOM_DRIFT_X.copy(),
-        description="Robot at rest; obstacle approaches head-on along +x.",
+        nominal_qdot=_NOM_REFUEL.copy(),
+        description=f"Head-on +x approach at {speed} m/s; arm executing refuel arc.",
     )
 
 
 def oblique(speed: float = 0.5, angle_deg: float = 45.0) -> Scenario:
-    """Diagonal approach toward stationary EE."""
+    """Obstacle approaches at an angle in the xy-plane."""
     a = np.deg2rad(angle_deg)
     direction = np.array([-np.cos(a), -np.sin(a), 0.0])
-    duration = 0.45 / max(speed, 0.1) + 0.5
-    start = P_EE_HOME - direction * 0.35
-    end = P_EE_HOME + direction * 0.10
+    duration = 0.70 / max(speed, 0.1)
+    start = P_EE_HOME - direction * 0.60   # 0.60 m away along approach axis
+    end = P_EE_HOME + direction * 0.10     # 0.10 m past EE
     return Scenario(
         name=f"oblique_{int(angle_deg)}_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(start=start, end=end, duration=duration,
-                                      radius=0.08, label=f"oblique_{int(angle_deg)}"),
-        nominal_qdot=_NOM_DRIFT_X.copy(),
-        description=f"Robot at rest; obstacle approaches at {angle_deg}° in xy plane.",
+                                      radius=0.10, label=f"oblique_{int(angle_deg)}"),
+        nominal_qdot=_NOM_REFUEL.copy(),
+        description=f"Oblique {angle_deg}° approach at {speed} m/s.",
     )
 
 
 def passing(speed: float = 0.5) -> Scenario:
-    """Obstacle passes ~0.30 m to the side. Methods should NOT trigger.
+    """Obstacle passes 0.50 m to the side. Methods should NOT trigger.
 
-    False-positive test. With 0.08 m radius and 0.30 m offset, separation
-    is always > 0.22 m which exceeds danger_distance (0.20 m).
+    False-positive test. Obstacle travels along x-axis at y = +0.50 m offset.
+    With 0.10 m radius the minimum clearance is ~0.40 m.
     """
-    duration = 3.0
-    side = 0.30
+    duration = 2.0
     travel = speed * duration
     return Scenario(
         name=f"passing_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=P_EE_HOME + np.array([+0.05, +side, 0.0]) - np.array([0, travel / 2, 0]),
-            end=P_EE_HOME + np.array([+0.05, +side, 0.0]) + np.array([0, travel / 2, 0]),
+            start=P_EE_HOME + np.array([-travel/2, +0.50, 0.0]),
+            end=P_EE_HOME + np.array([+travel/2, +0.50, 0.0]),
             duration=duration,
-            radius=0.08,
+            radius=0.10,
             label="passerby",
         ),
-        nominal_qdot=_NOM_DRIFT_X.copy(),
-        description="Obstacle passes 0.30 m to the side — must NOT false-trigger.",
+        nominal_qdot=_NOM_REFUEL.copy(),
+        description="Obstacle passes 0.50 m laterally — must NOT trigger.",
     )
 
 
 def fast_dash(speed: float = 1.5) -> Scenario:
-    """Worst-case fast head-on dash. Larger bubble."""
-    duration = 0.55 / max(speed, 0.1) + 0.3
+    """Worst-case fast head-on dash (e.g. a child running). Larger bubble."""
+    duration = 0.80 / max(speed, 0.1)
     return Scenario(
         name=f"fast_dash_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=_along_x(+0.45),
-            end=_along_x(-0.10),
+            start=_offset(dx=+0.70),
+            end=_offset(dx=-0.10),
             duration=duration,
-            radius=0.10,
-            label="dash",
+            radius=0.15,
+            label="child_running",
         ),
-        nominal_qdot=_NOM_DRIFT_X.copy(),
-        description="Fast head-on dash, 0.10 m bubble; tight reaction window.",
+        nominal_qdot=_NOM_REFUEL.copy(),
+        description=f"Fast dash at {speed} m/s; larger 0.15 m bubble.",
     )
 
 
 def static_in_path() -> Scenario:
-    """Stationary obstacle in workspace. With nominal=0 the EE wouldn't hit it,
-    so we use adversarial qdot pulling EE toward the obstacle."""
-    p = P_EE_HOME + np.array([+0.10, 0.0, 0.0])
+    """Stationary drum placed 0.25 m ahead of EE in the refueling path.
+
+    Nominal motion drives the EE toward it — method MUST override task.
+    """
+    p = _offset(dx=+0.25)
     return Scenario(
         name="static_in_path",
-        duration=2.0,
-        obstacle_traj=stationary_obstacle(p, radius=0.08, label="drum"),
-        nominal_qdot=_NOM_DRIFT_X.copy(),  # task moves EE toward drum
-        description="Drum 0.10 m ahead; nominal task pulls EE toward it — must override.",
+        duration=3.0,
+        obstacle_traj=stationary_obstacle(p, radius=0.10, label="drum"),
+        nominal_qdot=_NOM_REFUEL.copy(),
+        description="Drum 0.25 m ahead; nominal task drives EE into it.",
     )
 
 
-def vertical_drop(speed: float = 0.5) -> Scenario:
-    """Object drops onto stationary EE from above."""
-    duration = 0.5 / max(speed, 0.1) + 0.2
+def vertical_drop(speed: float = 0.8) -> Scenario:
+    """Object drops onto EE from above (e.g. a tool falling from a shelf)."""
+    duration = 0.70 / max(speed, 0.1)
     return Scenario(
         name=f"vertical_drop_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=P_EE_HOME + np.array([0.0, 0.0, +0.40]),
-            end=P_EE_HOME + np.array([0.0, 0.0, -0.10]),
+            start=_offset(dz=+0.60),
+            end=_offset(dz=-0.10),
             duration=duration,
-            radius=0.08,
+            radius=0.10,
             label="dropped_tool",
         ),
-        nominal_qdot=_NOM_DRIFT_X.copy(),
-        description="Object falls onto stationary EE from above.",
+        nominal_qdot=_NOM_REFUEL.copy(),
+        description="Object drops onto EE from 0.60 m above.",
     )
 
 
 def adversarial_head_on(speed: float = 0.5) -> Scenario:
-    """Worst case: nominal task moves EE toward incoming obstacle.
+    """Worst case: obstacle head-on AND nominal task pulls EE toward it.
 
-    Tests whether the safety method can override active task motion.
+    Uses a stronger forward-driving nominal qdot to stress the safety filter.
     """
-    duration = 0.45 / max(speed, 0.1) + 0.5
+    duration = 0.70 / max(speed, 0.1)
+    # Stronger forward motion (joint 2 pushing EE in +x)
+    adversarial_nom = np.array([0.0, 0.3, -0.15, 0.0, 0.2, 0.0])
     return Scenario(
         name=f"adversarial_head_on_{speed:.1f}",
         duration=duration,
         obstacle_traj=linear_obstacle(
-            start=_along_x(+0.35),
-            end=_along_x(-0.10),
+            start=_offset(dx=+0.60),
+            end=_offset(dx=-0.10),
             duration=duration,
-            radius=0.08,
+            radius=0.10,
             label="adversarial",
         ),
-        nominal_qdot=_NOM_DRIFT_X.copy(),
-        description="Obstacle head-on AND nominal task pulls EE forward.",
+        nominal_qdot=adversarial_nom.copy(),
+        description="Head-on + nominal task drives EE forward — hardest scenario.",
     )
 
 
 def all_scenarios() -> list[Scenario]:
-    """Default benchmark suite — diverse, deterministic, all force a reaction."""
+    """Default benchmark suite — 10 scenarios, all deterministic."""
     return [
         head_on(speed=0.3),
         head_on(speed=0.6),
@@ -225,6 +235,6 @@ def all_scenarios() -> list[Scenario]:
         passing(speed=0.5),
         fast_dash(speed=1.5),
         static_in_path(),
-        vertical_drop(speed=0.5),
+        vertical_drop(speed=0.8),
         adversarial_head_on(speed=0.5),
     ]

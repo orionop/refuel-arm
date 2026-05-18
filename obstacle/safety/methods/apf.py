@@ -34,11 +34,11 @@ from .base import SafetyMethod
 @dataclass
 class APFParams:
     k_att: float = 1.0       # attractive gain (toward nominal motion)
-    k_rep: float = 2.0       # repulsive gain
-    k_swirl: float = 1.5     # circular-field gain
-    rho_0: float = 0.6       # influence radius [m]
+    k_rep: float = 0.15      # repulsive gain (scaled for KR6 R700, 0.70m reach)
+    k_swirl: float = 0.5     # circular-field gain
+    rho_0: float = 0.50      # influence radius [m] (~70% of reach)
     eta_v: float = 0.3       # weight on obstacle relative velocity
-    qdot_max: float = 1.5    # per-joint velocity bound [rad/s] applied after pinv
+    qdot_max: float = 5.59   # per-joint velocity bound [rad/s] (KR6 R700 slowest axis)
 
 
 class APFCircularFields(SafetyMethod):

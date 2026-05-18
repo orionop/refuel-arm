@@ -53,3 +53,14 @@ obstacle/Universal_Robots_ROS2_GZ_Simulation/
 __pycache__/
 *.pyc
 scratch/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# NEO baseline — cloned third-party repos (re-cloneable from upstream)
+obstacle/neo_baseline/neo/
+obstacle/neo_baseline/robotics-toolbox-python/
+obstacle/neo_baseline/swift/
+obstacle/neo_baseline/pybullet_build.log

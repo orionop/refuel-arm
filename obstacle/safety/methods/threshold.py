@@ -19,7 +19,7 @@ from .base import SafetyMethod
 class DistanceThreshold(SafetyMethod):
     name = "threshold"
 
-    def __init__(self, r_safe: float = 0.4) -> None:
+    def __init__(self, r_safe: float = 0.40) -> None:  # ~57% of KR6 reach
         self.r_safe = r_safe
 
     def step(
