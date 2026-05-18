@@ -228,9 +228,14 @@ class NEONode:
         Ain[:n, :n], bin_[:n] = robot.joint_velocity_damper(ps, pi_inf, n)
 
         with self.obs_lock:
-            obstacles_snapshot = list(self.obstacles.values())
+            obstacles_snapshot = list(self.obstacles.items())
+            smoothed_v_snapshot = dict(self.obstacle_smoothed_v)
 
-        for collision in obstacles_snapshot:
+        # Per-step debug stats
+        n_obstacle_rows = 0
+        per_obs_log = []
+
+        for name, collision in obstacles_snapshot:
             try:
                 c_Ain, c_bin = robot.link_collision_damper(
                     collision,
@@ -242,12 +247,31 @@ class NEONode:
                     end=robot.link_dict["panda_hand"],
                 )
             except Exception:
+                per_obs_log.append((name, "exception", None, None))
                 continue
+            v_est = smoothed_v_snapshot.get(name, (0.0, 0.0, 0.0))
             if c_Ain is not None and c_bin is not None:
                 c_Ain = c_Ain[:, :n]
                 c_Ain = np.c_[c_Ain, np.zeros((c_Ain.shape[0], 6))]
                 Ain = np.r_[Ain, c_Ain]
                 bin_ = np.r_[bin_, c_bin]
+                n_obstacle_rows += c_Ain.shape[0]
+                per_obs_log.append((name, "in_range", c_Ain.shape[0], v_est))
+            else:
+                per_obs_log.append((name, "out_of_range", 0, v_est))
+
+        # Throttled debug: once per ~second
+        rospy.loginfo_throttle(
+            1.0,
+            "[neo] obs_rows=%d, details=%s",
+            n_obstacle_rows,
+            ", ".join(
+                "%s[%s, rows=%s, v=(%.2f,%.2f,%.2f)]" % (
+                    n, st, str(r) if r is not None else "?",
+                    ve[0], ve[1], ve[2]
+                ) for (n, st, r, ve) in per_obs_log if ve is not None
+            ) if per_obs_log else "no obstacles",
+        )
 
         c = np.r_[-robot.jacobm(q).reshape((n,)), np.zeros(6)]
 
